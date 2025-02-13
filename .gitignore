@@ -1,0 +1,35 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# TypeScript
+*.tsbuildinfo
+/dist/
+
+# VSCode settings
+.vscode/
+
+# Logs
+*.log
+
+# Operating System files
+.DS_Store  # macOS
+Thumbs.db  # Windows
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Optional: If you use a package manager lock file (npm, yarn, pnpm)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Compiled files (if not using /dist/)
+*.js
+*.js.map
