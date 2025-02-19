@@ -27,7 +27,8 @@ const registerController = catchAsync(async (req: Request, res: Response) => {
   const { user, accessToken, refreshToken } = await createAccount({
     email: request.email,
     password: request.password,
-    userAgent: request.userAgent,
+    userAgent: request.git push origin backend
+    
   });
 
   // Return the response
