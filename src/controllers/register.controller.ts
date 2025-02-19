@@ -34,7 +34,7 @@ const registerController = catchAsync(async (req: Request, res: Response) => {
   setAuthCookies({ res, accessToken, refreshToken });
   return res.status(HttpStatusCode.CREATED).json({
     status: "Registered successfully!",
-    user,
+    user: user.omitPassword(),
   });
 });
 
