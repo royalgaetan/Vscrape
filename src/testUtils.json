@@ -1,0 +1,68 @@
+ const fakeUsers = [
+  {
+    "email": "zoe@gmail.com",
+    "password": "zoe123",
+    "confirmPassword": "zoe123"
+  },
+  {
+    "email": "max@gmail.com",
+    "password": "max123",
+    "confirmPassword": "max123"
+  },
+  {
+    "email": "luc@gmail.com",
+    "password": "luc123",
+    "confirmPassword": "luc123"
+  }
+,
+  {
+    "email": "emma@gmail.com",
+    "password": "emma123",
+    "confirmPassword": "emma123"
+  },
+  {
+    "email": "leo@gmail.com",
+    "password": "leo123",
+    "confirmPassword": "leo123"
+  },
+  {
+    "email": "sam@gmail.com",
+    "password": "sam123",
+    "confirmPassword": "sam123"
+  },
+  {
+    "email": "jake@gmail.com",
+    "password": "jake123",
+    "confirmPassword": "jake123"
+  },
+  {
+    "email": "olga@gmail.com",
+    "password": "olga123",
+    "confirmPassword": "olga123"
+  },
+  {
+    "email": "lucas@gmail.com",
+    "password": "lucas123",
+    "confirmPassword": "lucas123"
+  },
+  {
+    "email": "mia@gmail.com",
+    "password": "mia123",
+    "confirmPassword": "mia123"
+  },
+  {
+    "email": "jay@gmail.com",
+    "password": "jay123",
+    "confirmPassword": "jay123"
+  },
+  {
+    "email": "tess@gmail.com",
+    "password": "tess123",
+    "confirmPassword": "tess123"
+  },
+  {
+    "email": "noa@gmail.com",
+    "password": "noa123",
+    "confirmPassword": "noa123"
+  }
+]
