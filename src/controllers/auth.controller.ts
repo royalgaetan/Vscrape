@@ -6,6 +6,7 @@ import {
   createAccount,
   loginAccount,
   refreshAccessToken,
+  verifyEmail,
 } from "../services/auth.service";
 import {
   clearAuthCookies,
@@ -29,6 +30,8 @@ const registerSchema = authSchema
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
   });
+
+const verificationCodeSchema = z.string().min(1).max(24);
 
 export const registerController = catchAsync(
   async (req: Request, res: Response) => {
@@ -83,15 +86,15 @@ export const logoutController = catchAsync(
     appAssert(
       accessToken,
       HttpStatusCode.BAD_REQUEST,
-      "Can't log out. Try again later"
+      "Can't log out. Access Token is missing."
     );
 
-    // Verify token payload
+    // Verify access token payload
     const payload = await verifyToken(accessToken, tokenType.ACCESS_TOKEN);
     appAssert(
       payload,
       HttpStatusCode.UNAUTHORIZED,
-      "Can't log out. Token error."
+      "Can't log out. Invalid Access Token."
     );
 
     // Delete corresponding session
@@ -116,7 +119,7 @@ export const refreshController = catchAsync(
     appAssert(
       refreshToken,
       HttpStatusCode.BAD_REQUEST,
-      "Refresh token missing"
+      "Refresh Token is missing."
     );
 
     // Call the service
@@ -126,6 +129,7 @@ export const refreshController = catchAsync(
 
     /**
      * Return new accessToken
+     * With new cookies updated with token new expiration dates
      * (and refreshToken if it was near expiration)
      */
     let additional = undefined;
@@ -135,7 +139,7 @@ export const refreshController = catchAsync(
         newRefreshToken,
         getCookieOptions(tokenType.REFRESH_TOKEN)
       );
-      additional = { additional: "refresh token renewed (silently)" };
+      additional = { additional: "Refresh Token renewed (silently)" };
     }
     return res
       .status(HttpStatusCode.OK)
@@ -145,8 +149,23 @@ export const refreshController = catchAsync(
         getCookieOptions(tokenType.ACCESS_TOKEN)
       )
       .json({
-        message: "Access token refresh",
+        message: "Access Token refreshed",
         ...(additional && additional),
       });
+  }
+);
+
+export const verifyEmailController = catchAsync(
+  async (req: Request, res: Response) => {
+    // Parse the code from request
+    const verificationCode = verificationCodeSchema.parse(req.params.code);
+
+    // Call the service
+    await verifyEmail(verificationCode);
+
+    // Return the response
+    res.status(HttpStatusCode.OK).json({
+      message: "Email verified.",
+    });
   }
 );

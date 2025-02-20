@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import { AppError } from "../utils/error";
 import { NODE_ENV } from "../constants/env";
 import { clearAuthCookies, REFRESH_PATH } from "../utils/cookies";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 const handleZodErrors = (res: Response, zErrors: ZodError) => {
   const errors = zErrors.issues.map((err) => ({
@@ -32,6 +33,19 @@ const handleLogs = (req: Request, error: any) => {
   }
 };
 
+const handleJWTErrors = (
+  res: Response,
+  error: TokenExpiredError | JsonWebTokenError
+) => {
+  return res.status(HttpStatusCode.UNAUTHORIZED).json({
+    message:
+      error instanceof TokenExpiredError
+        ? "Refresh Token is invalid."
+        : "Token error.",
+    error: error.message,
+  });
+};
+
 const errorHandler: ErrorRequestHandler = (error, req, res, next): any => {
   // Handle logs:
   handleLogs(req, error);
@@ -39,6 +53,14 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next): any => {
   // Handle error from "refreshToken path": if any, reset cookies
   if (req.path === REFRESH_PATH) {
     clearAuthCookies(res);
+  }
+
+  // Handle JWT Token Expired Error
+  if (
+    error instanceof TokenExpiredError ||
+    error instanceof JsonWebTokenError
+  ) {
+    return handleJWTErrors(res, error);
   }
 
   // Handle errors from Zod validation (z.schema.parse())

@@ -94,12 +94,12 @@ export const loginAccount = async (data: AccountParam) => {
 export const refreshAccessToken = async (refreshToken: string) => {
   // Verify refreshToken payload
   const payload = await verifyToken(refreshToken, tokenType.REFRESH_TOKEN);
-  appAssert(payload, HttpStatusCode.UNAUTHORIZED, "Invalid refresh token");
+  appAssert(payload, HttpStatusCode.UNAUTHORIZED, "Invalid Refresh Token.");
 
   // Verify if the session if in Session Store (DB) or Not expired
   const now = Date.now();
   const session = await SessionModel.findOne({
-    sessionId: payload.sessionId,
+    _id: payload.sessionId,
     expiresAt: { $gt: now },
   });
   appAssert(session, HttpStatusCode.UNAUTHORIZED, "Session expired.");
@@ -110,7 +110,7 @@ export const refreshAccessToken = async (refreshToken: string) => {
     session.expiresAt = thirtyDaysFromNow();
     await session.save();
 
-    // Generate a new refresh token (sync with the new session in term of expiration date)
+    // Generate a new refresh token (synced with the new session in term of expiration date)
     newRefreshToken = generateToken(
       { sessionId: session._id },
       tokenType.REFRESH_TOKEN
@@ -127,5 +127,38 @@ export const refreshAccessToken = async (refreshToken: string) => {
   return {
     newAccessToken,
     newRefreshToken,
+  };
+};
+
+export const verifyEmail = async (verificationCode: string) => {
+  // Verify if the Email Verification Code exists in DB and is still valide (not expired)
+  const validCode = await VerificationCodeModel.findOne({
+    _id: verificationCode,
+    verificationType: verificationCodeType.EmailVerification,
+    expiresAt: { $gt: new Date() },
+  });
+  appAssert(
+    validCode,
+    HttpStatusCode.NOT_FOUND,
+    "Verification code invalid or expired."
+  );
+
+  // Get the (owner) user and update the verified field to "true"
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    validCode.userId,
+    {
+      verified: true,
+    },
+    { new: true }
+  );
+  appAssert(
+    updatedUser,
+    HttpStatusCode.INTERNAL_SERVER_ERROR,
+    "Failed to verify email"
+  );
+
+  // return the user
+  return {
+    user: updatedUser.omitPassword,
   };
 };

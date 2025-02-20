@@ -3,3 +3,5 @@ TODO Auth:
 	-TODO: Refresh Token Rotation prevents reuse of stolen tokens.
 	-TODO: Session Validation (IP + Device Check) blocks refresh attempts from unknown devices.
 	-TODO: Token Blacklisting & Revoke on Logout ensures security.
+	
+	-TODO: Handle multiple login attempts which creates multiple sessions 
