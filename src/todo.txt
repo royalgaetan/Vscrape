@@ -1,0 +1,5 @@
+TODO Auth:
+    -TODO: Store user IP + device info in the session, and reject refresh requests from unknown locations.
+	-TODO: Refresh Token Rotation prevents reuse of stolen tokens.
+	-TODO: Session Validation (IP + Device Check) blocks refresh attempts from unknown devices.
+	-TODO: Token Blacklisting & Revoke on Logout ensures security.

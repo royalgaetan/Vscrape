@@ -3,6 +3,7 @@ import { HttpStatusCode } from "../constants/httpCodes";
 import { ZodError } from "zod";
 import { AppError } from "../utils/error";
 import { NODE_ENV } from "../constants/env";
+import { clearAuthCookies, REFRESH_PATH } from "../utils/cookies";
 
 const handleZodErrors = (res: Response, zErrors: ZodError) => {
   const errors = zErrors.issues.map((err) => ({
@@ -34,6 +35,11 @@ const handleLogs = (req: Request, error: any) => {
 const errorHandler: ErrorRequestHandler = (error, req, res, next): any => {
   // Handle logs:
   handleLogs(req, error);
+
+  // Handle error from "refreshToken path": if any, reset cookies
+  if (req.path === REFRESH_PATH) {
+    clearAuthCookies(res);
+  }
 
   // Handle errors from Zod validation (z.schema.parse())
   if (error instanceof ZodError) {

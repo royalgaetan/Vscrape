@@ -1,11 +1,17 @@
 import { Router } from "express";
-import registerController from "../controllers/register.controller";
-import loginController from "../controllers/loginController";
+import {
+  registerController,
+  loginController,
+  logoutController,
+  refreshController,
+} from "../controllers/auth.controller";
 
 const authRoutes = Router();
 
 // prefix: '/auth'
 authRoutes.post("/register", registerController);
 authRoutes.post("/login", loginController);
+authRoutes.get("/logout", logoutController);
+authRoutes.get("/refresh", refreshController);
 
 export default authRoutes;
