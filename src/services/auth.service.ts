@@ -1,13 +1,23 @@
-import { JWT_REFRESH_SECRET, JWT_SECRET } from "../constants/env";
+import { APP_ORIGIN } from "../constants/env";
 import verificationCodeType from "../constants/verificationCodeType";
 import { SessionModel } from "../models/session.model";
 import { UserModel } from "../models/user.model";
 import { VerificationCodeModel } from "../models/verificationCode.model";
-import { ONE_DAY_MS, oneYearFromNow, thirtyDaysFromNow } from "../utils/date";
-import jwt from "jsonwebtoken";
+import {
+  fiveMinutesAgo,
+  ONE_DAY_MS,
+  thirtyDaysFromNow,
+  thirtyMinutesFromNow,
+} from "../utils/date";
+
 import appAssert from "../utils/error";
 import { HttpStatusCode } from "../constants/httpCodes";
 import { generateToken, tokenType, verifyToken } from "../utils/token";
+import { sendEmail } from "../utils/email";
+import {
+  getEmailVerificationTemplate,
+  getPasswordResetTemplate,
+} from "../constants/emailTemplates";
 
 export type AccountParam = {
   email: string;
@@ -30,11 +40,15 @@ export const createAccount = async (data: AccountParam) => {
   const verificationCode = await VerificationCodeModel.create({
     userId: user._id,
     verificationType: verificationCodeType.EmailVerification,
-    expiresAt: oneYearFromNow(),
+    expiresAt: thirtyMinutesFromNow(),
   });
 
-  // send verification code
-  // TODO
+  // send verification code via Email
+  const verificationURL = `${APP_ORIGIN}/email/verify/${verificationCode._id}`;
+  const { emailStatus, emailError } = await sendEmail({
+    to: data.email,
+    ...getEmailVerificationTemplate(verificationURL),
+  });
 
   // create session
   const session = await SessionModel.create({
@@ -53,7 +67,7 @@ export const createAccount = async (data: AccountParam) => {
   );
 
   // return new user data & tokens
-  return { user, accessToken, refreshToken };
+  return { user, accessToken, refreshToken, emailError, emailStatus };
 };
 
 export const loginAccount = async (data: AccountParam) => {
@@ -157,8 +171,63 @@ export const verifyEmail = async (verificationCode: string) => {
     "Failed to verify email"
   );
 
+  // Delete all verification codes from this user in the DB (to avoid double-verification)
+  await VerificationCodeModel.deleteMany({
+    userId: updatedUser._id,
+  });
+
   // return the user
   return {
     user: updatedUser.omitPassword,
   };
+};
+
+export const sendPasswordResetCode = async (email: string) => {
+  // Check if a user exists with the provided email.
+  const user = await UserModel.findOne({ email });
+  appAssert(user, HttpStatusCode.NOT_FOUND, "User not found.");
+
+  // Ensure a verification code hasn’t been sent to this user in the last 5 minutes.
+  const count = await VerificationCodeModel.countDocuments({
+    userId: user._id,
+    verificationType: verificationCodeType.PasswordVerification,
+    createdAt: { $gt: fiveMinutesAgo() },
+  });
+  appAssert(
+    count <= 1,
+    HttpStatusCode.TOO_MANY_REQUESTS,
+    "You’ve requested too many password resets. Please wait a bit and try again."
+  );
+
+  // Generate a new verification code for password reset.
+  const expiresAt = thirtyMinutesFromNow();
+  const verificationCode = await VerificationCodeModel.create({
+    userId: user._id,
+    verificationType: verificationCodeType.PasswordVerification,
+    expiresAt,
+  });
+  appAssert(
+    verificationCode,
+    HttpStatusCode.INTERNAL_SERVER_ERROR,
+    "There was an issue generating your verification code. Please try again shortly."
+  );
+
+  // Send the newly generated verification code to the user’s email.
+  const resetPasswordURL = `${APP_ORIGIN}/password/reset?code=${
+    verificationCode._id
+  }&exp=${expiresAt.getTime()}`;
+  const { emailStatus, emailError } = await sendEmail({
+    to: email,
+    ...getPasswordResetTemplate(resetPasswordURL),
+  });
+
+  // Return the email status and any errors if they occur.
+  return {
+    emailStatus,
+    emailError,
+  };
+};
+
+export const resetPassword = (resetPasswordCode: string) => {
+  return;
 };

@@ -6,6 +6,8 @@ import {
   createAccount,
   loginAccount,
   refreshAccessToken,
+  resetPassword,
+  sendPasswordResetCode,
   verifyEmail,
 } from "../services/auth.service";
 import {
@@ -17,15 +19,17 @@ import appAssert from "../utils/error";
 import { SessionModel } from "../models/session.model";
 import { tokenType, verifyToken } from "../utils/token";
 
+const emailSchema = z.string().email().min(4).max(255);
+const passwordSchema = z.string().min(6).max(255);
 const authSchema = z.object({
-  email: z.string().email().min(4).max(255),
-  password: z.string().min(6).max(255),
+  email: emailSchema,
+  password: passwordSchema,
   userAgent: z.string().optional(),
 });
 
 const registerSchema = authSchema
   .extend({
-    confirmPassword: z.string().min(6).max(255),
+    confirmPassword: passwordSchema,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -42,17 +46,22 @@ export const registerController = catchAsync(
     });
 
     // Call the service
-    const { user, accessToken, refreshToken } = await createAccount({
-      email: request.email,
-      password: request.password,
-      userAgent: request.userAgent,
-    });
+    const { user, accessToken, refreshToken, emailStatus, emailError } =
+      await createAccount({
+        email: request.email,
+        password: request.password,
+        userAgent: request.userAgent,
+      });
 
     // Return the response
     setAuthCookies({ res, accessToken, refreshToken });
     return res.status(HttpStatusCode.CREATED).json({
       status: "Registered successfully!",
       user: user.omitPassword(),
+      verification_email: {
+        status: emailStatus,
+        ...(emailError && { error: emailError }),
+      },
     });
   }
 );
@@ -166,6 +175,53 @@ export const verifyEmailController = catchAsync(
     // Return the response
     res.status(HttpStatusCode.OK).json({
       message: "Email verified.",
+    });
+  }
+);
+
+export const sendPasswordResetCodeController = catchAsync(
+  async (req: Request, res: Response) => {
+    // Validate request body
+    const email = emailSchema.parse(req.body.email);
+
+    // Call the service
+    const { emailStatus, emailError } = await sendPasswordResetCode(email);
+
+    // Return response
+    res.status(HttpStatusCode.OK).json({
+      message: "Password reset code sent successfully.",
+      reset_password_email: {
+        status: emailStatus,
+        ...(emailError && { error: emailError }),
+      },
+    });
+  }
+);
+
+export const resetPasswordController = catchAsync(
+  async (req: Request, res: Response) => {
+    // Verify code and expiration date from request
+    // const resetPasswordCode = verificationCodeSchema.parse(req.query.code);
+    const resetPasswordCode = "Aaa";
+    const now = Date.now();
+    const hasExpired = Number(req.query.exp) < now;
+    console.log("@@🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡");
+    console.log("@@code", req.query.code);
+    console.log("@@exp", req.query.exp);
+    appAssert(
+      req.query.code && !hasExpired,
+      HttpStatusCode.UNAUTHORIZED,
+      "Reset Password Code invalid or expired"
+    );
+
+    // Call the service
+    await resetPassword(resetPasswordCode);
+
+    // Reset Auth cookies (to trigger a new login from user)
+    // Return the response
+    return clearAuthCookies(res).status(HttpStatusCode.OK).json({
+      message:
+        "Your password has been successfully reset! You can now log in with your new credentials.",
     });
   }
 );

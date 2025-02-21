@@ -47,7 +47,9 @@ app.use(errorHandler);
 // Start server
 app.listen(PORT, async () => {
   console.log(`✅ Server successfully started on port: ${PORT}...`);
-  console.log(`✅ Node Environment: <${NODE_ENV}>...`);
+  console.log(
+    `✅ Node Environment: <${NODE_ENV}> ${NODE_ENV == "prod" ? "⚡" : "🛡️"}`
+  );
 
   await connectToDatabase();
 });
