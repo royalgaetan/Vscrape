@@ -9,15 +9,15 @@ import {
   resetPasswordController,
 } from "../controllers/auth.controller";
 
-const authRoutes = Router();
+const authRouter = Router();
 
 // prefix: '/auth'
-authRoutes.post("/register", registerController);
-authRoutes.post("/login", loginController);
-authRoutes.get("/logout", logoutController);
-authRoutes.get("/refresh", refreshController);
-authRoutes.get("/email/verify/:code", verifyEmailController);
-authRoutes.post("/password/forgot", sendPasswordResetCodeController);
-authRoutes.get("/password/reset", resetPasswordController);
+authRouter.post("/register", registerController);
+authRouter.post("/login", loginController);
+authRouter.get("/logout", logoutController);
+authRouter.get("/refresh", refreshController);
+authRouter.get("/email/verify/:code", verifyEmailController);
+authRouter.post("/password/forgot", sendPasswordResetCodeController);
+authRouter.post("/password/reset", resetPasswordController);
 
-export default authRoutes;
+export default authRouter;

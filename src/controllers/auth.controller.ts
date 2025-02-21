@@ -36,6 +36,10 @@ const registerSchema = authSchema
   });
 
 const verificationCodeSchema = z.string().min(1).max(24);
+const resetPasswordSchema = z.object({
+  resetCode: verificationCodeSchema,
+  newPassword: passwordSchema,
+});
 
 export const registerController = catchAsync(
   async (req: Request, res: Response) => {
@@ -108,7 +112,7 @@ export const logoutController = catchAsync(
 
     // Delete corresponding session
     await SessionModel.findOneAndDelete({
-      sessionId: payload.sessionId,
+      _id: payload.sessionId,
     });
 
     // Delete all sessions belonging to this users: aka log this user out from all devices
@@ -185,14 +189,13 @@ export const sendPasswordResetCodeController = catchAsync(
     const email = emailSchema.parse(req.body.email);
 
     // Call the service
-    const { emailStatus, emailError } = await sendPasswordResetCode(email);
+    const { emailStatus } = await sendPasswordResetCode(email);
 
     // Return response
     res.status(HttpStatusCode.OK).json({
       message: "Password reset code sent successfully.",
       reset_password_email: {
         status: emailStatus,
-        ...(emailError && { error: emailError }),
       },
     });
   }
@@ -200,22 +203,19 @@ export const sendPasswordResetCodeController = catchAsync(
 
 export const resetPasswordController = catchAsync(
   async (req: Request, res: Response) => {
-    // Verify code and expiration date from request
-    // const resetPasswordCode = verificationCodeSchema.parse(req.query.code);
-    const resetPasswordCode = "Aaa";
-    const now = Date.now();
-    const hasExpired = Number(req.query.exp) < now;
-    console.log("@@🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡");
-    console.log("@@code", req.query.code);
-    console.log("@@exp", req.query.exp);
+    // Verify code and new password
+    const request = resetPasswordSchema.parse({
+      resetCode: req.body.resetCode,
+      newPassword: req.body.newPassword,
+    });
     appAssert(
-      req.query.code && !hasExpired,
-      HttpStatusCode.UNAUTHORIZED,
-      "Reset Password Code invalid or expired"
+      request,
+      HttpStatusCode.BAD_REQUEST,
+      "Reset Password Code or New Password invalid."
     );
 
     // Call the service
-    await resetPassword(resetPasswordCode);
+    await resetPassword(request.resetCode, request.newPassword);
 
     // Reset Auth cookies (to trigger a new login from user)
     // Return the response

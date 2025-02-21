@@ -18,6 +18,7 @@ import {
   getEmailVerificationTemplate,
   getPasswordResetTemplate,
 } from "../constants/emailTemplates";
+import { hashValue } from "../utils/bcrypt";
 
 export type AccountParam = {
   email: string;
@@ -106,11 +107,11 @@ export const loginAccount = async (data: AccountParam) => {
 };
 
 export const refreshAccessToken = async (refreshToken: string) => {
-  // Verify refreshToken payload
+  // Verify refreshToken payload & validity (if not expired)
   const payload = await verifyToken(refreshToken, tokenType.REFRESH_TOKEN);
   appAssert(payload, HttpStatusCode.UNAUTHORIZED, "Invalid Refresh Token.");
 
-  // Verify if the session if in Session Store (DB) or Not expired
+  // Verify if the session exists Session Store (DB) or Not expired
   const now = Date.now();
   const session = await SessionModel.findOne({
     _id: payload.sessionId,
@@ -133,7 +134,7 @@ export const refreshAccessToken = async (refreshToken: string) => {
 
   // Generate a new access token
   const newAccessToken = generateToken(
-    { sessionId: session._id, userId: payload.userId },
+    { sessionId: session._id, userId: session.userId },
     tokenType.ACCESS_TOKEN
   );
 
@@ -212,22 +213,76 @@ export const sendPasswordResetCode = async (email: string) => {
     "There was an issue generating your verification code. Please try again shortly."
   );
 
-  // Send the newly generated verification code to the user’s email.
+  // Craft Reset URL to attach to email
   const resetPasswordURL = `${APP_ORIGIN}/password/reset?code=${
     verificationCode._id
   }&exp=${expiresAt.getTime()}`;
+
+  // Send the newly generated verification code to the user’s email.
   const { emailStatus, emailError } = await sendEmail({
     to: email,
     ...getPasswordResetTemplate(resetPasswordURL),
   });
+  appAssert(
+    !emailError,
+    HttpStatusCode.INTERNAL_SERVER_ERROR,
+    "Unable to send Reset Password Email"
+  );
 
-  // Return the email status and any errors if they occur.
+  // Return the email status
   return {
     emailStatus,
-    emailError,
   };
 };
 
-export const resetPassword = (resetPasswordCode: string) => {
-  return;
+export const resetPassword = async (
+  resetPasswordCode: string,
+  newPassword: string
+) => {
+  // Get verification code: check validity and expiration date
+  const resetCode = await VerificationCodeModel.findOne({
+    _id: resetPasswordCode,
+    verificationType: verificationCodeType.PasswordVerification,
+    expiresAt: { $gt: new Date() },
+  });
+  appAssert(
+    resetCode,
+    HttpStatusCode.UNAUTHORIZED,
+    "Reset Password Code invalid or expired."
+  );
+
+  // Hash new password
+  // Then Update user password with the new one
+  const newPasswordHashed = await hashValue(newPassword);
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    resetCode.userId,
+    {
+      password: newPasswordHashed,
+    },
+    {
+      new: true,
+    }
+  );
+  appAssert(
+    updatedUser,
+    HttpStatusCode.INTERNAL_SERVER_ERROR,
+    "Failed to reset password."
+  );
+
+  // Delete all sessions of this user in our Session Store (DB)
+  // The user will be logout from all others sessions/devices
+  await SessionModel.deleteMany({
+    userId: updatedUser._id,
+  });
+
+  // Delete all Reset Password Request of this user in our DB
+  await VerificationCodeModel.deleteMany({
+    userId: updatedUser._id,
+    verificationType: verificationCodeType.PasswordVerification,
+  });
+
+  // Return the reponse
+  return {
+    user: updatedUser.omitPassword(),
+  };
 };

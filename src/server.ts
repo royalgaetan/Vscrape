@@ -10,6 +10,10 @@ import { HttpStatusCode } from "./constants/httpCodes";
 import authRoutes from "./routes/auth.route";
 import morgan from "morgan";
 import { Request, Response, NextFunction } from "express";
+import authRouter from "./routes/auth.route";
+import userRouter from "./routes/me.route";
+import authenticate from "./middleware/authenticate.middleware";
+import meRouter from "./routes/me.route";
 
 const express: typeof import("express") = require("express");
 
@@ -39,7 +43,16 @@ app.get(
   })
 );
 
-app.use("/auth", authRoutes);
+// Auth Routes
+app.use("/auth", authRouter);
+
+// Protected Routes (me)
+app.use("/me", authenticate, meRouter);
+// app.use("/worflows/:workflowId/executions/:execId/phases/:phaseId", authenticate, workflowRouter);
+
+// Public Routes
+// app.use("/templates/workflows/:id", templatesRouter);
+// app.use("/users/:userId", userRouter);
 
 // Error Handler (main)
 app.use(errorHandler);
