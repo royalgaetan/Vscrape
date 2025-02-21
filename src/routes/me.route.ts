@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  deleteUserSessionController,
   getUserController,
   getUserSessionsController,
 } from "../controllers/user.controller";
@@ -13,7 +14,7 @@ meRouter.get("/", getUserController);
 
 // Me: sessions
 meRouter.get("/sessions", getUserSessionsController);
-// userRouter.delete('/session/:id',  deleteSessionsController)
+meRouter.delete("/session/:id", deleteUserSessionController);
 
 // meRouter.get('billing/', );
 
