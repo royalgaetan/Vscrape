@@ -1,4 +1,4 @@
-# Viff App Roadmap: things to do, add, and adjust
+# Vscrape App Roadmap: things to do, add, and adjust
 
 Auth:
 -TODO: Store user IP + device info in the session, and reject refresh requests from unknown locations.
