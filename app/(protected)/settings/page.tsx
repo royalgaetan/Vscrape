@@ -1,14 +1,19 @@
 "use client";
 
+import CustomButton from "@/components/global/custom_button";
 import { redirect } from "next/navigation";
 import React from "react";
 
 const SettingsPage = () => {
   return (
     <>
-      <div>SettingsPage</div>
+      <h2 className="my-2 font-bold text-lg">Settings ⚙️</h2>
       <br />
-      <button onClick={() => redirect("/dashboard")}>Up to Dashboard 📈</button>
+      <CustomButton
+        text="Up to Dashboard"
+        onClick={() => redirect("/dashboard")}
+        emoji="📈"
+      />
     </>
   );
 };
