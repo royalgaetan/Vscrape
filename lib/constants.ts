@@ -1,1 +1,1 @@
-export const appName = "V Scrape";
+export const appName = "Vscrape";
