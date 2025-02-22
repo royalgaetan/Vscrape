@@ -14,7 +14,7 @@ const CustomButton = ({ text, emoji, onClick }: Props) => {
     >
       {text}
       {emoji && (
-        <span className="block transition-all duration-200  group-hover/button:translate-x-1 translate-x-0">
+        <span className="block transition-all duration-200 group-hover/button:translate-x-1 translate-x-0">
           {emoji}
         </span>
       )}
