@@ -1,11 +1,9 @@
-import { createContext, useState } from "react";
+"use client";
 
-const AuthContext = createContext<AuthContextValues>({
-  isAuthenticated: false,
-  isLoading: false,
-  logout: () => {},
-  login: () => {},
-});
+import { createContext, useState } from "react";
+export const AuthContext = createContext<AuthContextValues | undefined>(
+  undefined
+);
 
 type AuthContextValues = {
   isLoading: boolean;
@@ -35,5 +33,3 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     </AuthContext.Provider>
   );
 };
-
-export default AuthContext;

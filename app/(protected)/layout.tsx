@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useContext } from "react";
-import Sidebar from "@/components/global/sidebar";
+import React from "react";
 import { redirect } from "next/navigation";
-import AuthContext from "@/providers/authProvider";
-import CustomButton from "@/components/global/custom_button";
+import { useAuth } from "@/hooks/useAuth";
 import CustomLoader from "@/components/global/loader";
-
+import Sidebar from "@/components/global/sidebar";
+import CustomButton from "@/components/global/custom_button";
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading, logout } = useContext(AuthContext);
+  const { isAuthenticated, isLoading, logout } = useAuth();
 
   if (isLoading) {
     return <CustomLoader />;

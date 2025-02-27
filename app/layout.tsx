@@ -1,20 +1,8 @@
-"use client";
-
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
 import { appName } from "@/lib/constants";
+import { geistMono, geistSans } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/authProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export default function RootLayout({
   children,
@@ -29,6 +17,10 @@ export default function RootLayout({
           name="description"
           content="Take automation to the next level: create workflows, scrape the web while you sleep, extract data with AI, and export it in any format."
         ></meta>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/dheereshagrwal/coloured-icons@1.8.7/src/app/ci.min.css"
+        />
       </head>
       <body
         className={cn(
