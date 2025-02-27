@@ -14,8 +14,6 @@ const Wizard = () => {
         onClick={() => redirect("/dashboard")}
         emoji="📈"
       />
-      <br />
-      <br />
       <CustomButton
         text="Go to settings"
         onClick={() => redirect("/settings")}
