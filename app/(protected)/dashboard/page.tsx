@@ -14,6 +14,11 @@ const Dashboard = () => {
         onClick={() => redirect("/settings")}
         emoji="⚙️"
       />
+      <CustomButton
+        text="Go to Wizard"
+        onClick={() => redirect("/wizard")}
+        emoji="🪄"
+      />
     </>
   );
 };

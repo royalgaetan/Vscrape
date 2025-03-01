@@ -16,15 +16,15 @@ export const appName = "Vscrape";
 
 export const appUseCases = {
   "Competitor Price Tracking": BarChart,
+  "Review Sentiment Analysis": SmileIcon,
   "Image Resizing": Crop,
   "Product Scraping": Database,
   "Price Monitoring": Tag,
   "Market Trend Tracking": LineChart,
+  "Sales Trend Analysis": TrendingUp,
   "Catalog Updates": FileText,
   "Attribute Extraction": ListOrdered,
-  "Sales Trend Analysis": TrendingUp,
   "Inventory Alerts": Bell,
-  "Review Sentiment Analysis": SmileIcon,
   Other: MoreHorizontal,
 };
 
