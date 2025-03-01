@@ -22,7 +22,7 @@ const Home = () => {
       textareaRef.current.style.height = "auto"; // Reset height
       const scrollHeight = textareaRef.current.scrollHeight;
       const maxHeight =
-        3 * parseFloat(getComputedStyle(textareaRef.current).lineHeight);
+        5 * parseFloat(getComputedStyle(textareaRef.current).lineHeight);
 
       textareaRef.current.style.height = `${Math.min(
         scrollHeight,
@@ -42,7 +42,7 @@ const Home = () => {
           <Textarea
             className="mb-4 placeholder:text-muted-foreground/70 placeholder:font-normal border-none focus:ring-0 focus:outline-none focus-visible:ring-0 resize-none shadow-none overflow-hidden"
             maxLength={2000}
-            style={{ lineHeight: "2rem" }}
+            style={{ lineHeight: "1.1rem" }}
             ref={textareaRef}
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -65,12 +65,12 @@ const Home = () => {
           </Button>
 
           <Button variant={"ghost"} size={"sm"} className="w-fit">
-            <ShoppingCartIcon className="stroke-emerald-700" size={"1.3rem"} />
+            <ShoppingCartIcon className="stroke-green-700" size={"1.3rem"} />
             Pick from Marketplace
           </Button>
 
           <Button variant={"ghost"} size={"sm"} className="w-fit">
-            <FileInputIcon className="stroke-pink-600" size={"1.3rem"} />
+            <FileInputIcon className="stroke-pink-500" size={"1.3rem"} />
             Import an existing
           </Button>
         </div>
