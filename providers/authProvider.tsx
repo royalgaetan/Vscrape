@@ -13,7 +13,7 @@ type AuthContextValues = {
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setAuthenticated] = useState(false);
+  const [isAuthenticated, setAuthenticated] = useState(true);
   const [isLoading, setLoading] = useState(false);
 
   const login = () => switchAuthTo(true);

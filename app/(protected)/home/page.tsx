@@ -2,20 +2,27 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { HomeTextareaPlaceholders } from "@/lib/constants";
 import {
   FileInputIcon,
-  Import,
+  HelpCircleIcon,
   PencilLineIcon,
-  ShoppingBagIcon,
   ShoppingCartIcon,
   Terminal,
 } from "lucide-react";
-import { redirect } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 const Home = () => {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [placeholder, setPlaceholder] = useState("");
+
+  useEffect(() => {
+    const randomIndex = Math.floor(
+      Math.random() * HomeTextareaPlaceholders.length
+    );
+    setPlaceholder(HomeTextareaPlaceholders[randomIndex]);
+  }, []);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -47,11 +54,16 @@ const Home = () => {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             rows={1}
-            placeholder="What automation would you like me to create for you?"
+            placeholder={placeholder}
           />
 
           <div className="flex flex-1 justify-end">
-            <Button variant={"outline"} size={"sm"} className="w-fit">
+            <Button
+              variant={"outline"}
+              size={"sm"}
+              className="w-fit"
+              disabled={value.length < 2}
+            >
               <Terminal className="" size={"1.3rem"} />
               Generate
             </Button>
@@ -72,6 +84,11 @@ const Home = () => {
           <Button variant={"ghost"} size={"sm"} className="w-fit">
             <FileInputIcon className="stroke-pink-500" size={"1.3rem"} />
             Import an existing
+          </Button>
+
+          <Button variant={"ghost"} size={"sm"} className="w-fit">
+            <HelpCircleIcon className="stroke-blue-400" size={"1.3rem"} />
+            Help
           </Button>
         </div>
 

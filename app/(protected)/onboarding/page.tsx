@@ -28,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { generateAvatar } from "@/lib/avatar";
-import { Divide, RefreshCwIcon } from "lucide-react";
+import { RefreshCwIcon } from "lucide-react";
 import {
   Carousel,
   CarouselApi,
