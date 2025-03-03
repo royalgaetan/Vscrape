@@ -9,12 +9,14 @@ const LogoAndText = () => {
       <Image
         alt="Vscrape logo"
         src={"/Vscrape logo.png"}
-        className=""
+        className="select-none"
         width={35}
         height={35}
       />
 
-      <h3 className={cn("font-semibold text-lg  text-[#333]")}>{appName}</h3>
+      <h3 className={cn("select-none font-semibold text-lg  text-[#333]")}>
+        {appName}
+      </h3>
     </div>
   );
 };

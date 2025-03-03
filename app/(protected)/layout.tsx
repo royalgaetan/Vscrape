@@ -4,12 +4,9 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import CustomLoader from "@/components/global/loader";
-import Sidebar from "@/components/global/sidebar";
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from "@/components/ui/resizable";
+import AppSidebar from "@/components/global/app_sidebar";
+import AppHeader from "@/components/global/app_header";
+import { SidebarProvider } from "@/components/ui/sidebar";
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -21,23 +18,20 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="flex flex-1 h-full w-full">
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="flex flex-1 h-full w-full"
-      >
-        <ResizablePanel
-          defaultSize={17}
-          maxSize={22}
-          minSize={17}
-          className="h-screen bg-[#F8F8F7]"
-        >
-          <Sidebar />
-        </ResizablePanel>
-        <ResizableHandle />
-        <ResizablePanel className="flex flex-1">{children}</ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
+    <SidebarProvider>
+      <div className="flex flex-1 h-full w-full">
+        <AppSidebar />
+        <main className="flex flex-1">
+          <div className="flex flex-col w-full">
+            {/* Main Header */}
+            <AppHeader />
+
+            {/* Page Content */}
+            <div className="flex flex-1">{children}</div>
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 
