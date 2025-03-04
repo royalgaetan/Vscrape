@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { appName, appUseCases } from "@/lib/constants";
 import { redirect, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { onboardingFormSchema } from "@/lib/types";
+import { onboardingFormSchema } from "@/lib/schema_validation";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Image from "next/image";

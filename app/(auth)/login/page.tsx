@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authFormSchema } from "@/lib/types";
+import { authFormSchema } from "@/lib/schema_validation";
 import Link from "next/link";
 
 const LoginPage = () => {

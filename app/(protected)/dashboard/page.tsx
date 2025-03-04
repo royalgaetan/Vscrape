@@ -6,7 +6,7 @@ import React from "react";
 
 const Dashboard = () => {
   return (
-    <>
+    <div className="flex flex-col items-center justify-center w-full">
       <h2 className="my-2 font-bold text-lg">Dashboard 📉</h2>
       <br />
       <CustomButton
@@ -19,7 +19,7 @@ const Dashboard = () => {
         onClick={() => redirect("/wizard")}
         emoji="🪄"
       />
-    </>
+    </div>
   );
 };
 

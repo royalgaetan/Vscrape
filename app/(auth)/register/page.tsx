@@ -1,6 +1,6 @@
 "use client";
 
-import { registerFormSchema } from "@/lib/types";
+import { registerFormSchema } from "@/lib/schema_validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect } from "next/navigation";
 import React from "react";

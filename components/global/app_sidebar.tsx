@@ -1,5 +1,4 @@
 import React from "react";
-import { useAuth } from "@/hooks/useAuth";
 import {
   ChevronRight,
   HelpCircle,
@@ -21,17 +20,12 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
-
-type sidebarPathType = {
-  name: string;
-  path: string;
-  icon: LucideIcon;
-  type: "expandable" | "icon-only" | "main";
-};
+import SettingsDialog from "../../app/(protected)/_settings/settings_dialog";
+import { Button } from "../ui/button";
+import { sidebarColor } from "@/lib/colors";
+import { sidebarPathType } from "@/lib/types";
 
 const AppSidebar = () => {
-  const { logout } = useAuth();
-
   const sidebarPaths: sidebarPathType[] = [
     { name: "Home", path: "/home", icon: Home, type: "main" },
     {
@@ -55,14 +49,16 @@ const AppSidebar = () => {
       type: "expandable",
     },
     { name: "Chats", path: "/chats", icon: MessagesSquare, type: "expandable" },
-    { name: "Settings", path: "/settings", icon: Settings, type: "icon-only" },
+    { name: "Settings", path: "", icon: Settings, type: "icon-only" },
     { name: "Trash", path: "/trash", icon: Trash2, type: "icon-only" },
     { name: "Help", path: "/help", icon: HelpCircle, type: "icon-only" },
   ];
 
   return (
     <Sidebar>
-      <SidebarContent className="flex flex-col h-full items-start font-bold pt-4 pb-3 pl-2 pr-4 bg-[#F8F8F7]">
+      <SidebarContent
+        className={`flex flex-col h-full items-start font-bold pt-4 pb-3 pl-2 pr-4 bg-[${sidebarColor}]`}
+      >
         <div className="mb-4 ml-2">
           <LogoAndText />
         </div>
@@ -89,20 +85,28 @@ const AppSidebar = () => {
         <Separator className="my-0" />
         <SidebarFooter className="flex w-full h-8 mt-0 pt-0">
           {/* Icon-only Icons */}
-          <div className="flex flex-1">
+          <div className="flex flex-1 gap-0">
             {sidebarPaths
               .filter((item) => item.type === "icon-only")
               .map((item) => {
-                return (
-                  <div
-                    key={item.path}
-                    className={cn(
-                      item.name === "Help" && "flex flex-1 justify-end"
-                    )}
-                  >
-                    <SidebarButton item={item} />
-                  </div>
-                );
+                if (item.name === "Settings") {
+                  return (
+                    <SettingsDialog key={item.path}>
+                      <SidebarButton item={item} />
+                    </SettingsDialog>
+                  );
+                } else if (item.name === "Help") {
+                  return (
+                    <div
+                      key={item.path}
+                      className={cn("flex flex-1 justify-end")}
+                    >
+                      <SidebarButton item={item} />
+                    </div>
+                  );
+                } else {
+                  return <SidebarButton key={item.path} item={item} />;
+                }
               })}
           </div>
         </SidebarFooter>
@@ -113,36 +117,34 @@ const AppSidebar = () => {
 
 export default AppSidebar;
 
-const SidebarButton = ({ item }: { item: sidebarPathType }) => {
+export const SidebarButton = ({ item }: { item: sidebarPathType }) => {
   const pathname = usePathname();
 
   const Icon = item.icon;
-  return (
-    <Link
-      href={item.path}
-      className={cn(
-        "w-full group/sidebarButton transition-all duration-300",
-        item.type === "icon-only" && "w-auto"
-      )}
-    >
-      <div
-        className={cn(
-          "transition-all duration-300 h-8 flex flex-1 justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer mb-[0.9px] px-3 rounded-sm",
-          pathname === item.path && "bg-neutral-200/60"
-        )}
-      >
-        {/* Icon */}
-        <div className="">
-          <SidebarIcon
-            defaultIcon={Icon}
-            isExpandable={item.type === "expandable"}
-            type="icon"
-            isSelected={pathname === item.path}
-          />
-        </div>
 
-        {/* Text */}
-        {item.type !== "icon-only" && (
+  if (item.type !== "icon-only") {
+    return (
+      <Link
+        href={item.path}
+        className={cn("w-full group/sidebarButton transition-all duration-300")}
+      >
+        <div
+          className={cn(
+            "transition-all duration-300 h-8 flex flex-1 justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer mb-[0.9px] px-3 rounded-sm",
+            pathname === item.path && "bg-neutral-200/60"
+          )}
+        >
+          {/* Icon */}
+          <div className="">
+            <SidebarIcon
+              defaultIcon={Icon}
+              isExpandable={item.type === "expandable"}
+              type="icon"
+              isSelected={pathname === item.path}
+            />
+          </div>
+
+          {/* Text */}
           <span
             className={cn(
               "text-xs font-medium flex flex-1",
@@ -151,23 +153,43 @@ const SidebarButton = ({ item }: { item: sidebarPathType }) => {
           >
             {item.name}
           </span>
-        )}
 
-        {/* Action Buttons */}
-        {item.type === "expandable" && (
-          <SidebarIcon
-            defaultIcon={Plus}
-            isExpandable={false}
-            isSelected={undefined}
-            type="actionBtn"
-          />
+          {/* Action Buttons */}
+          {item.type === "expandable" && (
+            <SidebarIcon
+              defaultIcon={Plus}
+              isExpandable={false}
+              isSelected={undefined}
+              type="actionBtn"
+            />
+          )}
+        </div>
+      </Link>
+    );
+  } else if (item.type === "icon-only") {
+    return (
+      <Button
+        variant={"ghost"}
+        className={cn(
+          "w-auto transition-all duration-300 h-8 flex justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer mb-[0.9px] px-3 rounded-sm",
+          pathname === item.path && "bg-neutral-200/60"
         )}
-      </div>
-    </Link>
-  );
+      >
+        {/* Icon */}
+        <SidebarIcon
+          defaultIcon={Icon}
+          isExpandable={false}
+          type="icon"
+          isSelected={pathname === item.path}
+        />
+      </Button>
+    );
+  } else {
+    return <div></div>;
+  }
 };
 
-const SidebarIcon = ({
+export const SidebarIcon = ({
   defaultIcon,
   isSelected,
   isExpandable,
