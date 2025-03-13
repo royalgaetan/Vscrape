@@ -1,3 +1,5 @@
+"use client";
+
 import { generateAvatar } from "@/lib/avatar";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
@@ -13,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import SettingsDialog from "../../app/(protected)/_settings/settings_dialog";
 
 const AppHeader = () => {
   const [avatarImage, setAvatarImage] = useState("");
@@ -68,12 +69,10 @@ const ProfileActionItem = ({ children }: { children: React.ReactNode }) => {
         align="end"
         className="w-52 px-2 py-3 bg-white border-[1px] border-gray-200 rounded-lg shadow-lg"
       >
-        <SettingsDialog>
-          <DropdownMenuItem>
-            <UserRoundCogIcon className="stroke-neutral-600" />
-            <span className="text-neutral-600">Account Settings</span>
-          </DropdownMenuItem>
-        </SettingsDialog>
+        <DropdownMenuItem>
+          <UserRoundCogIcon className="stroke-neutral-600" />
+          <span className="text-neutral-600">Account Settings</span>
+        </DropdownMenuItem>
         <DropdownMenuItem>
           <ReceiptCent className="stroke-neutral-600" />
           <span className="text-neutral-600">Plans</span>

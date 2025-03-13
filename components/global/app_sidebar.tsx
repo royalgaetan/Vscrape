@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   ChevronRight,
@@ -22,10 +24,11 @@ import { Separator } from "../ui/separator";
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
 import SettingsDialog from "../../app/(protected)/_settings/settings_dialog";
 import { Button } from "../ui/button";
-import { sidebarColor } from "@/lib/colors";
 import { sidebarPathType } from "@/lib/types";
+import { COLORS } from "@/lib/colors";
 
 const AppSidebar = () => {
+  const pathname = usePathname();
   const sidebarPaths: sidebarPathType[] = [
     { name: "Home", path: "/home", icon: Home, type: "main" },
     {
@@ -57,7 +60,7 @@ const AppSidebar = () => {
   return (
     <Sidebar>
       <SidebarContent
-        className={`flex flex-col h-full items-start font-bold pt-4 pb-3 pl-2 pr-4 bg-[${sidebarColor}]`}
+        className={`flex flex-col h-full items-start font-bold pt-4 pb-3 pl-2 pr-4 bg-[${COLORS.sidebarColor}]`}
       >
         <div className="mb-4 ml-2">
           <LogoAndText />
@@ -67,7 +70,13 @@ const AppSidebar = () => {
           {sidebarPaths
             .filter((item) => item.type === "main")
             .map((item) => {
-              return <SidebarButton key={item.path} item={item} />;
+              return (
+                <SidebarButton
+                  isSelected={pathname === item.path}
+                  key={item.path}
+                  item={item}
+                />
+              );
             })}
         </div>
         <Separator className="" />
@@ -77,7 +86,13 @@ const AppSidebar = () => {
             {sidebarPaths
               .filter((item) => item.type === "expandable")
               .map((item) => {
-                return <SidebarButton key={item.path} item={item} />;
+                return (
+                  <SidebarButton
+                    isSelected={pathname === item.path}
+                    key={item.path}
+                    item={item}
+                  />
+                );
               })}
           </div>
         </div>
@@ -92,7 +107,10 @@ const AppSidebar = () => {
                 if (item.name === "Settings") {
                   return (
                     <SettingsDialog key={item.path}>
-                      <SidebarButton item={item} />
+                      <SidebarButton
+                        isSelected={pathname === item.path}
+                        item={item}
+                      />
                     </SettingsDialog>
                   );
                 } else if (item.name === "Help") {
@@ -101,11 +119,20 @@ const AppSidebar = () => {
                       key={item.path}
                       className={cn("flex flex-1 justify-end")}
                     >
-                      <SidebarButton item={item} />
+                      <SidebarButton
+                        isSelected={pathname === item.path}
+                        item={item}
+                      />
                     </div>
                   );
                 } else {
-                  return <SidebarButton key={item.path} item={item} />;
+                  return (
+                    <SidebarButton
+                      isSelected={pathname === item.path}
+                      key={item.path}
+                      item={item}
+                    />
+                  );
                 }
               })}
           </div>
@@ -117,21 +144,24 @@ const AppSidebar = () => {
 
 export default AppSidebar;
 
-export const SidebarButton = ({ item }: { item: sidebarPathType }) => {
-  const pathname = usePathname();
-
+export const SidebarButton = ({
+  item,
+  isLink = true,
+  isSelected,
+}: {
+  item: sidebarPathType;
+  isLink?: boolean;
+  isSelected: boolean;
+}) => {
   const Icon = item.icon;
 
   if (item.type !== "icon-only") {
     return (
-      <Link
-        href={item.path}
-        className={cn("w-full group/sidebarButton transition-all duration-300")}
-      >
+      <SidebarItemWrapper isLink={isLink} item={item}>
         <div
           className={cn(
             "transition-all duration-300 h-8 flex flex-1 justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer mb-[0.9px] px-3 rounded-sm",
-            pathname === item.path && "bg-neutral-200/60"
+            isSelected && "bg-neutral-200/60"
           )}
         >
           {/* Icon */}
@@ -140,15 +170,15 @@ export const SidebarButton = ({ item }: { item: sidebarPathType }) => {
               defaultIcon={Icon}
               isExpandable={item.type === "expandable"}
               type="icon"
-              isSelected={pathname === item.path}
+              isSelected={isSelected}
             />
           </div>
 
           {/* Text */}
           <span
             className={cn(
-              "text-xs font-medium flex flex-1",
-              pathname === item.path && "font-bold text-[#333333]/90"
+              "text-xs font-medium flex flex-1 truncate",
+              isSelected && "font-bold text-[#333333]/90"
             )}
           >
             {item.name}
@@ -164,7 +194,7 @@ export const SidebarButton = ({ item }: { item: sidebarPathType }) => {
             />
           )}
         </div>
-      </Link>
+      </SidebarItemWrapper>
     );
   } else if (item.type === "icon-only") {
     return (
@@ -172,7 +202,7 @@ export const SidebarButton = ({ item }: { item: sidebarPathType }) => {
         variant={"ghost"}
         className={cn(
           "w-auto transition-all duration-300 h-8 flex justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer mb-[0.9px] px-3 rounded-sm",
-          pathname === item.path && "bg-neutral-200/60"
+          isSelected && "bg-neutral-200/60"
         )}
       >
         {/* Icon */}
@@ -180,7 +210,7 @@ export const SidebarButton = ({ item }: { item: sidebarPathType }) => {
           defaultIcon={Icon}
           isExpandable={false}
           type="icon"
-          isSelected={pathname === item.path}
+          isSelected={isSelected}
         />
       </Button>
     );
@@ -240,4 +270,35 @@ export const SidebarIcon = ({
       )}
     </div>
   );
+};
+
+export const SidebarItemWrapper = ({
+  isLink,
+  item,
+  children,
+}: {
+  isLink: boolean;
+  item: sidebarPathType;
+  children: React.ReactNode;
+}) => {
+  let className = "w-full group/sidebarButton transition-all duration-300";
+
+  if (isLink) {
+    return (
+      <Link className={className} href={item.path}>
+        {children}
+      </Link>
+    );
+  } else {
+    return (
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+        className={className}
+      >
+        {children}
+      </button>
+    );
+  }
 };

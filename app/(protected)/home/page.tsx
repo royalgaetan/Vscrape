@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { HomeTextareaPlaceholders } from "@/lib/constants";
 import {
+  ArrowDownToLine,
   FileInputIcon,
   HelpCircleIcon,
   PencilLineIcon,
@@ -45,13 +46,14 @@ const Home = () => {
           How Can I help you today?
         </h2>
 
-        <div className="rounded-3xl p-3 my-3 h-auto w-[max(90%,700px)] border-[2px] bg-gray-50 border-gray-100">
+        <div className="rounded-3xl p-3 my-3 h-auto w-[max(90%,700px)] border-[2px] bg-gray-50 border-neutral-300">
           <Textarea
             className="mb-4 placeholder:text-muted-foreground/70 placeholder:font-normal border-none focus:ring-0 focus:outline-none focus-visible:ring-0 resize-none shadow-none overflow-hidden"
             maxLength={2000}
             style={{ lineHeight: "1.1rem" }}
             ref={textareaRef}
             value={value}
+            autoFocus
             onChange={(e) => setValue(e.target.value)}
             rows={1}
             placeholder={placeholder}
@@ -82,7 +84,7 @@ const Home = () => {
           </Button>
 
           <Button variant={"ghost"} size={"sm"} className="w-fit">
-            <FileInputIcon className="stroke-pink-500" size={"1.3rem"} />
+            <ArrowDownToLine className="stroke-pink-500" size={"1.3rem"} />
             Import an existing
           </Button>
 

@@ -9,7 +9,7 @@ type Props = {
 const CustomButton = ({ text, emoji, onClick }: Props) => {
   return (
     <button
-      className="hover:cursor-pointer hover:opacity-80 group/button flex flex-1 hover:bg-neutral-100 rounded-2xl px-4 py-1 text-sm"
+      className="hover:cursor-pointer hover:opacity-80 group/button flex hover:bg-neutral-100 rounded-2xl px-4 py-1 text-sm mb-2"
       onClick={() => onClick()}
     >
       {text}
