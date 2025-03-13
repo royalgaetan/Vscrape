@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SettingItemButton from "../_components/settings_item_button";
 import SettingsItemField from "../_components/settings_item_field";
 import SettingDialogHeader from "../_components/settings_dialog_header";
 import { Button } from "@/components/ui/button";
 import SettingItemTable from "../_components/settings_item_table";
-import { SessionType, userSessions } from "../sessions/sessions_settings";
-import { scrollToEl } from "@/lib/utils";
+import { removeDiacritics, scrollToEl } from "@/lib/utils";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { appsConnectionList } from "@/lib/constants";
@@ -78,6 +77,8 @@ export const connectedApps: ConnectedAppType[] = [
 ];
 
 const IntegrationSettings = () => {
+  const [searchConnectionContent, setSearchConnectionContent] = useState("");
+  const searchConnectionRef = useRef<HTMLInputElement>(null);
   const [connectedAppsData, setConnecconnectedAppsData] = useState<
     ConnectedAppType[]
   >([]);
@@ -95,6 +96,18 @@ const IntegrationSettings = () => {
   useEffect(() => {
     getConnectedApps();
   }, []);
+
+  const handleSearchConnectionFocus = () => {
+    searchConnectionRef.current?.focus();
+  };
+
+  const filteredApps = appsConnectionList
+    .filter((a) =>
+      removeDiacritics(a.appName.toLocaleLowerCase()).includes(
+        removeDiacritics(searchConnectionContent.toLocaleLowerCase())
+      )
+    )
+    .toSorted((a, b) => a.appName.localeCompare(b.appName));
 
   return (
     <div
@@ -117,6 +130,9 @@ const IntegrationSettings = () => {
                     parentId: "integrationSettingsContainer",
                     id: "discoverNewConnection",
                   });
+                  setTimeout(() => {
+                    handleSearchConnectionFocus();
+                  }, 500);
                 }}
               />
             }
@@ -134,8 +150,8 @@ const IntegrationSettings = () => {
 
       {/* Discover new connections */}
       <div
-        className="flex flex-col gap-2 w-full mt-14"
         id="discoverNewConnection"
+        className="flex flex-col gap-2 w-full sticky -top-1 bg-white pt-5 z-50 mt-10"
       >
         <SettingDialogHeader title="Discover new connections" />
 
@@ -146,26 +162,38 @@ const IntegrationSettings = () => {
             subtitle="Scroll through the list or quickly search for an app you’d like to connect"
             cta={
               <SettingItemSearchBar
+                inputRef={searchConnectionRef}
                 inputType="search"
                 placeholder="Search for an app to connect..."
-                onTextChange={(val) => {}}
-                onSubmit={(val) => {}}
-                onCancel={() => {}}
+                onTextChange={(val) => {
+                  setSearchConnectionContent(val);
+                }}
+                onSubmit={(val) => {
+                  setSearchConnectionContent(val);
+                }}
+                onCancel={() => {
+                  setSearchConnectionContent("");
+                }}
               />
             }
           />
         </div>
+      </div>
 
-        <div className="w-full h-full grid grid-cols-3 gap-3">
-          {appsConnectionList
-            .sort((a, b) => a.appName.localeCompare(b.appName))
-            .map((app, i) => {
+      <div className="w-full min-h-[59vh]">
+        {filteredApps.length === 0 ? (
+          <div className=" text-muted-foreground text-xs font-semibold flex flex-1 justify-center items-center h-44">
+            No app found.
+          </div> // Display "Not found" if no matches are found
+        ) : (
+          <div className="grid grid-cols-3 gap-3 pb-32">
+            {filteredApps.map((app) => {
               return (
                 <div
                   key={app.appName}
                   className="flex flex-col h-[10rem] px-5 py-5 items-start justify-start relative hover:hover:bg-neutral-200/60 transition-all duration-200 group/newApp cursor-pointer border-[2px] bg-white border-neutral-300 rounded-xl"
                 >
-                  <div className="absolute z-50 top-4 right-4 group-hover/newApp:block hidden transition-all duration-300">
+                  <div className="absolute z-10 top-4 right-4 group-hover/newApp:block hidden transition-all duration-300">
                     <ArrowUpRight className="size-5 stroke-primary/60 stroke-2" />
                   </div>
                   <div className="relative h-10 w-10 mb-2">
@@ -186,7 +214,8 @@ const IntegrationSettings = () => {
                 </div>
               );
             })}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

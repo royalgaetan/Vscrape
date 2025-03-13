@@ -146,7 +146,7 @@ const BillingSettings = () => {
       <div className="w-full max-w-full min-h-fit pr-8 overflow-x-scroll scrollbar-hide">
         <div className="gap-7 flex flex-1 mt-3 w-fit">
           {bankCards.map((card, i) => (
-            <span className={cn(i === 0 && "ml-5")}>
+            <span key={card.cardNumber} className={cn(i === 0 && "ml-5")}>
               <SettingsItemPaymentCard key={`${i.toString}`} bankCard={card} />
             </span>
           ))}

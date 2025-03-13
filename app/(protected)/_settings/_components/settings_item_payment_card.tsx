@@ -1,8 +1,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { CircleCheck, Edit2Icon, Edit3Icon, Trash2Icon } from "lucide-react";
+import { CircleCheck, Edit2Icon, Trash2Icon } from "lucide-react";
 export type BankCard = {
   title: string;
   cardNumber: string; // Storing the card number as a string for formatting purposes
@@ -58,8 +57,8 @@ const SettingsItemPaymentCard = ({ bankCard }: { bankCard: BankCard }) => {
             <Image
               src={
                 bankCard.cardType === "MasterCard"
-                  ? "/Mastercard logo.png"
-                  : "/Visa logo.png"
+                  ? "/logos/mastercard.svg"
+                  : "/logos/visa.svg"
               }
               alt={
                 bankCard.cardType === "MasterCard"

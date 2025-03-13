@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { appFeatures, featureGroupNames, plans } from "@/lib/constants";
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -32,9 +31,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn, getIconColor } from "@/lib/utils";
-import clsx from "clsx";
-import { Separator } from "@radix-ui/react-select";
-
 export type CreditOption = {
   value: string;
   label: string;
@@ -176,14 +172,14 @@ const PlansSettings = () => {
       <div className="flex flex-col gap-2 w-full mt-7">
         <SettingDialogHeader title="All Plans" />
 
-        <TableHeader className="min-w-full bg-white hover:bg-white top-0 sticky">
+        <TableHeader className="min-w-full bg-white hover:bg-white -top-1 sticky">
           <TableRow className="flex flex-1 bg-white hover:bg-white border-none ">
             {/* Empty Header for 1st header */}
             <TableHead className="px-4 py-2 flex flex-1"></TableHead>
 
             {plans.map((plan) => {
               return (
-                <div className="p-4 pl-2 rounded-lg w-1/4">
+                <div key={plan.name} className="p-4 pl-2 rounded-lg w-1/4">
                   <div className="flex flex-1 gap-1">
                     <h3 className="text-lg font-semibold">{plan.name}</h3>
                     {plan.name === "Plus" && (
@@ -220,18 +216,20 @@ const PlansSettings = () => {
           {Object.entries(featureGroupNames).map(([groupName, lucidIcon]) => {
             const Icon = lucidIcon;
             return (
-              <div className="flex flex-col">
+              <div key={groupName} className="flex flex-col">
                 {/* GroupName Color */}
-                <div
-                  className="flex flex-1 gap-1 items-center ml-3 mt-14 mb-4 font-semibold text-xs border-b-2 border-gray-300 pb-3"
-                  style={{
-                    stroke: getIconColor(Icon),
-                    color: getIconColor(Icon),
-                  }}
-                >
-                  <Icon className="size-4" />
-                  {groupName}
-                </div>
+                {groupName != "Highlight" && (
+                  <div
+                    className="flex flex-1 gap-1 items-center ml-3 mt-14 mb-4 font-semibold text-xs border-b-2 border-gray-300 pb-3"
+                    style={{
+                      stroke: getIconColor(Icon),
+                      color: getIconColor(Icon),
+                    }}
+                  >
+                    <Icon className="size-4" />
+                    {groupName}
+                  </div>
+                )}
                 {/* Features List */}
                 <div>
                   {appFeatures
@@ -271,7 +269,10 @@ const PlansSettings = () => {
                             .filter((p) => p.planName === plans[0].name)
                             .map((plan) => {
                               return (
-                                <FeatureCellContent content={plan.content} />
+                                <FeatureCellContent
+                                  key={feature.featureName}
+                                  content={plan.content}
+                                />
                               );
                             })}
                         </TableCell>
@@ -282,7 +283,10 @@ const PlansSettings = () => {
                             .filter((p) => p.planName === plans[1].name)
                             .map((plan) => {
                               return (
-                                <FeatureCellContent content={plan.content} />
+                                <FeatureCellContent
+                                  key={feature.featureName}
+                                  content={plan.content}
+                                />
                               );
                             })}
                         </TableCell>
@@ -293,7 +297,10 @@ const PlansSettings = () => {
                             .filter((p) => p.planName === plans[2].name)
                             .map((plan) => {
                               return (
-                                <FeatureCellContent content={plan.content} />
+                                <FeatureCellContent
+                                  key={feature.featureName}
+                                  content={plan.content}
+                                />
                               );
                             })}
                         </TableCell>
@@ -320,18 +327,14 @@ export const FeatureCellContent = ({
     <div className="">
       {typeof content === "string" ? (
         <div className="stroke-neutral-900 text-neutral-900">
-          {content === "Yes" ? (
-            <CheckIcon className="size-5 " />
-          ) : content === "No" ? (
-            <span className="text-neutral-400">—</span>
-          ) : (
-            `${content}`
-          )}
+          {content === "Yes" && <CheckIcon className="size-5 " />}
+          {content === "No" && <span className="text-neutral-400">—</span>}
+          {content !== "Yes" && content !== "No" && `${content}`}
         </div>
       ) : (
         <div className="flex flex-col justify-start items-start gap-2">
-          {(content as string[]).map((line) => {
-            return <div>◉ {line}</div>;
+          {content.map((line) => {
+            return <div key={line}>◉ {line}</div>;
           })}
         </div>
       )}

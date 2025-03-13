@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogTrigger,
   DialogContent,
+  DialogTitle,
 } from "../../../components/ui/dialog";
 import { SidebarButton } from "../../../components/global/app_sidebar";
 import {
@@ -31,7 +32,6 @@ import IntegrationSettings from "./integrations/integration_settings";
 import PlansSettings from "./plans/plans_settings";
 import ApiSettings from "./api/api_settings";
 import AccountSettings from "./account/account_settings";
-import { COLORS } from "@/lib/colors";
 import ImportSettings from "./import/import_settings";
 
 type settingsDialogItemType = sidebarPathType & {
@@ -109,6 +109,7 @@ const SettingsDialog = ({ children }: { children: React.ReactNode }) => {
         hideCloseButton
         className="h-[90vh] w-[70vw] max-w-none overflow-clip p-0"
       >
+        <DialogTitle className="hidden"></DialogTitle>
         <SidebarProvider>
           {/* Sidebar */}
           <SettingDialogSidebar
@@ -116,7 +117,7 @@ const SettingsDialog = ({ children }: { children: React.ReactNode }) => {
             selectedItemPath={itemSelected.path}
           />
 
-          <main className="flex flex-1 w-[0px]  p-0 bg-white">
+          <main className="flex flex-1 w-[0px] p-0">
             {/* Main Content */}
             {itemSelected.component}
           </main>
@@ -144,8 +145,12 @@ export const SettingDialogSidebar = ({
           .filter((item) => item.type === "main")
           .map((item, i) => {
             return (
-              <>
-                <button key={item.path} onClick={() => onItemSelected(item)}>
+              <span key={item.name}>
+                <button
+                  key={item.path}
+                  onClick={() => onItemSelected(item)}
+                  className="w-full flex flex-1"
+                >
                   <SidebarButton
                     item={item}
                     isLink={false}
@@ -158,7 +163,7 @@ export const SettingDialogSidebar = ({
                 {i === 4 && (
                   <Separator className="my-2 h-[0.1px] bg-gray-200" />
                 )}
-              </>
+              </span>
             );
           })}
       </div>

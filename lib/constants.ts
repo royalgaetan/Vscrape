@@ -12,19 +12,15 @@ import {
   MoreHorizontal,
   SmileIcon,
   LucideIcon,
-  LucideALargeSmall,
-  LucideActivity,
   Workflow,
   BarChart3,
-  BrainCircuit,
-  Cloud,
-  FileDown,
   PlugZap,
   Users,
   GlobeIcon,
   Cpu,
   Cloudy,
   FileUp,
+  Lightbulb,
 } from "lucide-react";
 import { AppsConnectionType, planNames, PlanType } from "./types";
 
@@ -172,6 +168,7 @@ export const plans: PlanType[] = [
 ];
 
 export const featureGroupNames: Record<string, LucideIcon> = {
+  Highlight: Lightbulb,
   "Workflow Automation": Workflow,
   "Web Scraping & Data Capture": GlobeIcon,
   "AI-Powered Data Extraction": Cpu,
@@ -181,11 +178,11 @@ export const featureGroupNames: Record<string, LucideIcon> = {
   "Insights & Monitoring": BarChart3,
   "Notifications & Alerts": Bell,
   "Integrations & API": PlugZap,
-};
+} as const;
 
 export const appFeatures: {
   featureName: string;
-  group: keyof typeof featureGroupNames | "Highlight";
+  group: keyof typeof featureGroupNames;
   description: string;
   planIncluded: {
     planName: planNames;
