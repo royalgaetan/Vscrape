@@ -57,6 +57,45 @@ export const avatarBackgroundColors = [
   "c06c84", // Soft Plum
 ];
 
+export const reportTypes = [
+  { label: "UI Display Issue", value: "ui_issue" },
+  { label: "Feature Not Working", value: "feature_not_working" },
+  { label: "Slow Performance", value: "performance_issue" },
+  { label: "App Crash / Error Message", value: "app_crash" },
+  { label: "Data Not Saving / Syncing", value: "data_sync_issue" },
+  { label: "Login / Authentication Problem", value: "auth_issue" },
+  { label: "Notification Not Received", value: "notification_issue" },
+  { label: "Broken Link or Button", value: "broken_link" },
+  { label: "Form Submission Problem", value: "form_issue" },
+  { label: "Other (Please Specify)", value: "other" },
+] as const;
+
+export const reportTypeValues = reportTypes.map((r) => r.value) as [
+  string,
+  ...string[]
+];
+
+export const featureCategories = [
+  { label: "UI/UX", value: "ui_ux" },
+  { label: "Security", value: "security" },
+  { label: "Performance", value: "performance" },
+  { label: "Integrations", value: "integrations" },
+  { label: "Bug Fixes", value: "bug_fixes" },
+  { label: "New Features", value: "new_features" },
+  { label: "API", value: "api" },
+  { label: "Documentation", value: "documentation" },
+  { label: "Analytics", value: "analytics" },
+  { label: "Mobile App", value: "mobile_app" },
+  { label: "Accessibility", value: "accessibility" },
+  { label: "Other", value: "other" },
+] as const;
+
+export const featureCategoriesValues = featureCategories.map(
+  (r) => r.value
+) as [string, ...string[]];
+
+export const featureFrequencyOfUse = ["Daily", "Weekly", "Occasionally"];
+
 export const HomeTextareaPlaceholders = [
   "What custom automation do you have in mind?",
   "Describe the automation you need, and I’ll make it happen!",

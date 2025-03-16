@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -34,7 +34,7 @@ import ApiSettings from "./api/api_settings";
 import AccountSettings from "./account/account_settings";
 import ImportSettings from "./import/import_settings";
 
-type settingsDialogItemType = sidebarPathType & {
+export type settingsDialogItemType = sidebarPathType & {
   component: React.JSX.Element;
 };
 
@@ -95,12 +95,24 @@ export const settingSidebarPaths: settingsDialogItemType[] = [
     type: "main",
     component: <ApiSettings />,
   },
-] as const;
+];
 
-const SettingsDialog = ({ children }: { children: React.ReactNode }) => {
+const SettingsDialog = ({
+  children,
+  initialTabIndex,
+}: {
+  initialTabIndex: number;
+  children: React.ReactNode;
+}) => {
   const [itemSelected, setItemSelected] = useState<settingsDialogItemType>(
     settingSidebarPaths[0]
   );
+
+  useEffect(() => {
+    if (settingSidebarPaths[initialTabIndex]) {
+      setItemSelected(settingSidebarPaths[initialTabIndex]);
+    }
+  }, [initialTabIndex]);
 
   return (
     <Dialog>

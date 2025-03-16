@@ -26,6 +26,7 @@ import SettingsDialog from "../../app/(protected)/_settings/settings_dialog";
 import { Button } from "../ui/button";
 import { sidebarPathType } from "@/lib/types";
 import { COLORS } from "@/lib/colors";
+import MoreDialog from "@/app/(protected)/_more/more_dialog";
 
 const AppSidebar = () => {
   const pathname = usePathname();
@@ -54,7 +55,7 @@ const AppSidebar = () => {
     { name: "Chats", path: "/chats", icon: MessagesSquare, type: "expandable" },
     { name: "Settings", path: "", icon: Settings, type: "icon-only" },
     { name: "Trash", path: "/trash", icon: Trash2, type: "icon-only" },
-    { name: "Help", path: "/help", icon: HelpCircle, type: "icon-only" },
+    { name: "More", path: "", icon: HelpCircle, type: "icon-only" },
   ];
 
   return (
@@ -71,11 +72,12 @@ const AppSidebar = () => {
             .filter((item) => item.type === "main")
             .map((item) => {
               return (
-                <SidebarButton
-                  isSelected={pathname === item.path}
-                  key={item.path}
-                  item={item}
-                />
+                <span key={item.path} className={cn("mb-[1px]")}>
+                  <SidebarButton
+                    isSelected={pathname === item.path}
+                    item={item}
+                  />
+                </span>
               );
             })}
         </div>
@@ -98,31 +100,33 @@ const AppSidebar = () => {
         </div>
 
         <Separator className="my-0" />
+        {/* Icon-only Icons */}
         <SidebarFooter className="flex w-full h-8 mt-0 pt-0">
-          {/* Icon-only Icons */}
           <div className="flex flex-1 gap-0">
             {sidebarPaths
               .filter((item) => item.type === "icon-only")
               .map((item) => {
                 if (item.name === "Settings") {
                   return (
-                    <SettingsDialog key={item.path}>
+                    <SettingsDialog key={item.path} initialTabIndex={0}>
                       <SidebarButton
                         isSelected={pathname === item.path}
                         item={item}
                       />
                     </SettingsDialog>
                   );
-                } else if (item.name === "Help") {
+                } else if (item.name === "More") {
                   return (
                     <div
                       key={item.path}
                       className={cn("flex flex-1 justify-end")}
                     >
-                      <SidebarButton
-                        isSelected={pathname === item.path}
-                        item={item}
-                      />
+                      <MoreDialog>
+                        <SidebarButton
+                          isSelected={pathname === item.path}
+                          item={item}
+                        />
+                      </MoreDialog>
                     </div>
                   );
                 } else {

@@ -5,13 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { HomeTextareaPlaceholders } from "@/lib/constants";
 import {
   ArrowDownToLine,
-  FileInputIcon,
   HelpCircleIcon,
   PencilLineIcon,
   ShoppingCartIcon,
   Terminal,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import SettingsDialog from "../_settings/settings_dialog";
 
 const Home = () => {
   const [value, setValue] = useState("");
@@ -48,7 +48,7 @@ const Home = () => {
 
         <div className="rounded-3xl p-3 my-3 h-auto w-[max(90%,700px)] border-[2px] bg-gray-50 border-neutral-300">
           <Textarea
-            className="mb-4 placeholder:text-muted-foreground/70 placeholder:font-normal border-none focus:ring-0 focus:outline-none focus-visible:ring-0 resize-none shadow-none overflow-hidden"
+            className="bg-transparent mb-4 placeholder:text-muted-foreground/70 placeholder:font-normal border-none focus:ring-0 focus:outline-none focus-visible:ring-0 resize-none shadow-none overflow-hidden"
             maxLength={2000}
             style={{ lineHeight: "1.1rem" }}
             ref={textareaRef}
@@ -83,10 +83,12 @@ const Home = () => {
             Pick from Marketplace
           </Button>
 
-          <Button variant={"ghost"} size={"sm"} className="w-fit">
-            <ArrowDownToLine className="stroke-pink-500" size={"1.3rem"} />
-            Import an existing
-          </Button>
+          <SettingsDialog initialTabIndex={5}>
+            <Button variant={"ghost"} size={"sm"} className="w-fit">
+              <ArrowDownToLine className="stroke-pink-500" size={"1.3rem"} />
+              Import an existing
+            </Button>
+          </SettingsDialog>
 
           <Button variant={"ghost"} size={"sm"} className="w-fit">
             <HelpCircleIcon className="stroke-blue-400" size={"1.3rem"} />

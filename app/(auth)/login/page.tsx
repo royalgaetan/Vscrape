@@ -34,7 +34,7 @@ const LoginPage = () => {
     return <CustomLoader />;
   }
   if (isAuthenticated) {
-    return redirect("/dashboard");
+    return redirect("/home");
   }
 
   return (

@@ -3,18 +3,24 @@
 import { generateAvatar } from "@/lib/avatar";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { CoinsIcon, LogOut, ReceiptCent, UserRoundCogIcon } from "lucide-react";
+import {
+  CoinsIcon,
+  LogOut,
+  PlusIcon,
+  ReceiptCent,
+  UserRoundCogIcon,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Breadcrumbs from "./breadcrumbs";
 import {
   DropdownMenu,
   DropdownMenuContent,
-} from "@radix-ui/react-dropdown-menu";
-import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import SettingsDialog from "@/app/(protected)/_settings/settings_dialog";
+import { useAuth } from "@/hooks/useAuth";
 
 const AppHeader = () => {
   const [avatarImage, setAvatarImage] = useState("");
@@ -32,27 +38,31 @@ const AppHeader = () => {
 
       {/* Action Items */}
       <div className="flex justify-center items-center py-2 px-6 gap-3">
+        {/* Create a new Workflow */}
+        <Button variant={"outline"} className="rounded-3xl h-8 mr-2 gap-1 px-3">
+          <PlusIcon className="stroke-primary" />
+          <span className="text-xs">Create a workflow</span>
+        </Button>
+
         {/* Get Free Credits */}
-        <Button
+        {/* <Button
           variant={"link"}
           className="rounded-3xl h-8 hover:opacity-80 hover:no-underline active:scale-[0.98] transition-all duration-200"
         >
           <span className="text-xs text-primary">Get Free Credits!</span>
-        </Button>
+        </Button> */}
 
         {/* Credits */}
-        <Button variant={"outline"} className="rounded-3xl h-8 -ml-2">
+        <Button
+          variant={"outline"}
+          className="rounded-3xl h-8 -ml-2 gap-1 px-3"
+        >
           <CoinsIcon className="stroke-primary" />
           <span className="text-xs">5405</span>
         </Button>
 
         {/* Avatar: Profile Action Items */}
-        <ProfileActionItem>
-          <Avatar className="h-8 w-8 ml-1 cursor-pointer">
-            <AvatarImage src={avatarImage} alt="Avatar" />
-            <AvatarFallback>Vs</AvatarFallback>
-          </Avatar>
-        </ProfileActionItem>
+        <ProfileActionItem avatarImage={avatarImage} />
       </div>
     </div>
   );
@@ -60,30 +70,54 @@ const AppHeader = () => {
 
 export default AppHeader;
 
-const ProfileActionItem = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent
-        side="bottom"
-        align="end"
-        className="w-52 px-2 py-3 bg-white border-[1px] border-gray-200 rounded-lg shadow-lg"
-      >
-        <DropdownMenuItem>
-          <UserRoundCogIcon className="stroke-neutral-600" />
-          <span className="text-neutral-600">Account Settings</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <ReceiptCent className="stroke-neutral-600" />
-          <span className="text-neutral-600">Plans</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+const ProfileActionItem = ({ avatarImage }: { avatarImage: string }) => {
+  const { logout } = useAuth();
+  const [initialSettingTabIndex, setInitialSettingTabIndex] =
+    useState<number>(0);
 
-        <DropdownMenuItem>
-          <LogOut className="stroke-neutral-600" />
-          <span className="text-neutral-600">Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+  return (
+    <SettingsDialog initialTabIndex={initialSettingTabIndex}>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Avatar className="h-8 w-8 ml-1 cursor-pointer">
+            <AvatarImage src={avatarImage} alt="Avatar" />
+            <AvatarFallback>Vs</AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          side="bottom"
+          align="end"
+          className="w-52 px-2 py-3"
+        >
+          <DropdownMenuItem
+            onClick={() => {
+              setInitialSettingTabIndex(0);
+            }}
+          >
+            <UserRoundCogIcon className="stroke-neutral-600" />
+            <span className="text-neutral-600">Account Settings</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={(e) => {
+              setInitialSettingTabIndex(4);
+            }}
+          >
+            <ReceiptCent className="stroke-neutral-600" />
+            <span className="text-neutral-600">Plans</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault();
+              logout();
+            }}
+          >
+            <LogOut className="stroke-neutral-600" />
+            <span className="text-neutral-600">Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </SettingsDialog>
   );
 };

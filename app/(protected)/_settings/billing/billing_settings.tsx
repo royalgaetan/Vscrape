@@ -16,8 +16,8 @@ export type BillingHistoryType = {
   plan: string;
   amount: string;
   status: "Paid" | "Pending" | "Failed";
-  date: string;
-  paymentMethod: string;
+  date: Date;
+  method: string;
   download: React.ReactNode;
 };
 
@@ -41,8 +41,8 @@ export const userBillingHistoryData: BillingHistoryType[] = [
     plan: "Pro Plan (Monthly)",
     amount: "$129.00",
     status: "Paid",
-    date: "March 01, 2025",
-    paymentMethod: "Visa •••• 4242",
+    date: new Date(2025, 3, 1, 15, 39),
+    method: "Visa •••• 4242",
     download: getDownloadBillButton(),
   },
   {
@@ -50,8 +50,8 @@ export const userBillingHistoryData: BillingHistoryType[] = [
     plan: "Pro Plan (Monthly)",
     amount: "$129.00",
     status: "Paid",
-    date: "February 01, 2025",
-    paymentMethod: "Visa •••• 4242",
+    date: new Date(2025, 2, 1, 15, 39),
+    method: "Visa •••• 4242",
     download: getDownloadBillButton(),
   },
   {
@@ -59,8 +59,8 @@ export const userBillingHistoryData: BillingHistoryType[] = [
     plan: "Pro Plan (Monthly)",
     amount: "$129.00",
     status: "Failed",
-    date: "January 01, 2025",
-    paymentMethod: "Visa •••• 4242",
+    date: new Date(2025, 1, 1, 15, 40),
+    method: "Visa •••• 4242",
     download: getDownloadBillButton(),
   },
   {
@@ -68,8 +68,8 @@ export const userBillingHistoryData: BillingHistoryType[] = [
     plan: "Basic Plan (Monthly)",
     amount: "$49.00",
     status: "Paid",
-    date: "December 01, 2024",
-    paymentMethod: "Mastercard •••• 8745",
+    date: new Date(2024, 12, 1, 15, 39),
+    method: "Mastercard •••• 8745",
     download: getDownloadBillButton(),
   },
 ];

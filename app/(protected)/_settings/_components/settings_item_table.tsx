@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -15,21 +16,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Check, CircleSmallIcon, Loader2 } from "lucide-react";
-import React, { useState } from "react";
 import { SessionType } from "../sessions/sessions_settings";
-import {
-  camelToSentenceCase,
-  cn,
-  copyToClipboard,
-  delay,
-  maskApiKey,
-} from "@/lib/utils";
+import { camelToSentenceCase, cn, maskApiKey } from "@/lib/utils";
 import { BillingHistoryType } from "../billing/billing_settings";
 import { ConnectedAppType } from "../integrations/integration_settings";
 import { format } from "date-fns";
 import { ApiKeyType, WebhookType } from "@/lib/types";
 import { isImage } from "@/lib/image";
 import Image from "next/image";
+import { useCopy2Clipboard } from "@/hooks/useCopy2Clipboard";
 
 const SettingItemTable = ({
   data,
@@ -130,23 +125,8 @@ const CustomTableCell = ({
   val: any;
   item: any;
 }) => {
-  const [isSecretKeyCopied, setSecretKeyCopied] = useState<boolean | null>(
-    null
-  );
-  const [isSecretKeyBeingCopied, setSecretBeingKeyCopied] =
-    useState<boolean>(false);
-
-  const handleSecretkeyCopiedToClipboard = async (secretKey: string) => {
-    setSecretBeingKeyCopied(true);
-    const res = await copyToClipboard(secretKey);
-    setSecretKeyCopied(res);
-    await delay(200);
-    setSecretBeingKeyCopied(false);
-    await delay(1000);
-    setSecretKeyCopied(null);
-  };
-
   const isSecretKey = index === 2 && dataType === "apiKeys";
+
   return (
     <TableCell
       key={`${index.toString()}`}
@@ -154,110 +134,36 @@ const CustomTableCell = ({
         "my-4 align-top break-all overflow-hidden",
         dataType === "sessions" && index === 0 && "w-7",
         index === 1 && "font-semibold",
+        dataType === "billingHistory" && index === 1 && "max-w-32",
+        dataType === "billingHistory" && index === 4 && "min-w-28",
         dataType === "connectedApps" && index === 0 && "w-fit",
         dataType === "connectedApps" && index === 1 && "align-middle",
         dataType === "apiKeys" && index === 0 && "w-4",
         dataType === "apiKeys" && index === 2 && "w-28",
+        dataType === "apiKeys" && index === 2 && "max-w-28 mr-5",
         dataType === "webhooks" && index === 2 && "max-w-7",
-        dataType === "webhooks" && index === 4 && "max-w-7",
-        dataType === "apiKeys" && index === 2 && "max-w-28 mr-5"
+        dataType === "webhooks" && index === 4 && "max-w-7"
       )}
     >
       {/* Handle val as Date */}
-      {val instanceof Date && (
-        <div className="flex flex-col justify-start">
-          <div className="font-semibold text-[#333]">
-            {format(val, "MMMM dd, yyyy")}
-          </div>
-          <div className="font-normal text-muted-foreground">
-            {format(val, "HH:mm")}
-          </div>
-        </div>
-      )}
+      {val instanceof Date && <DateCell date={val} />}
       {/* Handle val as Image */}
-      {typeof val === "string" && isImage(val) && (
-        <div className="relative h-7 ml-3">
-          <Image
-            alt={val}
-            src={val}
-            className="select-none object-contain"
-            fill
-          />
-        </div>
-      )}
+      {typeof val === "string" && isImage(val) && <ImageCell imagePath={val} />}
 
       {/* Handle val as Array */}
-      {val instanceof Array && (
-        <div className="flex flex-col justify-start items-start gap-2">
-          {val.map((line) => {
-            return <div key={line}>◉ {line}</div>;
-          })}
-        </div>
-      )}
+      {val instanceof Array && <ArrayCell array={val} />}
 
       {/* Handle val as Secret Key (e.g. API key) */}
       {!(val instanceof Array) &&
         !(val instanceof Date) &&
         typeof val === "string" &&
         !isImage(val) &&
-        isSecretKey && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => handleSecretkeyCopiedToClipboard(val)}
-                  disabled={
-                    isSecretKeyBeingCopied || isSecretKeyCopied !== null
-                  }
-                  className={cn(
-                    "font-semibold text-[#333] w-full line-clamp-2",
-                    isSecretKeyCopied === null && "cursor-pointer"
-                  )}
-                >
-                  {isSecretKeyBeingCopied && (
-                    <Loader2 className="animate-spin text-neutral-700 size-4" />
-                  )}
-                  {!isSecretKeyBeingCopied && isSecretKeyCopied && (
-                    <div className="flex flex-1 gap-1">
-                      <Check className="size-4 stroke-neutral-700" />
-                      <span>Copied!</span>
-                    </div>
-                  )}
-                  {!isSecretKeyBeingCopied && isSecretKeyCopied === false && (
-                    <div className="flex flex-1 gap-1">
-                      <span>Failed to copy</span>
-                    </div>
-                  )}
-                  {!isSecretKeyBeingCopied && isSecretKeyCopied === null && (
-                    <div className="w-full text-start justify-start items-start line-clamp-2">
-                      {maskApiKey(val)}
-                    </div>
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Click to copy</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
+        isSecretKey && <CopiableTextCell text={val} />}
 
       {/* Handle val as Text */}
       {typeof val === "string" && !isImage(val) && !isSecretKey && (
         <div className="flex flex-1 items-center gap-1 break-all overflow-hidden">
-          <p
-            className={cn(
-              "line-clamp-2",
-              val === "Active" && "text-emerald-700 font-semibold",
-              val === "Paid" && "text-emerald-700 font-semibold",
-              val === "Disabled" && "text-yellow-500 font-semibold",
-              val === "Expired" && "text-red-700 font-semibold",
-              val === "Failed" && "text-red-700 font-semibold",
-              val === "Revoked" && "text-red-700 font-semibold"
-            )}
-          >
-            {val}
-          </p>
+          <TextCell text={val} />
           {dataType === "sessions" && item.isActive && index === 1 && (
             <TooltipProvider>
               <Tooltip>
@@ -283,3 +189,101 @@ const CustomTableCell = ({
 };
 
 export default SettingItemTable;
+
+export const TextCell = ({ text }: { text: string }) => {
+  return (
+    <p
+      className={cn(
+        "line-clamp-2",
+        text === "Active" && "text-emerald-700 font-semibold",
+        text === "Paid" && "text-emerald-700 font-semibold",
+        text === "Disabled" && "text-yellow-500 font-semibold",
+        text === "Expired" && "text-red-700 font-semibold",
+        text === "Failed" && "text-red-700 font-semibold",
+        text === "Revoked" && "text-red-700 font-semibold"
+      )}
+    >
+      {text}
+    </p>
+  );
+};
+
+export const DateCell = ({ date }: { date: Date }) => {
+  return (
+    <div className="flex flex-col justify-start">
+      <div className="font-semibold text-[#333]">
+        {format(date, "MMMM dd, yyyy")}
+      </div>
+      <div className="font-normal text-muted-foreground">
+        {format(date, "HH:mm")}
+      </div>
+    </div>
+  );
+};
+
+export const ImageCell = ({ imagePath }: { imagePath: string }) => {
+  return (
+    <div className="relative h-7 ml-3">
+      <Image
+        alt={imagePath}
+        src={imagePath}
+        className="select-none object-contain"
+        fill
+      />
+    </div>
+  );
+};
+
+export const ArrayCell = ({ array }: { array: Array<any> }) => {
+  return (
+    <div className="flex flex-col justify-start items-start gap-2">
+      {array.map((line) => {
+        return <div key={line}>◉ {line}</div>;
+      })}
+    </div>
+  );
+};
+
+export const CopiableTextCell = ({ text }: { text: string }) => {
+  const { textCopied, isTextBeingCopied, copy2Clipboard } = useCopy2Clipboard();
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={() => copy2Clipboard(text)}
+            disabled={isTextBeingCopied || textCopied !== null}
+            className={cn(
+              "font-semibold text-[#333] w-full line-clamp-2",
+              textCopied === null && "cursor-pointer"
+            )}
+          >
+            {isTextBeingCopied && (
+              <Loader2 className="animate-spin text-neutral-700 size-4" />
+            )}
+            {!isTextBeingCopied && textCopied && (
+              <div className="flex flex-1 gap-1">
+                <Check className="size-4 stroke-neutral-700" />
+                <span>Copied!</span>
+              </div>
+            )}
+            {!isTextBeingCopied && textCopied === false && (
+              <div className="flex flex-1 gap-1">
+                <span>Failed to copy</span>
+              </div>
+            )}
+            {!isTextBeingCopied && textCopied === null && (
+              <div className="w-full text-start justify-start items-start line-clamp-2">
+                {maskApiKey(text)}
+              </div>
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Click to copy</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
