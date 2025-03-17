@@ -161,7 +161,7 @@ export const SettingDialogSidebar = ({
                 <button
                   key={item.path}
                   onClick={() => onItemSelected(item)}
-                  className="w-full flex flex-1"
+                  className="w-full flex flex-1 mb-[1px]"
                 >
                   <SidebarButton
                     item={item}

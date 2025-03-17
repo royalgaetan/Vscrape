@@ -72,6 +72,12 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  html,
+  body {
+    @apply h-full w-full bg-transparent overflow-x-hidden overscroll-none;
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */

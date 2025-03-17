@@ -3,6 +3,7 @@ import { appName } from "@/lib/constants";
 import { geistMono, geistSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/authProvider";
+import { PanSidebarProvider } from "@/providers/panSidebarProvider";
 
 export default function RootLayout({
   children,
@@ -28,7 +29,9 @@ export default function RootLayout({
           "h-full w-full flex flex-1 justify-center items-center"
         )}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <PanSidebarProvider>{children}</PanSidebarProvider>
+        </AuthProvider>
       </body>
     </html>
   );

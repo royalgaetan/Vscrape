@@ -32,7 +32,7 @@ const AppHeader = () => {
   return (
     <div className="flex justify-between w-full h-fit">
       {/* Breadcrumbs */}
-      <div className="flex flex-1 items-start text-xs py-4 px-10">
+      <div className="flex flex-1 items-start text-xs py-4 pr-10">
         <Breadcrumbs />
       </div>
 

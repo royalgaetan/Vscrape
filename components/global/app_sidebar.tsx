@@ -27,8 +27,16 @@ import { Button } from "../ui/button";
 import { sidebarPathType } from "@/lib/types";
 import { COLORS } from "@/lib/colors";
 import MoreDialog from "@/app/(protected)/_more/more_dialog";
+import { usePanSidebar } from "@/hooks/usePanSidebar";
+import { panSidebarType } from "@/providers/panSidebarProvider";
 
 const AppSidebar = () => {
+  const {
+    setIsPanSidebarOpen,
+    setPanSidebarType,
+    isPanSidebarOpen,
+    panSidebarType,
+  } = usePanSidebar();
   const pathname = usePathname();
   const sidebarPaths: sidebarPathType[] = [
     { name: "Home", path: "/home", icon: Home, type: "main" },
@@ -39,7 +47,7 @@ const AppSidebar = () => {
       type: "main",
     },
     { name: "Search", path: "/search", icon: Search, type: "main" },
-    { name: "Inbox", path: "/inbox", icon: Inbox, type: "main" },
+    { name: "Inbox", path: "", icon: Inbox, type: "main" },
     {
       name: "Marketplace",
       path: "/marketplace",
@@ -54,9 +62,22 @@ const AppSidebar = () => {
     },
     { name: "Chats", path: "/chats", icon: MessagesSquare, type: "expandable" },
     { name: "Settings", path: "", icon: Settings, type: "icon-only" },
-    { name: "Trash", path: "/trash", icon: Trash2, type: "icon-only" },
     { name: "More", path: "", icon: HelpCircle, type: "icon-only" },
+    { name: "Trash", path: "/trash", icon: Trash2, type: "icon-only" },
   ];
+
+  const togglePanSidebar = (type: panSidebarType) => {
+    if (isPanSidebarOpen) {
+      if (panSidebarType !== type) {
+        setPanSidebarType(type);
+      } else {
+        setIsPanSidebarOpen(false);
+      }
+    } else {
+      setPanSidebarType(type);
+      setIsPanSidebarOpen(true);
+    }
+  };
 
   return (
     <Sidebar>
@@ -71,14 +92,32 @@ const AppSidebar = () => {
           {sidebarPaths
             .filter((item) => item.type === "main")
             .map((item) => {
-              return (
-                <span key={item.path} className={cn("mb-[1px]")}>
-                  <SidebarButton
-                    isSelected={pathname === item.path}
-                    item={item}
-                  />
-                </span>
-              );
+              if (item.name === "Inbox") {
+                return (
+                  <button
+                    key={item.path}
+                    className={cn("mb-[1px]")}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      togglePanSidebar("inbox");
+                    }}
+                  >
+                    <SidebarButton
+                      isSelected={pathname === item.path}
+                      item={item}
+                    />
+                  </button>
+                );
+              } else {
+                return (
+                  <span key={item.path} className={cn("mb-[1px]")}>
+                    <SidebarButton
+                      isSelected={pathname === item.path}
+                      item={item}
+                    />
+                  </span>
+                );
+              }
             })}
         </div>
         <Separator className="" />
@@ -101,7 +140,7 @@ const AppSidebar = () => {
 
         <Separator className="my-0" />
         {/* Icon-only Icons */}
-        <SidebarFooter className="flex w-full h-8 mt-0 pt-0">
+        <SidebarFooter className="flex w-full h-8 m-0 p-0">
           <div className="flex flex-1 gap-0">
             {sidebarPaths
               .filter((item) => item.type === "icon-only")
@@ -117,10 +156,7 @@ const AppSidebar = () => {
                   );
                 } else if (item.name === "More") {
                   return (
-                    <div
-                      key={item.path}
-                      className={cn("flex flex-1 justify-end")}
-                    >
+                    <div key={item.path}>
                       <MoreDialog>
                         <SidebarButton
                           isSelected={pathname === item.path}
@@ -128,6 +164,22 @@ const AppSidebar = () => {
                         />
                       </MoreDialog>
                     </div>
+                  );
+                } else if (item.name === "Trash") {
+                  return (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        togglePanSidebar("trash");
+                      }}
+                      key={item.path}
+                      className={cn("flex flex-1 justify-end")}
+                    >
+                      <SidebarButton
+                        isSelected={pathname === item.path}
+                        item={item}
+                      />
+                    </button>
                   );
                 } else {
                   return (
