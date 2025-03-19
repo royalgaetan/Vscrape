@@ -8,11 +8,11 @@ import {
   Inbox,
   LayoutDashboard,
   LucideIcon,
-  MessagesSquare,
   Plus,
   Search,
   Settings,
-  ShoppingBag,
+  Shapes,
+  Terminal,
   Trash2,
   Workflow,
 } from "lucide-react";
@@ -29,6 +29,35 @@ import { COLORS } from "@/lib/colors";
 import MoreDialog from "@/app/(protected)/_more/more_dialog";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
 import { panSidebarType } from "@/providers/panSidebarProvider";
+import { useSearch } from "@/hooks/useSearchDialog";
+
+export const sidebarPaths: sidebarPathType[] = [
+  { name: "Home", path: "/home", icon: Home, type: "main" },
+  {
+    name: "Dashboard",
+    path: "/dashboard",
+    icon: LayoutDashboard,
+    type: "main",
+  },
+  { name: "Search", path: "", icon: Search, type: "main" },
+  { name: "Inbox", path: "", icon: Inbox, type: "main" },
+  { name: "Generate", path: "/generate", icon: Terminal, type: "main" },
+  {
+    name: "Templates",
+    path: "/templates",
+    icon: Shapes,
+    type: "main",
+  },
+  {
+    name: "Workflows",
+    path: "/workflows",
+    icon: Workflow,
+    type: "expandable",
+  },
+  { name: "Settings", path: "", icon: Settings, type: "icon-only" },
+  { name: "More", path: "", icon: HelpCircle, type: "icon-only" },
+  { name: "Trash", path: "/trash", icon: Trash2, type: "icon-only" },
+];
 
 const AppSidebar = () => {
   const {
@@ -38,33 +67,7 @@ const AppSidebar = () => {
     panSidebarType,
   } = usePanSidebar();
   const pathname = usePathname();
-  const sidebarPaths: sidebarPathType[] = [
-    { name: "Home", path: "/home", icon: Home, type: "main" },
-    {
-      name: "Dashboard",
-      path: "/dashboard",
-      icon: LayoutDashboard,
-      type: "main",
-    },
-    { name: "Search", path: "/search", icon: Search, type: "main" },
-    { name: "Inbox", path: "", icon: Inbox, type: "main" },
-    {
-      name: "Marketplace",
-      path: "/marketplace",
-      icon: ShoppingBag,
-      type: "main",
-    },
-    {
-      name: "Workflows",
-      path: "/workflows",
-      icon: Workflow,
-      type: "expandable",
-    },
-    { name: "Chats", path: "/chats", icon: MessagesSquare, type: "expandable" },
-    { name: "Settings", path: "", icon: Settings, type: "icon-only" },
-    { name: "More", path: "", icon: HelpCircle, type: "icon-only" },
-    { name: "Trash", path: "/trash", icon: Trash2, type: "icon-only" },
-  ];
+  const { setOpenSearchDialog } = useSearch();
 
   const togglePanSidebar = (type: panSidebarType) => {
     if (isPanSidebarOpen) {
@@ -108,31 +111,63 @@ const AppSidebar = () => {
                     />
                   </button>
                 );
-              } else {
+              } else if (item.name === "Search") {
                 return (
-                  <span key={item.path} className={cn("mb-[1px]")}>
+                  <button
+                    key={item.path}
+                    className={cn("mb-[1px]")}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setOpenSearchDialog(true);
+                    }}
+                  >
                     <SidebarButton
                       isSelected={pathname === item.path}
                       item={item}
                     />
-                  </span>
+                  </button>
+                );
+              } else {
+                return (
+                  <button
+                    key={item.path}
+                    className={cn(
+                      "mb-[1px]",
+                      item.name === "Templates" && "-mb-2"
+                    )}
+                    onClick={() => {
+                      setIsPanSidebarOpen(false);
+                    }}
+                  >
+                    {item.name === "Generate" && <Separator className="my-1" />}
+                    <SidebarButton
+                      isSelected={pathname === item.path}
+                      item={item}
+                    />
+                  </button>
                 );
               }
             })}
         </div>
-        <Separator className="" />
+
         {/* Expandable Icons */}
-        <div className="flex flex-1 w-full ">
+        <div className="flex flex-1 w-full">
           <div className="flex flex-col w-full overflow-x-auto">
             {sidebarPaths
               .filter((item) => item.type === "expandable")
               .map((item) => {
                 return (
-                  <SidebarButton
-                    isSelected={pathname === item.path}
+                  <button
                     key={item.path}
-                    item={item}
-                  />
+                    onClick={() => {
+                      setIsPanSidebarOpen(false);
+                    }}
+                  >
+                    <SidebarButton
+                      isSelected={pathname === item.path}
+                      item={item}
+                    />
+                  </button>
                 );
               })}
           </div>

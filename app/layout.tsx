@@ -2,6 +2,7 @@ import "./globals.css";
 import { appName } from "@/lib/constants";
 import { geistMono, geistSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
+import AppSearchProvider from "@/providers/appSearchProvider";
 import { AuthProvider } from "@/providers/authProvider";
 import { PanSidebarProvider } from "@/providers/panSidebarProvider";
 
@@ -30,7 +31,9 @@ export default function RootLayout({
         )}
       >
         <AuthProvider>
-          <PanSidebarProvider>{children}</PanSidebarProvider>
+          <AppSearchProvider>
+            <PanSidebarProvider>{children}</PanSidebarProvider>
+          </AppSearchProvider>
         </AuthProvider>
       </body>
     </html>

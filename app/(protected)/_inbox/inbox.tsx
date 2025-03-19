@@ -11,7 +11,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,6 @@ import {
   CheckCheck,
   InboxIcon,
   ListFilter,
-  LucideIcon,
   Mail,
   MailIcon,
 } from "lucide-react";
@@ -40,7 +38,7 @@ export const inboxFilterOptions = {
   today: { icon: CalendarClockIcon, title: "Today's" },
 } as const;
 
-export type InboxItem = {
+export type InboxItemType = {
   date: Date;
   avatar: React.ReactNode;
   subjectLine: string;
@@ -192,7 +190,7 @@ const Inbox = () => {
 
 export default Inbox;
 
-export const InboxItem = ({ item }: { item: InboxItem }) => {
+export const InboxItem = ({ item }: { item: InboxItemType }) => {
   return (
     <Accordion type="multiple" className="w-full">
       <AccordionItem

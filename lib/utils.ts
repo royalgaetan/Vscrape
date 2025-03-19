@@ -19,6 +19,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const isSearchTermFound = ({
+  text,
+  keySearchTerm,
+}: {
+  text: string;
+  keySearchTerm: string;
+}): boolean => {
+  return removeDiacritics(text.toLocaleLowerCase()).includes(
+    removeDiacritics(keySearchTerm.toLocaleLowerCase())
+  );
+};
+
 export const maskApiKey = (key: string): string => {
   if (key.length <= 4) return "*".repeat(key.length); // If key is too short, mask it
   const visiblePart = key.slice(0, 4);

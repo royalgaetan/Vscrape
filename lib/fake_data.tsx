@@ -1,83 +1,69 @@
-import { InboxItem } from "@/app/(protected)/_inbox/inbox";
+import { InboxItem, InboxItemType } from "@/app/(protected)/_inbox/inbox";
 import { trashItemType } from "@/app/(protected)/_trash/trash";
 
 export const userEmail = "kabundele@gmail.com";
 
 export const trashItems: trashItemType[] = [
   {
-    type: "workflow",
     title: "Email Automation",
     subTitle: "Old marketing campaign flow",
   },
   {
-    type: "chat",
     title: "Client Support - Sarah",
     subTitle: "Archived support conversation",
   },
-  { type: "workflow", title: "Lead Nurturing", subTitle: "Outdated CRM flow" },
+  { title: "Lead Nurturing", subTitle: "Outdated CRM flow" },
   {
-    type: "chat",
     title: "Project Update - John",
     subTitle: "Weekly project discussion",
   },
   {
-    type: "workflow",
     title: "Invoice Reminder",
     subTitle: "Automation for late payments",
   },
   {
-    type: "chat",
     title: "Team Brainstorm",
     subTitle: "Old group chat for Q1 ideas",
   },
   {
-    type: "workflow",
     title: "Survey Follow-Up",
     subTitle: "Inactive customer feedback sequence",
   },
   {
-    type: "chat",
     title: "Vendor Inquiry",
     subTitle: "Chat with supplier regarding materials",
   },
   {
-    type: "workflow",
     title: "Product Launch Flow",
     subTitle: "Retired campaign for V2",
   },
   {
-    type: "chat",
     title: "Internal QA Discussion",
     subTitle: "Testing feedback conversation",
   },
   {
-    type: "workflow",
     title: "Appointment Booking",
     subTitle: "Deprecated calendar sync flow",
   },
   {
-    type: "chat",
     title: "Customer Onboarding - Alex",
     subTitle: "Welcome chat from onboarding",
   },
   {
-    type: "workflow",
     title: "Blog Promotion",
     subTitle: "Old social media automation",
   },
   {
-    type: "chat",
     title: "Design Review Chat",
     subTitle: "Archived UI feedback conversation",
   },
   {
-    type: "workflow",
     title: "Abandoned Cart Reminder",
     subTitle: "Legacy eCommerce automation",
   },
 ];
 
-export const inboxItems: InboxItem[] = [
+export const inboxItems: InboxItemType[] = [
   {
     date: new Date("2025-03-17T22:00:15"),
     avatar: (

@@ -1,51 +1,33 @@
 import React, { useState } from "react";
 import SettingItemSearchBar from "../_settings/_components/settings_item_searchbar";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trashItems } from "@/lib/fake_data";
-import { MessagesSquare, Trash2Icon, Undo2, Workflow } from "lucide-react";
+import { Trash2Icon, Undo2, Workflow } from "lucide-react";
 import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Button } from "@/components/ui/button";
-import {
-  capitalizeFirstLetter,
-  cn,
-  getIconColor,
-  removeDiacritics,
-} from "@/lib/utils";
+import { cn, getIconColor, removeDiacritics } from "@/lib/utils";
 
 export type trashItemType = {
-  type: "workflow" | "chat";
   title: string;
   subTitle: string;
 };
 
-const tabOptions = ["all", "workflow", "chat"] as const;
-
 const Trash = () => {
   const [searchContent, setSearchContent] = useState("");
-  const [selectedTab, setSelectedTab] =
-    useState<(typeof tabOptions)[number]>("all");
 
-  const filteredItems = trashItems
-    .filter((item) => {
-      return selectedTab === "all" ? item : item.type === selectedTab;
-    })
-    .filter((item) => {
-      return (
-        // Filter based search term: 1.Title
-        removeDiacritics(item.title.toLocaleLowerCase()).includes(
-          removeDiacritics(searchContent.toLocaleLowerCase())
-        ) ||
-        // Filter based search term: 2.SubTitle
-        removeDiacritics(item.subTitle.toLocaleLowerCase()).includes(
-          removeDiacritics(searchContent.toLocaleLowerCase())
-        )
-      );
-    });
+  const filteredItems = trashItems.filter((item) => {
+    return (
+      // Filter based search term: 1.Title
+      removeDiacritics(item.title.toLocaleLowerCase()).includes(
+        removeDiacritics(searchContent.toLocaleLowerCase())
+      ) ||
+      // Filter based search term: 2.SubTitle
+      removeDiacritics(item.subTitle.toLocaleLowerCase()).includes(
+        removeDiacritics(searchContent.toLocaleLowerCase())
+      )
+    );
+  });
   return (
-    <Tabs
-      defaultValue={selectedTab}
-      className="w-full h-full overflow-y-clip bg-white flex flex-col space-y-2 pt-7"
-    >
+    <div className="w-full h-full overflow-y-clip bg-white flex flex-col space-y-2 pt-7">
       {/* Header */}
       <h2 className="text-2xl font-semibold text-[#333] px-5 mb-2">Trash</h2>
 
@@ -69,22 +51,6 @@ const Trash = () => {
         />
       </div>
 
-      {/* Tabs list */}
-      <TabsList className="bg-transparent border-b-2 border-neutral-400/20 pb-0 pl-0 rounded-none justify-start w-full gap-3 px-5">
-        {tabOptions.map((tabVal) => {
-          return (
-            <TabsTrigger
-              className="text-xs rounded-none pb-2 border-b-4 border-transparent data-[state=active]:border-primary font-medium focus-visible:ring-0 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-none"
-              key={tabVal}
-              value={tabVal}
-              onClick={() => setSelectedTab(tabVal)}
-            >
-              {capitalizeFirstLetter(tabVal)}
-            </TabsTrigger>
-          );
-        })}
-      </TabsList>
-
       {/* Trash Content */}
       <div className="h-max w-full overflow-x-clip overflow-y-auto pb-5">
         {filteredItems.length === 0 ? (
@@ -97,7 +63,7 @@ const Trash = () => {
           })
         )}
       </div>
-    </Tabs>
+    </div>
   );
 };
 
@@ -105,17 +71,10 @@ export default Trash;
 
 const TrashItem = ({ item }: { item: trashItemType }) => {
   return (
-    <div className="group/trashItem w-full my-1 px-5 py-2 hover:bg-neutral-200/40  bg-white cursor-pointer flex justify-start items-start transition-all duration-200">
+    <div className="group/trashItem w-full my-1 px-5 py-1 hover:bg-neutral-200/40  bg-white cursor-pointer flex justify-start items-start transition-all duration-200">
       {/* Icon */}
       <div className="w-8 mr-2 pt-1 flex justify-center align-top  group-hover/trashItem:opacity-90">
-        {item.type === "workflow" ? (
-          <Workflow
-            style={{ stroke: getIconColor(Workflow) }}
-            className="size-5"
-          />
-        ) : (
-          <MessagesSquare className="size-5 stroke-muted-foreground" />
-        )}
+        <Workflow className="size-5 stroke-muted-foreground" />
       </div>
 
       {/* Title + Subtitle */}

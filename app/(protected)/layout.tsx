@@ -10,6 +10,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { SIDEBAR_WIDTH } from "@/lib/values";
 import { AppPanSidebar } from "@/components/global/app_pan_sidebar";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
+import Search from "./_search/search";
+
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, isLoading } = useAuth();
@@ -51,6 +53,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </main>
       </div>
+
+      {/* Search */}
+      <Search />
     </SidebarProvider>
   );
 };
