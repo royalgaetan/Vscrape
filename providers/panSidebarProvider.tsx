@@ -1,17 +1,26 @@
 "use client";
+import { inboxFilterOptions } from "@/app/(protected)/_inbox/inbox";
 import { createContext, useState } from "react";
 
-export const panSidebarContext = createContext<panSidebarContextType | null>(
+export const PanSidebarContext = createContext<panSidebarContextType | null>(
   null
 );
 
 export type panSidebarType = "trash" | "inbox";
+export type inboxOptionsType = {
+  filter?: keyof typeof inboxFilterOptions;
+  scrollToId?: string;
+};
 
 type panSidebarContextType = {
   isPanSidebarOpen: boolean;
-  setIsPanSidebarOpen: (val: boolean) => void;
   panSidebarType: panSidebarType;
-  setPanSidebarType: (type: panSidebarType) => void;
+  panSidebarOptions?: inboxOptionsType;
+  setOpenPanSidebar: (
+    isOpen: boolean,
+    type: panSidebarType,
+    inboxOptions?: inboxOptionsType
+  ) => void;
 };
 
 export const PanSidebarProvider = ({
@@ -21,17 +30,30 @@ export const PanSidebarProvider = ({
 }) => {
   const [isPanSidebarOpen, setIsPanSidebarOpen] = useState<boolean>(false);
   const [panSidebarType, setPanSidebarType] = useState<panSidebarType>("inbox");
+  const [panSidebarOptions, setPanSidebarOptions] = useState<
+    inboxOptionsType | undefined
+  >({});
+
+  const setOpenPanSidebar = (
+    isOpen: boolean,
+    type: panSidebarType,
+    inboxOptions?: inboxOptionsType
+  ) => {
+    setPanSidebarOptions(inboxOptions);
+    setPanSidebarType(type);
+    setIsPanSidebarOpen(isOpen);
+  };
 
   return (
-    <panSidebarContext.Provider
+    <PanSidebarContext.Provider
       value={{
         isPanSidebarOpen,
-        setIsPanSidebarOpen,
         panSidebarType,
-        setPanSidebarType,
+        panSidebarOptions,
+        setOpenPanSidebar,
       }}
     >
       {children}
-    </panSidebarContext.Provider>
+    </PanSidebarContext.Provider>
   );
 };

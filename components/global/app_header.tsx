@@ -21,6 +21,7 @@ import {
 } from "../ui/dropdown-menu";
 import SettingsDialog from "@/app/(protected)/_settings/settings_dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { useAppDialog } from "@/hooks/useAppDialog";
 
 const AppHeader = () => {
   const [avatarImage, setAvatarImage] = useState("");
@@ -72,52 +73,45 @@ export default AppHeader;
 
 const ProfileActionItem = ({ avatarImage }: { avatarImage: string }) => {
   const { logout } = useAuth();
-  const [initialSettingTabIndex, setInitialSettingTabIndex] =
-    useState<number>(0);
+  const { setOpenSettingsDialog } = useAppDialog();
 
   return (
-    <SettingsDialog initialTabIndex={initialSettingTabIndex}>
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Avatar className="h-8 w-8 ml-1 cursor-pointer">
-            <AvatarImage src={avatarImage} alt="Avatar" />
-            <AvatarFallback>Vs</AvatarFallback>
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side="bottom"
-          align="end"
-          className="w-52 px-2 py-3"
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Avatar className="h-8 w-8 ml-1 cursor-pointer">
+          <AvatarImage src={avatarImage} alt="Avatar" />
+          <AvatarFallback>Vs</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="end" className="w-52 px-2 py-3">
+        <DropdownMenuItem
+          onClick={() => {
+            setOpenSettingsDialog(true, "account");
+          }}
         >
-          <DropdownMenuItem
-            onClick={() => {
-              setInitialSettingTabIndex(0);
-            }}
-          >
-            <UserRoundCogIcon className="stroke-neutral-600" />
-            <span className="text-neutral-600">Account Settings</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={(e) => {
-              setInitialSettingTabIndex(4);
-            }}
-          >
-            <ReceiptCent className="stroke-neutral-600" />
-            <span className="text-neutral-600">Plans</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <UserRoundCogIcon className="stroke-neutral-600" />
+          <span className="text-neutral-600">Account Settings</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={(e) => {
+            setOpenSettingsDialog(true, "plans");
+          }}
+        >
+          <ReceiptCent className="stroke-neutral-600" />
+          <span className="text-neutral-600">Plans</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
 
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.preventDefault();
-              logout();
-            }}
-          >
-            <LogOut className="stroke-neutral-600" />
-            <span className="text-neutral-600">Log out</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </SettingsDialog>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            logout();
+          }}
+        >
+          <LogOut className="stroke-neutral-600" />
+          <span className="text-neutral-600">Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

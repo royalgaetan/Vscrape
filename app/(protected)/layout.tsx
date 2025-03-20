@@ -10,17 +10,19 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { SIDEBAR_WIDTH } from "@/lib/values";
 import { AppPanSidebar } from "@/components/global/app_pan_sidebar";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
-import Search from "./_search/search";
+import MoreDialog from "./_more/more_dialog";
+import SearchModal from "./_search/search";
+import SettingsDialog from "./_settings/settings_dialog";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, isLoading } = useAuth();
-  const { setIsPanSidebarOpen } = usePanSidebar();
+  const { setOpenPanSidebar } = usePanSidebar();
 
   useEffect(() => {
     if (mainContainerRef.current) {
       mainContainerRef.current.addEventListener("click", () => {
-        setIsPanSidebarOpen(false);
+        setOpenPanSidebar(false, "inbox");
       });
     }
   }, []);
@@ -54,8 +56,14 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         </main>
       </div>
 
-      {/* Search */}
-      <Search />
+      {/* Search Modal */}
+      <SearchModal />
+
+      {/* More Modal  */}
+      <MoreDialog />
+
+      {/* Settings Modal */}
+      <SettingsDialog />
     </SidebarProvider>
   );
 };

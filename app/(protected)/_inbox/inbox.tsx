@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SettingItemSearchBar from "../_settings/_components/settings_item_searchbar";
 import {
   Accordion,
@@ -14,7 +14,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { capitalizeFirstLetter, cn, removeDiacritics } from "@/lib/utils";
+import {
+  capitalizeFirstLetter,
+  cn,
+  isAccordionElementOpen,
+  isSearchTermFound,
+  scrollToEl,
+  waitForElementById,
+} from "@/lib/utils";
 import { SidebarIcon } from "@/components/global/app_sidebar";
 import {
   ArchiveIcon,
@@ -30,6 +37,7 @@ import {
 import { inboxItems } from "@/lib/fake_data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow, isToday } from "date-fns";
+import { usePanSidebar } from "@/hooks/usePanSidebar";
 
 export const inboxFilterOptions = {
   default: { icon: InboxIcon, title: "Inbox" },
@@ -40,7 +48,7 @@ export const inboxFilterOptions = {
 
 export type InboxItemType = {
   date: Date;
-  avatar: React.ReactNode;
+  avatar: string;
   subjectLine: string;
   content: string[];
   actions: ("view" | "accept" | "refuse" | "retry")[];
@@ -49,9 +57,42 @@ export type InboxItemType = {
 };
 
 const Inbox = () => {
+  const { isPanSidebarOpen, panSidebarOptions, panSidebarType } =
+    usePanSidebar();
   const [searchContent, setSearchContent] = useState("");
   const [inboxFilter, setInboxFilter] =
     useState<keyof typeof inboxFilterOptions>("default");
+
+  useEffect(() => {
+    const inboxListId = "inboxList";
+    // Check for initial filters
+    if (panSidebarType === "inbox" && panSidebarOptions?.filter) {
+      setInboxFilter(panSidebarOptions?.filter);
+    }
+
+    // Check if there's a Scrollto Element needed
+    // And Click the element
+    if (panSidebarType === "inbox" && panSidebarOptions?.scrollToId) {
+      waitForElementById(panSidebarOptions?.scrollToId)
+        .then(async (el) => {
+          !isAccordionElementOpen(el.id) && el.click();
+          scrollToEl({
+            parentId: inboxListId,
+            id: el.id,
+            offsetTopMargin: 10,
+          });
+        })
+        .catch((err) => {
+          console.warn(err.message);
+        });
+    }
+
+    return () => {};
+  }, [
+    isPanSidebarOpen,
+    panSidebarOptions?.filter,
+    panSidebarOptions?.scrollToId,
+  ]);
 
   const filteredInboxItems = inboxItems
     .filter((item) => {
@@ -75,21 +116,18 @@ const Inbox = () => {
     })
     // Search Filter
     .filter((item) => {
-      return (
-        // Filter based search term: 1.Subject line
-        removeDiacritics(item.subjectLine.toLocaleLowerCase()).includes(
-          removeDiacritics(searchContent.toLocaleLowerCase())
-        ) ||
-        // Filter based search term: 2.Content
-        removeDiacritics(item.content.join(". ").toLocaleLowerCase()).includes(
-          removeDiacritics(searchContent.toLocaleLowerCase())
-        )
-      );
+      return isSearchTermFound({
+        text: item.subjectLine.concat(item.content.join(".")),
+        keySearchTerm: searchContent,
+      });
     })
     .toSorted((a, b) => b.date.getTime() - a.date.getTime());
 
   return (
-    <div className="w-full h-full bg-white flex flex-col space-y-2 overflow-x-clip overflow-y-auto pb-5">
+    <div
+      className="w-full h-full bg-white flex flex-col space-y-2 overflow-x-clip overflow-y-auto pb-10"
+      id="inboxList"
+    >
       <div className="px-5 bg-white mt-7 flex justify-between">
         {/* Header */}
         <h2 className="text-2xl font-semibold text-[#333]">
@@ -175,15 +213,17 @@ const Inbox = () => {
       </div>
 
       {/* Inbox Content */}
-      {filteredInboxItems.length === 0 ? (
-        <div className=" text-muted-foreground text-xs font-semibold flex justify-center items-center h-36">
-          No item found.
-        </div> // Display "Not found" if no matches are found
-      ) : (
-        filteredInboxItems.map((item, i) => {
-          return <InboxItem key={`${i.toString()}`} item={item} />;
-        })
-      )}
+      <div className="flex flex-col">
+        {filteredInboxItems.length === 0 ? (
+          <div className=" text-muted-foreground text-xs font-semibold flex justify-center items-center h-36">
+            No item found.
+          </div> // Display "Not found" if no matches are found
+        ) : (
+          filteredInboxItems.map((item, i) => {
+            return <InboxItem key={`${i.toString()}`} item={item} />;
+          })
+        )}
+      </div>
     </div>
   );
 };
@@ -199,13 +239,14 @@ export const InboxItem = ({ item }: { item: InboxItemType }) => {
       >
         {/* SujectLine expandable */}
         <AccordionTrigger
+          id={item.subjectLine}
           hideArrowIndicator
           className="hover:bg-neutral-200/40 h-12 px-5 py-2 mb-1 flex flex-1 gap-2 hover:no-underline"
         >
           <div className="relative">
             {/* Avatar */}
             <Avatar className="h-7 w-7 ml-1 cursor-pointer relative">
-              <AvatarImage src={""} alt="Avatar" />
+              <AvatarImage src={item.avatar} alt="Avatar" />
               <AvatarFallback className="bg-zinc-500 text-white">
                 A
               </AvatarFallback>
@@ -223,7 +264,7 @@ export const InboxItem = ({ item }: { item: InboxItemType }) => {
 
           {/* Subject line content + Date */}
           <div className="flex flex-1">
-            <div className="flex flex-col text-xs">
+            <div className="flex flex-col text-xs items-start">
               <h6
                 className={cn(
                   "font-normal text-[#333] line-clamp-1",

@@ -1,4 +1,4 @@
-import { InboxItem, InboxItemType } from "@/app/(protected)/_inbox/inbox";
+import { InboxItemType } from "@/app/(protected)/_inbox/inbox";
 import { trashItemType } from "@/app/(protected)/_trash/trash";
 
 export const userEmail = "kabundele@gmail.com";
@@ -66,10 +66,8 @@ export const trashItems: trashItemType[] = [
 export const inboxItems: InboxItemType[] = [
   {
     date: new Date("2025-03-17T22:00:15"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="avatar" />
-    ),
-    subjectLine: "Sarah shared you access to a workflow",
+    avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+    subjectLine: "Yesss Sarah shared you access to a workflow",
     content: [
       "You have been granted access to a new workflow. Click accept to validate your access",
       "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
@@ -81,10 +79,8 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-16T14:20:30"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="avatar" />
-    ),
-    subjectLine: "Your workflow execution failed: Inventory Management",
+    avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+    subjectLine: "Gogo workflow execution failed: Inventory Management",
     content: [
       "The workflow execution id:40dek9JKsos2sPA failed due to this error: not enough credits.",
     ],
@@ -94,9 +90,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-15T10:15:10"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/women/5.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/women/5.jpg",
     subjectLine: "Sarah shared you access to a workflow",
     content: [
       "A new workflow has been shared with you. Check it out!. ",
@@ -110,9 +104,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-17T20:10:15"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/men/4.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/men/4.jpg",
     subjectLine: "Your workflow execution failed: Order Processing",
     content: ["Execution failed due to network errors. Please try again."],
     actions: ["view", "retry"],
@@ -121,9 +113,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-13T12:10:50"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/women/8.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/women/8.jpg",
     subjectLine: "Worflow access accepted",
     content: [
       "You have confirmed your access to the workflow shared by Sarah",
@@ -135,9 +125,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-12T16:00:40"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
     subjectLine: "Your workflow execution failed: Payment Gateway",
     content: ["The payment gateway workflow failed. Please check the logs."],
     actions: ["view", "retry"],
@@ -146,9 +134,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-11T09:30:25"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/women/3.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
     subjectLine: "Your workflow execution failed: User Registration",
     content: ["A failure occurred during user registration. Please review."],
     actions: ["view", "retry"],
@@ -157,9 +143,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-10T17:45:10"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/men/7.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/men/7.jpg",
     subjectLine: "Michael shared you access to a workflow",
     content: ["You've been granted access to a workflow related to orders."],
     actions: ["view"],
@@ -168,9 +152,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-09T11:20:55"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/women/9.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/women/9.jpg",
     subjectLine: "Your workflow execution failed: Inventory Update",
     content: ["The workflow failed due to an error with the database."],
     actions: ["view", "retry"],
@@ -179,9 +161,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-08T15:50:40"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/men/2.jpg",
     subjectLine: "Frank shared you access to a workflow",
     content: ["New workflow has been shared. Please review and proceed."],
     actions: ["view", "accept", "refuse"],
@@ -190,9 +170,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-07T18:25:10"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/women/4.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/women/4.jpg",
     subjectLine: "Your workflow execution failed: Report Generation",
     content: ["Failure detected in report generation. Kindly investigate."],
     actions: ["view", "retry"],
@@ -201,9 +179,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-06T13:40:50"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/men/5.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/men/5.jpg",
     subjectLine: "Your workflow execution failed: Data Sync",
     content: [
       "The sync operation failed due to data inconsistency.",
@@ -215,9 +191,7 @@ export const inboxItems: InboxItemType[] = [
   },
   {
     date: new Date("2025-03-04T14:10:30"),
-    avatar: (
-      <img src="https://randomuser.me/api/portraits/men/6.jpg" alt="avatar" />
-    ),
+    avatar: "https://randomuser.me/api/portraits/men/6.jpg",
     subjectLine: "Your workflow execution succeed: Notification System",
     content: [
       "The notification system workflow has been successfully executed.",
@@ -225,5 +199,198 @@ export const inboxItems: InboxItemType[] = [
     actions: [],
     isRead: false,
     isArchived: true,
+  },
+  {
+    date: new Date("2025-03-11T09:45:00"),
+    avatar: "https://randomuser.me/api/portraits/men/9.jpg",
+    subjectLine: "New update on your shared workflow",
+    content: ["Workflow ‘User Onboarding’ has received new changes."],
+    actions: ["view"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-03-10T11:15:30"),
+    avatar: "https://randomuser.me/api/portraits/women/11.jpg",
+    subjectLine: "Workflow execution succeeded: Billing Automation",
+    content: ["The billing automation executed successfully."],
+    actions: ["view"],
+    isRead: true,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-03-14T08:05:12"),
+    avatar: "https://randomuser.me/api/portraits/men/6.jpg",
+    subjectLine: "Workflow execution failed: Lead Generation",
+    content: ["Credits limit exceeded. Retry after upgrading your plan."],
+    actions: ["view", "retry"],
+    isRead: false,
+    isArchived: true,
+  },
+  {
+    date: new Date("2025-03-09T17:20:45"),
+    avatar: "https://randomuser.me/api/portraits/women/10.jpg",
+    subjectLine: "Alex granted you access to Workflow Hub",
+    content: ["You’ve been added to Workflow Hub. Accept to get started."],
+    actions: ["view", "accept", "refuse"],
+    isRead: true,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-03-08T19:55:21"),
+    avatar: "https://randomuser.me/api/portraits/men/7.jpg",
+    subjectLine: "Reminder: Pending workflow access request",
+    content: ["You have not yet accepted the shared workflow access."],
+    actions: ["view", "accept", "refuse"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-03-06T13:35:10"),
+    avatar: "https://randomuser.me/api/portraits/women/4.jpg",
+    subjectLine: "Workflow execution failed: Data Sync",
+    content: ["Failure in syncing external data sources."],
+    actions: ["view", "retry"],
+    isRead: false,
+    isArchived: true,
+  },
+  {
+    date: new Date("2025-03-05T10:25:00"),
+    avatar: "https://randomuser.me/api/portraits/men/10.jpg",
+    subjectLine: "System update: Improved workflow builder",
+    content: [
+      "New drag and drop features added.",
+      "You can now organize steps visually.",
+    ],
+    actions: ["view"],
+    isRead: true,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-03-04T22:05:00"),
+    avatar: "https://randomuser.me/api/portraits/women/6.jpg",
+    subjectLine: "You’ve been mentioned in a workflow comment",
+    content: ["@You Please review the last execution details."],
+    actions: ["view"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-03-03T09:00:00"),
+    avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+    subjectLine: "Reminder: Archive unused workflows",
+    content: ["You have 5 workflows inactive for 30+ days."],
+    actions: ["view"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-03-02T14:40:00"),
+    avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+    subjectLine: "Team workflow shared with you: Analytics Reports",
+    content: [
+      "You’ve been granted access by Daniel.",
+      "View and collaborate on this analytics workflow.",
+    ],
+    actions: ["view", "accept", "refuse"],
+    isRead: true,
+    isArchived: true,
+  },
+  {
+    date: new Date("2025-03-01T15:45:50"),
+    avatar: "https://randomuser.me/api/portraits/men/8.jpg",
+    subjectLine: "Workflow execution alert: Email Campaign",
+    content: ["Execution took longer than expected."],
+    actions: ["view", "retry"],
+    isRead: true,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-02-29T18:30:00"),
+    avatar: "https://randomuser.me/api/portraits/women/7.jpg",
+    subjectLine: "You were removed from a shared workflow",
+    content: ["Your access to workflow ‘Daily Report’ was revoked."],
+    actions: ["view"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-02-28T21:15:10"),
+    avatar: "https://randomuser.me/api/portraits/men/11.jpg",
+    subjectLine: "Workflow archive confirmation",
+    content: ["You successfully archived ‘Monthly Sync’ workflow."],
+    actions: ["view"],
+    isRead: true,
+    isArchived: true,
+  },
+  {
+    date: new Date("2025-02-27T11:50:00"),
+    avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+    subjectLine: "Workflow update: Trigger conditions",
+    content: ["New trigger conditions are now available for your workflows."],
+    actions: ["view"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-02-26T08:25:10"),
+    avatar: "https://randomuser.me/api/portraits/men/5.jpg",
+    subjectLine: "Security alert: Workflow permissions changed",
+    content: ["Permissions for ‘HR Onboarding’ were modified recently."],
+    actions: ["view"],
+    isRead: false,
+    isArchived: true,
+  },
+  {
+    date: new Date("2025-02-25T17:00:45"),
+    avatar: "https://randomuser.me/api/portraits/women/9.jpg",
+    subjectLine: "Reminder: Accept shared workflow",
+    content: ["‘Feedback Loop’ is still waiting for your confirmation."],
+    actions: ["view", "accept", "refuse"],
+    isRead: true,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-02-24T13:13:30"),
+    avatar: "https://randomuser.me/api/portraits/men/12.jpg",
+    subjectLine: "Execution failed: CRM Integration",
+    content: ["API key invalid. Please verify your CRM integration."],
+    actions: ["view", "retry"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-02-23T10:33:00"),
+    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+    subjectLine: "yoyo",
+    content: [
+      "Workflow completion: Event Automation. Your event automation completed successfully.",
+    ],
+    actions: ["view"],
+    isRead: true,
+    isArchived: true,
+  },
+  {
+    date: new Date("2025-02-22T16:10:00"),
+    avatar: "https://randomuser.me/api/portraits/men/13.jpg",
+    subjectLine: "Alert: Low success rate in workflow",
+    content: [
+      "Only 3 of 10 executions succeeded.",
+      "Consider reviewing your logic.",
+    ],
+    actions: ["view", "retry"],
+    isRead: false,
+    isArchived: false,
+  },
+  {
+    date: new Date("2025-02-21T12:12:12"),
+    avatar: "https://randomuser.me/api/portraits/women/14.jpg",
+    subjectLine: "You've been invited to join a workflow: Growth Engine",
+    content: [
+      "David invited you to participate in a new growth automation workflow.",
+    ],
+    actions: ["view", "accept", "refuse"],
+    isRead: false,
+    isArchived: false,
   },
 ];

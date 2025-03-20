@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogTitle,
 } from "../../../components/ui/dialog";
@@ -33,6 +32,7 @@ import PlansSettings from "./plans/plans_settings";
 import ApiSettings from "./api/api_settings";
 import AccountSettings from "./account/account_settings";
 import ImportSettings from "./import/import_settings";
+import { useAppDialog } from "@/hooks/useAppDialog";
 
 export type settingsDialogItemType = sidebarPathType & {
   component: React.JSX.Element;
@@ -97,26 +97,20 @@ export const settingSidebarPaths: settingsDialogItemType[] = [
   },
 ];
 
-const SettingsDialog = ({
-  children,
-  initialTabIndex,
-}: {
-  initialTabIndex: number;
-  children: React.ReactNode;
-}) => {
-  const [itemSelected, setItemSelected] = useState<settingsDialogItemType>(
-    settingSidebarPaths[0]
-  );
-
-  useEffect(() => {
-    if (settingSidebarPaths[initialTabIndex]) {
-      setItemSelected(settingSidebarPaths[initialTabIndex]);
-    }
-  }, [initialTabIndex]);
+const SettingsDialog = () => {
+  const {
+    settingsDialogCurrentTab,
+    isSettingDialogOpen,
+    setOpenSettingsDialog,
+  } = useAppDialog();
 
   return (
-    <Dialog>
-      <DialogTrigger>{children}</DialogTrigger>
+    <Dialog
+      open={isSettingDialogOpen}
+      onOpenChange={(isOpen) => {
+        setOpenSettingsDialog(isOpen, "account");
+      }}
+    >
       <DialogContent
         hideCloseButton
         className="h-[90vh] w-[70vw] max-w-none overflow-clip p-0"
@@ -124,14 +118,15 @@ const SettingsDialog = ({
         <DialogTitle className="hidden"></DialogTitle>
         <SidebarProvider>
           {/* Sidebar */}
-          <SettingDialogSidebar
-            onItemSelected={(item) => setItemSelected(item)}
-            selectedItemPath={itemSelected.path}
-          />
+          <SettingDialogSidebar />
 
           <main className="flex flex-1 w-[0px] p-0">
             {/* Main Content */}
-            {itemSelected.component}
+            {
+              settingSidebarPaths.find(
+                (item) => item.path === settingsDialogCurrentTab
+              )?.component
+            }
           </main>
         </SidebarProvider>
       </DialogContent>
@@ -141,13 +136,9 @@ const SettingsDialog = ({
 
 export default SettingsDialog;
 
-export const SettingDialogSidebar = ({
-  onItemSelected,
-  selectedItemPath,
-}: {
-  onItemSelected: (val: settingsDialogItemType) => void;
-  selectedItemPath: string;
-}) => {
+export const SettingDialogSidebar = () => {
+  const { settingsDialogCurrentTab, setOpenSettingsDialog } = useAppDialog();
+
   return (
     <div className={cn("flex w-[15vw] p-3 pt-7", `bg-[#F8F8F7]`)}>
       {/* Main Icons */}
@@ -160,13 +151,13 @@ export const SettingDialogSidebar = ({
               <span key={item.name}>
                 <button
                   key={item.path}
-                  onClick={() => onItemSelected(item)}
+                  onClick={() => setOpenSettingsDialog(true, item.path)}
                   className="w-full flex flex-1 mb-[1px]"
                 >
                   <SidebarButton
                     item={item}
                     isLink={false}
-                    isSelected={selectedItemPath === item.path}
+                    isSelected={settingsDialogCurrentTab === item.path}
                   />
                 </button>
                 {i === 2 && (

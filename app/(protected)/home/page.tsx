@@ -12,11 +12,14 @@ import {
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import SettingsDialog from "../_settings/settings_dialog";
+import { useAppDialog } from "@/hooks/useAppDialog";
 
 const Home = () => {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [placeholder, setPlaceholder] = useState("");
+
+  const { setOpenSettingsDialog } = useAppDialog();
 
   useEffect(() => {
     const randomIndex = Math.floor(
@@ -83,12 +86,15 @@ const Home = () => {
             Pick from Marketplace
           </Button>
 
-          <SettingsDialog initialTabIndex={5}>
-            <Button variant={"ghost"} size={"sm"} className="w-fit">
-              <ArrowDownToLine className="stroke-pink-500" size={"1.3rem"} />
-              Import an existing
-            </Button>
-          </SettingsDialog>
+          <Button
+            onClick={() => setOpenSettingsDialog(true, "import")}
+            variant={"ghost"}
+            size={"sm"}
+            className="w-fit"
+          >
+            <ArrowDownToLine className="stroke-pink-500" size={"1.3rem"} />
+            Import an existing
+          </Button>
 
           <Button variant={"ghost"} size={"sm"} className="w-fit">
             <HelpCircleIcon className="stroke-blue-400" size={"1.3rem"} />

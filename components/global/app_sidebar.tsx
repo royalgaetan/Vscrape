@@ -2,13 +2,16 @@
 
 import React from "react";
 import {
+  Bug,
   ChevronRight,
+  Headset,
   HelpCircle,
   Home,
   Inbox,
   LayoutDashboard,
   LucideIcon,
   Plus,
+  Rocket,
   Search,
   Settings,
   Shapes,
@@ -26,10 +29,20 @@ import SettingsDialog from "../../app/(protected)/_settings/settings_dialog";
 import { Button } from "../ui/button";
 import { sidebarPathType } from "@/lib/types";
 import { COLORS } from "@/lib/colors";
-import MoreDialog from "@/app/(protected)/_more/more_dialog";
+import { moreButtonPathType } from "@/app/(protected)/_more/more_dialog";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
 import { panSidebarType } from "@/providers/panSidebarProvider";
-import { useSearch } from "@/hooks/useSearchDialog";
+import { useAppDialog } from "@/hooks/useAppDialog";
+import Support from "@/app/(protected)/_more/support/support";
+import FeatureRequest from "@/app/(protected)/_more/feature_request/feature_request";
+import Report from "@/app/(protected)/_more/report/report";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 export const sidebarPaths: sidebarPathType[] = [
   { name: "Home", path: "/home", icon: Home, type: "main" },
@@ -56,29 +69,36 @@ export const sidebarPaths: sidebarPathType[] = [
   },
   { name: "Settings", path: "", icon: Settings, type: "icon-only" },
   { name: "More", path: "", icon: HelpCircle, type: "icon-only" },
-  { name: "Trash", path: "/trash", icon: Trash2, type: "icon-only" },
+  { name: "Trash", path: "", icon: Trash2, type: "icon-only" },
+];
+
+export const moreButtonPaths: moreButtonPathType[] = [
+  { name: "Support", path: "support", icon: Headset, component: Support },
+  { name: "Report", path: "report", icon: Bug, component: Report },
+  {
+    name: "Feature Request",
+    path: "featureRequest",
+    icon: Rocket,
+    component: FeatureRequest,
+  },
 ];
 
 const AppSidebar = () => {
-  const {
-    setIsPanSidebarOpen,
-    setPanSidebarType,
-    isPanSidebarOpen,
-    panSidebarType,
-  } = usePanSidebar();
+  const { isPanSidebarOpen, panSidebarType, setOpenPanSidebar } =
+    usePanSidebar();
   const pathname = usePathname();
-  const { setOpenSearchDialog } = useSearch();
+
+  const { setOpenSettingsDialog, setOpenSearchDialog } = useAppDialog();
 
   const togglePanSidebar = (type: panSidebarType) => {
     if (isPanSidebarOpen) {
       if (panSidebarType !== type) {
-        setPanSidebarType(type);
+        setOpenPanSidebar(true, type);
       } else {
-        setIsPanSidebarOpen(false);
+        setOpenPanSidebar(false, type);
       }
     } else {
-      setPanSidebarType(type);
-      setIsPanSidebarOpen(true);
+      setOpenPanSidebar(true, type);
     }
   };
 
@@ -136,7 +156,7 @@ const AppSidebar = () => {
                       item.name === "Templates" && "-mb-2"
                     )}
                     onClick={() => {
-                      setIsPanSidebarOpen(false);
+                      setOpenPanSidebar(false, "inbox");
                     }}
                   >
                     {item.name === "Generate" && <Separator className="my-1" />}
@@ -160,7 +180,7 @@ const AppSidebar = () => {
                   <button
                     key={item.path}
                     onClick={() => {
-                      setIsPanSidebarOpen(false);
+                      setOpenPanSidebar(false, "inbox");
                     }}
                   >
                     <SidebarButton
@@ -182,39 +202,39 @@ const AppSidebar = () => {
               .map((item) => {
                 if (item.name === "Settings") {
                   return (
-                    <SettingsDialog key={item.path} initialTabIndex={0}>
-                      <SidebarButton
-                        isSelected={pathname === item.path}
-                        item={item}
-                      />
-                    </SettingsDialog>
-                  );
-                } else if (item.name === "More") {
-                  return (
-                    <div key={item.path}>
-                      <MoreDialog>
-                        <SidebarButton
-                          isSelected={pathname === item.path}
-                          item={item}
-                        />
-                      </MoreDialog>
-                    </div>
-                  );
-                } else if (item.name === "Trash") {
-                  return (
                     <button
+                      key={`${item.path}_settings`}
                       onClick={(e) => {
                         e.preventDefault();
-                        togglePanSidebar("trash");
+                        setOpenSettingsDialog(true, "account");
                       }}
-                      key={item.path}
-                      className={cn("flex flex-1 justify-end")}
                     >
                       <SidebarButton
                         isSelected={pathname === item.path}
                         item={item}
                       />
                     </button>
+                  );
+                } else if (item.name === "More") {
+                  return <MoreButton item={item} key={`${item.path}_more`} />;
+                } else if (item.name === "Trash") {
+                  return (
+                    <div
+                      key={`${item.path}_trash`}
+                      className="flex flex-1 justify-end"
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          togglePanSidebar("trash");
+                        }}
+                      >
+                        <SidebarButton
+                          isSelected={pathname === item.path}
+                          item={item}
+                        />
+                      </button>
+                    </div>
                   );
                 } else {
                   return (
@@ -392,4 +412,34 @@ export const SidebarItemWrapper = ({
       </button>
     );
   }
+};
+
+export const MoreButton = ({ item }: { item: sidebarPathType }) => {
+  const { setOpenMoreDialog } = useAppDialog();
+  const pathname = usePathname();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <SidebarButton isSelected={pathname === item.path} item={item} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="flex flex-col">
+        {moreButtonPaths.map((p, i) => {
+          const Icon = p.icon;
+          return (
+            <button
+              key={`${i.toString()}`}
+              onClick={() => setOpenMoreDialog(true, p.path)}
+            >
+              <DropdownMenuItem>
+                <Icon className="stroke-neul-600" />
+                <span className="text-neutral-600">{p.name}</span>
+              </DropdownMenuItem>
+              {i === 1 && <DropdownMenuSeparator />}
+            </button>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };

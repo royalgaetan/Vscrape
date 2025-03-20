@@ -68,10 +68,48 @@ export const removeDiacritics = (str: string): string => {
     .replace(/[\u0300-\u036f]/g, ""); // Remove the diacritical marks (accents).
 };
 
+export const waitForElementById = (
+  id: string,
+  timeout = 5000
+): Promise<HTMLElement> => {
+  return new Promise((resolve, reject) => {
+    const el = document.getElementById(id);
+    if (el) return resolve(el);
+
+    const observer = new MutationObserver(() => {
+      const found = document.getElementById(id);
+      if (found) {
+        observer.disconnect();
+        resolve(found);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    setTimeout(() => {
+      observer.disconnect();
+      reject(new Error("Timeout: Element not found"));
+    }, timeout);
+  });
+};
+
+export const isAccordionElementOpen = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    const state = element.getAttribute("data-state");
+    if (state === "open") return true;
+  } else {
+    return false;
+  }
+  return false;
+};
+
 export const scrollToEl = ({
   parentId,
   id,
+  offsetTopMargin = 15,
 }: {
+  offsetTopMargin?: number;
   parentId?: string;
   id: string;
 }) => {
@@ -79,11 +117,12 @@ export const scrollToEl = ({
   const el = document.getElementById(id);
   if (el && parent) {
     parent.scrollTo({
-      top: el.offsetTop - 15,
+      top: el.offsetTop - offsetTopMargin,
       behavior: "smooth",
     });
   } else {
     console.log(
+      "@@TEST err",
       `Parent element with ID "${parent}" or child element with ID "${id}" was not found.`
     );
   }
