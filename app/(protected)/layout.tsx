@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import CustomLoader from "@/components/global/loader";
 import AppSidebar from "@/components/global/app_sidebar";
@@ -13,11 +13,13 @@ import { usePanSidebar } from "@/hooks/usePanSidebar";
 import MoreDialog from "./_more/more_dialog";
 import SearchModal from "./_search/search";
 import SettingsDialog from "./_settings/settings_dialog";
+import { cn } from "@/lib/utils";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, isLoading } = useAuth();
   const { setOpenPanSidebar } = usePanSidebar();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (mainContainerRef.current) {
@@ -46,12 +48,22 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           {/* Pan Sidebar */}
           <AppPanSidebar />
 
-          <div ref={mainContainerRef} className="flex flex-col w-full">
+          <div
+            ref={mainContainerRef}
+            className="w-full max-h-[100vh] overflow-auto"
+          >
             {/* Main Header */}
-            <AppHeader />
+            <div
+              className={cn(
+                "h-[8vh] sticky top-0 bg-white",
+                pathname === "/dashboard" && "bg-transparent"
+              )}
+            >
+              <AppHeader />
+            </div>
 
             {/* Page Content */}
-            <div className="flex flex-1">{children}</div>
+            <div className="overscroll-y-auto h-fit">{children}</div>
           </div>
         </main>
       </div>

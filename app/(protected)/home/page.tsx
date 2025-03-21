@@ -1,111 +1,91 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { HomeTextareaPlaceholders } from "@/lib/constants";
 import {
   ArrowDownToLine,
-  HelpCircleIcon,
+  LucideIcon,
   PencilLineIcon,
-  ShoppingCartIcon,
-  Terminal,
+  Shapes,
+  SparklesIcon,
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
-import SettingsDialog from "../_settings/settings_dialog";
+import React from "react";
 import { useAppDialog } from "@/hooks/useAppDialog";
+import { cn } from "@/lib/utils";
+import { redirect } from "next/navigation";
 
 const Home = () => {
-  const [value, setValue] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [placeholder, setPlaceholder] = useState("");
-
   const { setOpenSettingsDialog } = useAppDialog();
 
-  useEffect(() => {
-    const randomIndex = Math.floor(
-      Math.random() * HomeTextareaPlaceholders.length
-    );
-    setPlaceholder(HomeTextareaPlaceholders[randomIndex]);
-  }, []);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reset height
-      const scrollHeight = textareaRef.current.scrollHeight;
-      const maxHeight =
-        5 * parseFloat(getComputedStyle(textareaRef.current).lineHeight);
-
-      textareaRef.current.style.height = `${Math.min(
-        scrollHeight,
-        maxHeight
-      )}px`;
-    }
-  }, [value]);
-
   return (
-    <div className="h-full w-full flex flex-1 justify-center items-center">
+    <div className="h-[90vh] w-full flex flex-1 justify-center items-center">
       <div className="flex flex-col items-center justify-center gap-4">
-        <h2 className="text-2xl text-[#333] font-semibold">
-          How Can I help you today?
-        </h2>
+        <div className="mb-5 text-center">
+          <h2 className="text-3xl text-[#333] font-semibold">
+            Create Workflows in Minutes
+          </h2>
+          <p className="text-muted-foreground font-normal text-sm mt-1">
+            Build from scratch or accelerate with templates
+          </p>
+        </div>
 
-        <div className="rounded-3xl p-3 my-3 h-auto w-[max(90%,700px)] border-[2px] bg-gray-50 border-neutral-300">
-          <Textarea
-            className="bg-transparent mb-4 placeholder:text-muted-foreground/70 placeholder:font-normal border-none focus:ring-0 focus:outline-none focus-visible:ring-0 resize-none shadow-none overflow-hidden"
-            maxLength={2000}
-            style={{ lineHeight: "1.1rem" }}
-            ref={textareaRef}
-            value={value}
-            autoFocus
-            onChange={(e) => setValue(e.target.value)}
-            rows={1}
-            placeholder={placeholder}
+        <div className="w-full gap-3 flex justify-center items-center">
+          <GetStartedOption
+            text={"Create a workflow from scratch"}
+            Icon={PencilLineIcon}
+            iconColor="stroke-orange-400"
+            onClick={() => {}}
           />
 
-          <div className="flex flex-1 justify-end">
-            <Button
-              variant={"outline"}
-              size={"sm"}
-              className="w-fit"
-              disabled={value.length < 2}
-            >
-              <Terminal className="" size={"1.3rem"} />
-              Generate
-            </Button>
-          </div>
-        </div>
+          <GetStartedOption
+            text={"Build one in less than 1 sec"}
+            Icon={SparklesIcon}
+            iconColor="stroke-blue-400"
+            onClick={() => redirect("/generate")}
+          />
 
-        <div className="w-full gap-3 flex flex-1 justify-center items-center">
-          <Button variant={"ghost"} size={"sm"} className="w-fit">
-            <PencilLineIcon className="stroke-orange-400" size={"1.3rem"} />
-            Create from scratch
-          </Button>
+          <GetStartedOption
+            text={"Choose from templates"}
+            Icon={Shapes}
+            iconColor="stroke-green-700"
+            onClick={() => redirect("/templates")}
+          />
 
-          <Button variant={"ghost"} size={"sm"} className="w-fit">
-            <ShoppingCartIcon className="stroke-green-700" size={"1.3rem"} />
-            Pick from Marketplace
-          </Button>
-
-          <Button
+          <GetStartedOption
+            text={"Import an existing"}
+            Icon={ArrowDownToLine}
+            iconColor="stroke-pink-500"
             onClick={() => setOpenSettingsDialog(true, "import")}
-            variant={"ghost"}
-            size={"sm"}
-            className="w-fit"
-          >
-            <ArrowDownToLine className="stroke-pink-500" size={"1.3rem"} />
-            Import an existing
-          </Button>
-
-          <Button variant={"ghost"} size={"sm"} className="w-fit">
-            <HelpCircleIcon className="stroke-blue-400" size={"1.3rem"} />
-            Help
-          </Button>
+          />
         </div>
-
-        <div className="grid grid-cols-3 gap-5"></div>
       </div>
     </div>
   );
 };
 
 export default Home;
+
+export const GetStartedOption = ({
+  text,
+  Icon,
+  iconColor,
+  onClick,
+}: {
+  text: string;
+  Icon: LucideIcon;
+  iconColor: string;
+  onClick: () => void;
+}) => {
+  return (
+    <button
+      onClick={() => onClick()}
+      className="w-44 h-32 flex-col rounded-3xl pt-2 pb-3 px-3 group bg-muted-foreground/[0.03] hover:bg-muted-foreground/[0.05] border-[2.2px] border-muted-foreground/5 hover:border-muted-foreground/10 transition-all duration-200"
+    >
+      <div className="h-16 flex items-end">
+        <Icon className={cn("size-6 stroke-2 mb-1", iconColor)} />
+      </div>
+
+      <div className="h-12 mr-5 line-clamp-2 text-left whitespace-pre-wrap text-sm font-medium group-hover:text-[#333]">
+        {text}
+      </div>
+    </button>
+  );
+};

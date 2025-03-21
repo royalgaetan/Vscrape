@@ -55,11 +55,11 @@ const AppHeader = () => {
 
         {/* Credits */}
         <Button
-          variant={"outline"}
+          variant={"default"}
           className="rounded-3xl h-8 -ml-2 gap-1 px-3"
         >
-          <CoinsIcon className="stroke-primary" />
-          <span className="text-xs">5405</span>
+          <CoinsIcon className="stroke-white" />
+          <span className="text-xs">13,403</span>
         </Button>
 
         {/* Avatar: Profile Action Items */}

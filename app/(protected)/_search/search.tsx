@@ -334,7 +334,7 @@ const SearchModal = () => {
 
 export default SearchModal;
 
-const SearchableActionItem = ({
+export const SearchableActionItem = ({
   item,
   typeType,
 }: {
@@ -423,7 +423,13 @@ const SearchableActionItem = ({
   );
 };
 
-const SearchableInboxItem = ({ item }: { item: InboxItemType }) => {
+export const SearchableInboxItem = ({
+  item,
+  className,
+}: {
+  item: InboxItemType;
+  className?: string;
+}) => {
   const { setOpenSearchDialog } = useAppDialog();
   const { setOpenPanSidebar } = usePanSidebar();
 
@@ -456,7 +462,12 @@ const SearchableInboxItem = ({ item }: { item: InboxItemType }) => {
       }}
       className="w-full flex flex-1 appearance-none bg-transparent border-none p-0 m-0 text-inherit font-inherit"
     >
-      <div className="cursor-pointer group/searchable-action-item hover:bg-neutral-200/40 h-9 px-5 py-2 mb-1 flex flex-1 items-center gap-2 transition-all duration-300">
+      <div
+        className={cn(
+          "cursor-pointer group/searchable-action-item hover:bg-neutral-200/40 h-9 px-5 py-2 mb-1 flex flex-1 items-center gap-2 transition-all duration-300",
+          className
+        )}
+      >
         <div className="relative">
           {/* Avatar */}
           <Avatar className="h-7 w-7 ml-1 cursor-pointer relative">
@@ -480,7 +491,7 @@ const SearchableInboxItem = ({ item }: { item: InboxItemType }) => {
           <div className="flex flex-col text-xs items-start">
             <h6
               className={cn(
-                "font-normal text-[#333] line-clamp-1",
+                "font-normal text-[#333] line-clamp-1 text-start",
                 !item.isRead && "font-semibold"
               )}
             >

@@ -32,7 +32,7 @@ const SettingItemSelect = ({
       <SelectTrigger className="h-8 px-2 text-xs border border-gray-300 bg-background hover:bg-accent/30 hover:text-accent-foreground">
         {label}
       </SelectTrigger>
-      <SelectContent className="h-80">
+      <SelectContent className="h-fit max-h-80">
         {Object.entries(data).map(([groupName, options], idx) => {
           return (
             <SelectGroup key={groupName}>

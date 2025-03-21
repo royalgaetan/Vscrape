@@ -122,7 +122,6 @@ export const scrollToEl = ({
     });
   } else {
     console.log(
-      "@@TEST err",
       `Parent element with ID "${parent}" or child element with ID "${id}" was not found.`
     );
   }

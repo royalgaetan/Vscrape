@@ -14,16 +14,37 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { usePathname } from "next/navigation";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 const Breadcrumbs = () => {
+  const pathname = usePathname();
+  const showBreadcrumb =
+    pathname.includes("/workflows") || pathname.includes("/templates");
   return (
     <div>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
+      {showBreadcrumb && (
+        <Breadcrumb>
+          <BreadcrumbList>
+            {pathname.split("/").map((path, i) => {
+              return (
+                <>
+                  <BreadcrumbItem>
+                    {pathname === `/${path}` && i === 1 ? (
+                      <div className="cursor-pointer">
+                        {capitalizeFirstLetter(path)}
+                      </div>
+                    ) : (
+                      <BreadcrumbLink href={`/${path}`}>
+                        {capitalizeFirstLetter(path)}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                </>
+              );
+            })}
+
+            {/* <BreadcrumbSeparator />
           <BreadcrumbItem>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1">
@@ -36,17 +57,10 @@ const Breadcrumbs = () => {
                 <DropdownMenuItem>GitHub</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/docs/components">Worflow</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>[Shopify Flows] Update store</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+          </BreadcrumbItem> */}
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
     </div>
   );
 };
