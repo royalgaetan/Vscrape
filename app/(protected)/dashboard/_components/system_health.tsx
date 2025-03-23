@@ -10,24 +10,25 @@ import {
 import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import {
   Activity,
+  BadgeInfo,
   Check,
   Cpu,
   History,
+  InfoIcon,
   ListCollapseIcon,
   Loader2,
   LucideIcon,
   Play,
 } from "lucide-react";
-import { SearchableInboxItem } from "@/app/(protected)/_search/search";
 
 export type SystemHealthStatus = "error" | "alert" | "running" | "success";
 
 const SystemHealth = () => {
   return (
-    <div className="w-full max-w-md p-4 pl-5 rounded-3xl border bg-white border-gray-200">
+    <div className="w-full max-w-md p-4 pl-5 rounded-3xl border bg-primary/10 border-gray-200">
       <h2 className="text-base font-semibold text-gray-800 mb-4 mt-2 gap-2 flex justify-start items-center">
-        <Activity className="stroke-gray-800 size-5" />
-        <span>System Health</span>
+        <InfoIcon className="stroke-gray-800 size-5" />
+        <span>Status Overview</span>
       </h2>
 
       <div className="ml-1 flex flex-1 justify-start items-center gap-4">

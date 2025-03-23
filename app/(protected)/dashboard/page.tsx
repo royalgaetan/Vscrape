@@ -1,12 +1,9 @@
 "use client";
 import React from "react";
-import Stats from "./_components/stats";
-import { TextSeparator } from "@/components/global/text_separator";
-import { SearchableInboxItem } from "../_search/search";
-import { inboxItems } from "@/lib/fake_data";
 import SystemHealth from "./_components/system_health";
 import ActivityFeed from "./_components/activity_feed";
 import DashboardPinned from "./_components/dashboard_pinned";
+import StatsAndMetricsSection from "./_components/stats_section";
 
 const Dashboard = () => {
   return (
@@ -25,7 +22,7 @@ const Dashboard = () => {
           </div>
 
           {/* Workflows & Stats */}
-          <Stats />
+          <StatsAndMetricsSection />
 
           {/* Pinned */}
           <DashboardPinned />

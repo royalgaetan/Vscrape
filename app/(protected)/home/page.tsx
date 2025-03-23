@@ -77,7 +77,7 @@ export const GetStartedOption = ({
   return (
     <button
       onClick={() => onClick()}
-      className="w-44 h-32 flex-col rounded-3xl pt-2 pb-3 px-3 group bg-muted-foreground/[0.03] hover:bg-muted-foreground/[0.05] border-[2.2px] border-muted-foreground/5 hover:border-muted-foreground/10 transition-all duration-200"
+      className="w-44 h-32 flex-col rounded-2xl pt-2 pb-3 pl-4 pr-3 group bg-muted-foreground/[0.03] hover:bg-muted-foreground/[0.05] border-[2.2px] border-muted-foreground/5 hover:border-muted-foreground/10 transition-all duration-200"
     >
       <div className="h-16 flex items-end">
         <Icon className={cn("size-6 stroke-2 mb-1", iconColor)} />

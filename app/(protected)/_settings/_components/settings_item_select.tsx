@@ -6,6 +6,7 @@ import {
   SelectLabel,
   SelectTrigger,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import React from "react";
 
 export type SettingItemSelectDataType = Record<
@@ -18,8 +19,12 @@ const SettingItemSelect = ({
   data,
   label,
   selectedItemValue,
+  triggerClassName,
+  contentClassName,
 }: {
   label: string;
+  triggerClassName?: string;
+  contentClassName?: string;
   selectedItemValue: string;
   data: SettingItemSelectDataType;
   onSelect: (item: string) => void;
@@ -29,10 +34,17 @@ const SettingItemSelect = ({
       value={selectedItemValue}
       onValueChange={(itemValue) => onSelect(itemValue)}
     >
-      <SelectTrigger className="h-8 px-2 text-xs border border-gray-300 bg-background hover:bg-accent/30 hover:text-accent-foreground">
+      <SelectTrigger
+        className={cn(
+          "h-8 px-2 text-xs border border-gray-300 bg-background hover:bg-accent/30 hover:text-accent-foreground",
+          triggerClassName
+        )}
+      >
         {label}
       </SelectTrigger>
-      <SelectContent className="h-fit max-h-80">
+      <SelectContent
+        className={cn("h-fit max-h-80 max-w-fit", contentClassName)}
+      >
         {Object.entries(data).map(([groupName, options], idx) => {
           return (
             <SelectGroup key={groupName}>

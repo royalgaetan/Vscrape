@@ -56,7 +56,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             <div
               className={cn(
                 "h-[8vh] sticky top-0 bg-white",
-                pathname === "/dashboard" && "bg-transparent"
+                pathname === "/dashboard" &&
+                  "bg-transparent pointer-events-none"
               )}
             >
               <AppHeader />

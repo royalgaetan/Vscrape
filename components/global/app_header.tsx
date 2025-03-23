@@ -22,6 +22,7 @@ import {
 import SettingsDialog from "@/app/(protected)/_settings/settings_dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDialog } from "@/hooks/useAppDialog";
+import { formatNumber } from "@/lib/utils";
 
 const AppHeader = () => {
   const [avatarImage, setAvatarImage] = useState("");
@@ -59,7 +60,7 @@ const AppHeader = () => {
           className="rounded-3xl h-8 -ml-2 gap-1 px-3"
         >
           <CoinsIcon className="stroke-white" />
-          <span className="text-xs">13,403</span>
+          <span className="text-xs">{formatNumber(13403)} </span>
         </Button>
 
         {/* Avatar: Profile Action Items */}

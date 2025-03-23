@@ -19,6 +19,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const formatNumber = (n: number) => Intl.NumberFormat("en-US").format(n);
+
 export const isSearchTermFound = ({
   text,
   keySearchTerm,
