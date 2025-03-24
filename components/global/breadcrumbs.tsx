@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -14,50 +14,119 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { usePathname } from "next/navigation";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { redirect, usePathname } from "next/navigation";
+import { capitalizeFirstLetter, cn } from "@/lib/utils";
+import { folders } from "@/lib/fake_data";
+import { Squircle } from "lucide-react";
 
 const Breadcrumbs = () => {
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
+  const pathSplitted = pathname.split("/");
   const showBreadcrumb =
     pathname.includes("/workflows") || pathname.includes("/templates");
+
+  const getFolderName = (folderId: string) => {
+    return folders.find((f) => f.folderPath === folderId)?.folderName;
+  };
+
+  const isAFolder = (currentPath: string) => {
+    return (
+      pathSplitted[pathSplitted.length - 2] === "folders" &&
+      pathSplitted.length === 4 &&
+      currentPath !== "folders" &&
+      currentPath !== "workflows"
+    );
+  };
+
+  const isLinkDisabled = (currentPath: string) => {
+    return isAFolder(currentPath) || pathname === `/${currentPath}`;
+  };
+
   return (
     <div>
       {showBreadcrumb && (
         <Breadcrumb>
           <BreadcrumbList>
             {pathname.split("/").map((path, i) => {
+              if (i === 0) return <></>;
+
+              // If item is "folders" form "/workflows/folders"
+              if (pathSplitted[1] === "workflows" && path === "folders") {
+                return (
+                  <>
+                    <BreadcrumbItem>
+                      <DropdownMenu
+                        open={isDropdownOpen}
+                        onOpenChange={setDropdownOpen}
+                      >
+                        <DropdownMenuTrigger className="flex items-center gap-1">
+                          <BreadcrumbEllipsis className="h-4 w-4" />
+                          <span className="sr-only">
+                            {capitalizeFirstLetter(path)}
+                          </span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="start"
+                          className="w-52 max-h-[60vh] overflow-y-auto"
+                        >
+                          <div className="w-full text-xs text-muted-foreground justify-start mb-1 px-3 pt-2">
+                            Folders
+                          </div>
+                          {folders.map((folder) => (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDropdownOpen(false);
+                                redirect(
+                                  `/workflows/folders/${folder.folderPath}`
+                                );
+                              }}
+                              key={folder.folderPath}
+                              className="truncate w-full"
+                            >
+                              <Squircle
+                                fill={folder.folderColor}
+                                className="stroke-none"
+                              />
+                              <span>
+                                {capitalizeFirstLetter(folder.folderName)}
+                              </span>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="last:hidden" />
+                  </>
+                );
+              }
+
               return (
-                <>
+                <span key={path}>
                   <BreadcrumbItem>
-                    {pathname === `/${path}` && i === 1 ? (
-                      <div className="cursor-pointer">
-                        {capitalizeFirstLetter(path)}
-                      </div>
-                    ) : (
-                      <BreadcrumbLink href={`/${path}`}>
-                        {capitalizeFirstLetter(path)}
-                      </BreadcrumbLink>
-                    )}
+                    <BreadcrumbLink
+                      aria-disabled={isLinkDisabled(path)}
+                      className={cn(
+                        isLinkDisabled(path) && "pointer-events-none"
+                      )}
+                      href={
+                        isAFolder(path)
+                          ? `/workflows/folders/${path}`
+                          : `/${path}`
+                      }
+                    >
+                      {/* If item if "folders" form "/workflows/folders" */}
+                      {isAFolder(path)
+                        ? getFolderName(pathSplitted[3])
+                        : capitalizeFirstLetter(path)}
+                    </BreadcrumbLink>
+                    <br />
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                </>
+
+                  <BreadcrumbSeparator className="last:hidden" />
+                </span>
               );
             })}
-
-            {/* <BreadcrumbItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1">
-                <BreadcrumbEllipsis className="h-4 w-4" />
-                <span className="sr-only">Toggle menu</span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem>Documentation</DropdownMenuItem>
-                <DropdownMenuItem>Themes</DropdownMenuItem>
-                <DropdownMenuItem>GitHub</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </BreadcrumbItem>  */}
           </BreadcrumbList>
         </Breadcrumb>
       )}

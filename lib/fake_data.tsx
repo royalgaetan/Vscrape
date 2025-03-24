@@ -5,6 +5,7 @@ import { WorkflowCardType } from "@/app/(protected)/workflows/_components/workfl
 import { subDays, startOfYesterday, startOfToday } from "date-fns";
 import { WORKFLOW_COLORS } from "./colors";
 import { folderType } from "@/app/(protected)/workflows/layout";
+import { importedFile } from "@/app/(protected)/_settings/import/import_settings";
 
 export const userEmail = "kabundele@gmail.com";
 
@@ -1730,5 +1731,112 @@ export const fakeWorkflows: WorkflowCardType[] = [
       "Collect and organize all form submissions from your site into a central dashboard.",
     createdAt: new Date("2025-01-02"),
     updatedAt: new Date("2025-01-10"),
+  },
+];
+
+export const fakeImportedFiles: importedFile[] = [
+  {
+    name: "product_data.json",
+    importedAt: new Date("2025-03-20T10:15:00Z"),
+    fileCategory: "Workflow",
+    fileType: "json",
+    fileSizeInBytes: 20480,
+    isSafe: true,
+  },
+  {
+    name: "seo_guide.md",
+    importedAt: new Date("2025-03-21T14:30:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "markdown",
+    fileSizeInBytes: 10240,
+    isSafe: true,
+  },
+  {
+    name: "customer_faq.txt",
+    importedAt: new Date("2025-03-18T08:45:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "txt",
+    fileSizeInBytes: 5120,
+    isSafe: true,
+  },
+  {
+    name: "workflow_config.json",
+    importedAt: new Date("2025-03-22T16:10:00Z"),
+    fileCategory: "Workflow",
+    fileType: "json",
+    fileSizeInBytes: 30720,
+    isSafe: true,
+  },
+  {
+    name: "user_guide.html",
+    importedAt: new Date("2025-03-19T11:20:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "html",
+    fileSizeInBytes: 25600,
+    isSafe: true,
+  },
+  {
+    name: "api_reference.md",
+    importedAt: new Date("2025-03-17T09:00:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "markdown",
+    fileSizeInBytes: 153000260,
+    isSafe: true,
+  },
+  {
+    name: "site_backup.json",
+    importedAt: new Date("2025-03-15T07:45:00Z"),
+    fileCategory: "Workflow",
+    fileType: "json",
+    fileSizeInBytes: 51200,
+    isSafe: true,
+  },
+  {
+    name: "terms_of_service.txt",
+    importedAt: new Date("2025-03-14T13:25:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "txt",
+    fileSizeInBytes: 8192,
+    isSafe: true,
+  },
+  {
+    name: "project_automation.json",
+    importedAt: new Date("2025-03-16T18:55:00Z"),
+    fileCategory: "Workflow",
+    fileType: "json",
+    fileSizeInBytes: 40960,
+    isSafe: true,
+  },
+  {
+    name: "business_strategy.md",
+    importedAt: new Date("2025-03-23T20:30:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "markdown",
+    fileSizeInBytes: 12288,
+    isSafe: true,
+  },
+  {
+    name: "website_structure.html",
+    importedAt: new Date("2025-03-20T15:40:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "html",
+    fileSizeInBytes: 34816,
+    isSafe: true,
+  },
+  {
+    name: "email_campaign_workflow.json",
+    importedAt: new Date("2025-03-24T09:10:00Z"),
+    fileCategory: "Workflow",
+    fileType: "json",
+    fileSizeInBytes: 28672,
+    isSafe: true,
+  },
+  {
+    name: "important_notes.txt",
+    importedAt: new Date("2025-01-22T22:15:00Z"),
+    fileCategory: "Knowledge Base",
+    fileType: "txt",
+    fileSizeInBytes: 4096,
+    isSafe: true,
   },
 ];

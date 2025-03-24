@@ -109,7 +109,7 @@ const AppSidebar = () => {
   return (
     <Sidebar>
       <SidebarContent
-        className={`flex flex-col justify-between gap-0 max-h- overflow-y-hidden items-start font-bold pt-4 pr-0 bg-[${COLORS.sidebarColor}]`}
+        className={`flex  flex-col justify-between w-full gap-0 max-h-full overflow-y-hidden items-start font-bold pt-4 pr-0 bg-[${COLORS.sidebarColor}]`}
       >
         <div className="mb-0 ml-2 pl-2 h-10">
           <LogoAndText />
@@ -120,7 +120,8 @@ const AppSidebar = () => {
             className={`absolute top-0 z-30 pointer-events-none bg-gradient-to-b from-[#F8F8F7] from-30% to-transparent h-5 w-full`}
           ></div>
 
-          <div className="w-full flex flex-col  overflow-y-auto scrollbar-hide pr-4 pt-4 pl-2">
+          <div className="w-full flex flex-col overflow-y-auto scrollbar-hide pr-4 pt-4 pl-2">
+            {/* Main Icons */}
             {sidebarPaths
               .filter((item) => item.type === "main")
               .map((item) => {
@@ -185,7 +186,7 @@ const AppSidebar = () => {
               .filter((item) => item.type === "expandable")
               .map((item) => {
                 return (
-                  <span key={item.path} className="w-full text-teal-700 my-2">
+                  <span key={item.path} className="w-full my-2">
                     <button
                       className="w-full"
                       onClick={() => {
@@ -216,7 +217,7 @@ const AppSidebar = () => {
                                 icon: Squircle,
                                 name: folder.folderName,
                                 type: "main",
-                                path: `/workflows/folder/${folder.folderPath}`,
+                                path: `/workflows/folders/${folder.folderPath}`,
                               }}
                             />
                           );
@@ -230,39 +231,20 @@ const AppSidebar = () => {
         </div>
 
         {/* Icon-only Icons */}
-        <Separator className="my-0" />
-        <div className="flex w-full h-10 m-0 p-0 pl-2">
-          <div className="flex flex-1 gap-0">
-            {sidebarPaths
-              .filter((item) => item.type === "icon-only")
-              .map((item) => {
-                if (item.name === "Settings") {
-                  return (
-                    <button
-                      key={`${item.path}_settings`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setOpenSettingsDialog(true, "account");
-                      }}
-                    >
-                      <SidebarButton
-                        isSelected={pathname === item.path}
-                        item={item}
-                      />
-                    </button>
-                  );
-                } else if (item.name === "More") {
-                  return <MoreButton item={item} key={`${item.path}_more`} />;
-                } else if (item.name === "Trash") {
-                  return (
-                    <div
-                      key={`${item.path}_trash`}
-                      className="flex flex-1 justify-end"
-                    >
+        <div className="flex flex-col w-full h-[3rem] justify-between">
+          <Separator className="mb-1" />
+          <div className="flex h-full w-full m-0 p-0 pl-3 pr-2">
+            <div className="flex flex-1 gap-0">
+              {sidebarPaths
+                .filter((item) => item.type === "icon-only")
+                .map((item) => {
+                  if (item.name === "Settings") {
+                    return (
                       <button
+                        key={`${item.path}_settings`}
                         onClick={(e) => {
                           e.preventDefault();
-                          togglePanSidebar("trash");
+                          setOpenSettingsDialog(true, "account");
                         }}
                       >
                         <SidebarButton
@@ -270,18 +252,39 @@ const AppSidebar = () => {
                           item={item}
                         />
                       </button>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <SidebarButton
-                      isSelected={pathname === item.path}
-                      key={item.path}
-                      item={item}
-                    />
-                  );
-                }
-              })}
+                    );
+                  } else if (item.name === "More") {
+                    return <MoreButton item={item} key={`${item.path}_more`} />;
+                  } else if (item.name === "Trash") {
+                    return (
+                      <div
+                        key={`${item.path}_trash`}
+                        className="flex flex-1 justify-end"
+                      >
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            togglePanSidebar("trash");
+                          }}
+                        >
+                          <SidebarButton
+                            isSelected={pathname === item.path}
+                            item={item}
+                          />
+                        </button>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <SidebarButton
+                        isSelected={pathname === item.path}
+                        key={item.path}
+                        item={item}
+                      />
+                    );
+                  }
+                })}
+            </div>
           </div>
         </div>
       </SidebarContent>
@@ -320,7 +323,7 @@ export const SidebarButton = ({
           )}
         >
           {/* Icon */}
-          <button
+          <div
             className="inset-0"
             onClick={(e) => {
               e.preventDefault();
@@ -336,7 +339,7 @@ export const SidebarButton = ({
               iconFillColor={iconFillColor}
               iconStrokeColor={iconStrokeColor}
             />
-          </button>
+          </div>
 
           {/* Text */}
           <span

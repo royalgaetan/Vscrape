@@ -68,7 +68,7 @@ export const settingSidebarPaths: settingsDialogItemType[] = [
     component: <BillingSettings />,
   },
   {
-    name: "Plans",
+    name: "Plans & Credits",
     path: "plans",
     icon: Package,
     type: "main",

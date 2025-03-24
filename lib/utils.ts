@@ -29,7 +29,7 @@ export const getTimeAgoWithLimit = (date: Date, suffix?: boolean) => {
       addSuffix: true,
     });
   } else {
-    return `${suffix ? "on " : ""}${format(date, "dd MMM yyyy")}`;
+    return `${suffix ? "on " : ""}${format(date, "MMM dd, yyyy")}`;
   }
 };
 
@@ -74,6 +74,18 @@ export const camelToSentenceCase = (text: string) => {
 // Capitalize the first letter of the theme
 export const capitalizeFirstLetter = (text: string) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+export const formatFileSize = (sizeInBytes: number): string => {
+  if (sizeInBytes < 1024) {
+    return `${sizeInBytes} B`; // Bytes
+  } else if (sizeInBytes < 1024 * 1024) {
+    return `${(sizeInBytes / 1024).toFixed(2)} KB`; // Kilobytes
+  } else if (sizeInBytes < 1024 * 1024 * 1024) {
+    return `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`; // Megabytes
+  } else {
+    return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`; // Gigabytes
+  }
 };
 
 export const removeDiacritics = (str: string): string => {

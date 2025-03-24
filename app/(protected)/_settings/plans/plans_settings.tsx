@@ -30,7 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn, getIconColor } from "@/lib/utils";
+import { cn, formatNumber, getIconColor } from "@/lib/utils";
 export type CreditOption = {
   value: string;
   label: string;
@@ -63,18 +63,24 @@ const PlansSettings = () => {
           <div className="flex flex-1 min-h-28 justify-between items-start mx-3 my-2 rounded-2xl px-5 py-6 border-[2px] bg-white border-neutral-300">
             {/* Plan Description */}
             <div className="flex flex-col w-1/2 justify-start items-start mt-4">
-              <div className={`text-4xl font-bold ${COLORS.neutralDark}`}>
-                Free
+              <div className="mb-7">
+                <div className={`text-4xl font-bold ${COLORS.neutralDark}`}>
+                  {formatNumber(13403)}
+                </div>
+                <div className="text-xs mt-1 font-medium text-muted-foreground">
+                  Credits left
+                </div>
               </div>
-              <div className="text-xs mt-1 font-medium text-muted-foreground">
-                Current plan
+
+              <div>
+                <div className={`text-4xl font-bold ${COLORS.neutralDark}`}>
+                  Free
+                </div>
+                <div className="text-xs mt-1 font-medium text-muted-foreground">
+                  Current plan
+                </div>
               </div>
-              <div
-                className={`text-xs font-normal text-neutral-900 w-2/3 mt-3`}
-              >
-                Create and launch workflows with no cost – automate and extract
-                data.
-              </div>
+
               <div className="flex flex-1 gap-[0.33rem] mt-2">
                 <Zap className="size-4" style={{ stroke: getIconColor(Zap) }} />
                 <Workflow
