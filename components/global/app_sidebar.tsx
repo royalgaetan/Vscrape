@@ -210,8 +210,10 @@ const AppSidebar = () => {
                           return (
                             <SidebarButton
                               key={folder.folderName}
-                              // isSelected={pathname === item.path}
-                              isSelected={false}
+                              isSelected={
+                                pathname ===
+                                `/workflows/folders/${folder.folderPath}`
+                              }
                               iconFillColor={folder.folderColor}
                               item={{
                                 icon: Squircle,
