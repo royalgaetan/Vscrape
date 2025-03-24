@@ -1,7 +1,10 @@
 import { InboxItemType } from "@/app/(protected)/_inbox/inbox";
 import { trashItemType } from "@/app/(protected)/_trash/trash";
 import { statsDataItemType } from "@/app/(protected)/dashboard/_components/stats_charts";
+import { WorkflowCardType } from "@/app/(protected)/workflows/_components/workflow_card";
 import { subDays, startOfYesterday, startOfToday } from "date-fns";
+import { WORKFLOW_COLORS } from "./colors";
+import { folderType } from "@/app/(protected)/workflows/layout";
 
 export const userEmail = "kabundele@gmail.com";
 
@@ -1183,3 +1186,549 @@ export const getFakeStatData = () => {
     },
   ];
 };
+
+export const folders: folderType[] = [
+  {
+    folderName: "Reports",
+    folderColor: WORKFLOW_COLORS.indigo,
+    folderPath: "r1e4t5s2", // Random ID
+  },
+  {
+    folderName: "CRM Automation",
+    folderColor: WORKFLOW_COLORS.blue,
+    folderPath: "c5r3m1a2", // Random ID
+  },
+  {
+    folderName: "Inventory",
+    folderColor: WORKFLOW_COLORS.teal,
+    folderPath: "i6n4v9t3r", // Random ID
+  },
+  {
+    folderName: "Notifications",
+    folderColor: WORKFLOW_COLORS.amber,
+    folderPath: "n2o1t4s7", // Random ID
+  },
+  {
+    folderName: "Marketing",
+    folderColor: WORKFLOW_COLORS.slate,
+    folderPath: "m9r8k5t1g", // Random ID
+  },
+  {
+    folderName: "Email Campaigns",
+    folderColor: WORKFLOW_COLORS.purple,
+    folderPath: "e4m3c2p9s", // Random ID
+  },
+  {
+    folderName: "Retention",
+    folderColor: WORKFLOW_COLORS.red,
+    folderPath: "r3e8t6n2", // Random ID
+  },
+  {
+    folderName: "Social Media",
+    folderColor: WORKFLOW_COLORS.yellow,
+    folderPath: "s2m1d6a8", // Random ID
+  },
+  {
+    folderName: "User Onboarding",
+    folderColor: WORKFLOW_COLORS.green,
+    folderPath: "u1o3b6n7", // Random ID
+  },
+  {
+    folderName: "Backup & Security",
+    folderColor: WORKFLOW_COLORS.slate,
+    folderPath: "b7s3e8c9r", // Random ID
+  },
+  {
+    folderName: "Finance",
+    folderColor: WORKFLOW_COLORS.indigo,
+    folderPath: "f9n1a5c2", // Random ID
+  },
+  {
+    folderName: "Surveys",
+    folderColor: WORKFLOW_COLORS.teal,
+    folderPath: "s5r9e3y8s", // Random ID
+  },
+  {
+    folderName: "DevOps",
+    folderColor: WORKFLOW_COLORS.yellow,
+    folderPath: "d7v3o2p9s", // Random ID
+  },
+];
+
+export const fakeWorkflows: WorkflowCardType[] = [
+  {
+    title: "Daily Sales Report",
+    creditCost: 10,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[0],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Automated daily report that summarizes total sales and key metrics.",
+    createdAt: new Date("2025-03-23"),
+    updatedAt: new Date("2025-03-23"),
+  },
+  {
+    title: "Lead Enrichment",
+    creditCost: 15,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[1],
+    isActive: true,
+    hasError: false,
+    description:
+      "Enhance your CRM data with additional information about leads like company size, social profiles, and more.",
+    createdAt: new Date("2025-01-10"),
+    updatedAt: new Date("2025-01-10"),
+  },
+  {
+    title: "Product Sync",
+    creditCost: 8,
+    triggerMode: "Manual",
+    state: "Published",
+    folder: folders[2],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Keep your product catalog synced between your internal database and your e-commerce platforms.",
+    createdAt: new Date("2024-12-18"),
+    updatedAt: new Date("2025-01-07"),
+  },
+  {
+    title: "New Order Alert",
+    creditCost: 5,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[3],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Instantly get notified when a new order is placed on your store.",
+    createdAt: new Date("2025-01-02"),
+    updatedAt: new Date("2025-01-14"),
+  },
+  {
+    title: "Blog SEO Scan",
+    creditCost: 12,
+    triggerMode: "Manual",
+    state: "Draft",
+    folder: folders[4],
+    isPinned: true,
+    isActive: false,
+    hasError: false,
+    description:
+      "Scan your blog content to identify SEO improvements such as keyword density, readability, and meta data suggestions.",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
+  },
+  {
+    title: "Weekly Email Digest",
+    creditCost: 20,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[5],
+    isPinned: true,
+    isActive: true,
+    hasError: true,
+    description:
+      "Send out a beautifully formatted weekly summary email to your subscribers with the top updates and content.",
+    createdAt: new Date("2024-12-29"),
+    updatedAt: new Date("2025-01-06"),
+  },
+  {
+    title: "Abandoned Cart Reminder",
+    creditCost: 18,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[6],
+    isPinned: true,
+    isActive: true,
+    hasError: true,
+    description:
+      "Automatically remind users who left products in their cart to complete their purchase.",
+    createdAt: new Date("2025-01-04"),
+    updatedAt: new Date("2025-01-12"),
+  },
+  {
+    title: "Instagram Auto Poster",
+    creditCost: 25,
+    triggerMode: "Manual",
+    state: "Draft",
+    folder: folders[7],
+    isPinned: false,
+    isActive: false,
+    hasError: false,
+    description:
+      "Schedule and publish posts automatically to your Instagram account without manual intervention.",
+    createdAt: new Date("2025-01-05"),
+    updatedAt: new Date("2025-01-05"),
+  },
+  {
+    title: "New User Welcome",
+    creditCost: 7,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[8],
+    isPinned: false,
+    isActive: true,
+    hasError: true,
+    description:
+      "Deliver a warm welcome to new users and guide them through your onboarding steps.",
+    createdAt: new Date("2025-01-07"),
+    updatedAt: new Date("2025-01-13"),
+  },
+  {
+    title: "Backup to Google Drive",
+    creditCost: 11,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[9],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Automatically backup your critical files and data to a secure Google Drive folder every day.",
+    createdAt: new Date("2024-12-22"),
+    updatedAt: new Date("2025-01-02"),
+  },
+  {
+    title: "Invoice Generator",
+    creditCost: 9,
+    triggerMode: "Manual",
+    state: "Published",
+    folder: folders[10],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Generate professional-looking invoices on the fly and send them to your clients with just a few clicks.",
+    createdAt: new Date("2024-12-28"),
+    updatedAt: new Date("2025-01-11"),
+  },
+  {
+    title: "Feedback Collector",
+    creditCost: 6,
+    triggerMode: "Webhook",
+    state: "Draft",
+    folder: folders[11],
+    isPinned: true,
+    isActive: false,
+    hasError: true,
+    description:
+      "Capture customer feedback at key touchpoints and analyze sentiment for continuous improvement.",
+    createdAt: new Date("2025-01-08"),
+    updatedAt: new Date("2025-01-08"),
+  },
+  {
+    title: "Server Health Monitor",
+    creditCost: 14,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[12],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Monitor your server uptime, performance metrics, and receive real-time alerts for anomalies.",
+    createdAt: new Date("2025-01-03"),
+    updatedAt: new Date("2025-01-14"),
+  },
+  {
+    title: "Monthly Revenue Snapshot",
+    creditCost: 13,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[0],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Get a clean snapshot of your monthly revenue, broken down by product, region, and sales channel.",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-10"),
+  },
+  {
+    title: "Product Performance Report",
+    creditCost: 10,
+    triggerMode: "Manual",
+    state: "Published",
+    folder: folders[0],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Analyze how each product is performing over time in terms of revenue, engagement, and returns.",
+    createdAt: new Date("2025-01-02"),
+    updatedAt: new Date("2025-01-12"),
+  },
+  {
+    title: "User Growth Report",
+    creditCost: 12,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[0],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Measure user acquisition trends and growth rate across different time periods.",
+    createdAt: new Date("2025-01-03"),
+    updatedAt: new Date("2025-01-13"),
+  },
+  {
+    title: "Sales Team Performance",
+    creditCost: 16,
+    triggerMode: "Scheduled",
+    state: "Draft",
+    folder: folders[0],
+    isPinned: false,
+    isActive: false,
+    hasError: false,
+    description:
+      "Compare the performance of your sales team members by deal value, close rate, and response time.",
+    createdAt: new Date("2025-01-04"),
+    updatedAt: new Date("2025-01-04"),
+  },
+  {
+    title: "CRM Contact Sync",
+    creditCost: 10,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[1],
+    isPinned: true,
+    isActive: true,
+    hasError: true,
+    description:
+      "Ensure your CRM contact database stays updated with the latest changes from your other tools.",
+    createdAt: new Date("2025-01-06"),
+    updatedAt: new Date("2025-01-14"),
+  },
+  {
+    title: "Duplicate Contact Cleaner",
+    creditCost: 8,
+    triggerMode: "Manual",
+    state: "Draft",
+    folder: folders[1],
+    isPinned: false,
+    isActive: false,
+    hasError: false,
+    description:
+      "Identify and merge duplicate contact entries in your CRM system to maintain data cleanliness.",
+    createdAt: new Date("2025-01-03"),
+    updatedAt: new Date("2025-01-03"),
+  },
+  {
+    title: "Lead Scoring Bot",
+    creditCost: 18,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[1],
+    isPinned: false,
+    isActive: true,
+    hasError: true,
+    description:
+      "Automatically score leads based on custom rules and behavior to prioritize follow-ups.",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-12"),
+  },
+  {
+    title: "Customer Segmentation",
+    creditCost: 14,
+    triggerMode: "Manual",
+    state: "Published",
+    folder: folders[2],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Segment your customers dynamically based on behavior, purchase history, and demographics.",
+    createdAt: new Date("2025-01-04"),
+    updatedAt: new Date("2025-01-09"),
+  },
+  {
+    title: "Inventory Tracker",
+    creditCost: 17,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[2],
+    isPinned: true,
+    isActive: true,
+    hasError: true,
+    description:
+      "Track your product inventory levels across warehouses and receive alerts for low stock.",
+    createdAt: new Date("2024-12-31"),
+    updatedAt: new Date("2025-01-11"),
+  },
+  {
+    title: "Order Status Notifier",
+    creditCost: 6,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[3],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Send real-time updates to customers about their order processing and delivery status.",
+    createdAt: new Date("2025-01-05"),
+    updatedAt: new Date("2025-01-07"),
+  },
+  {
+    title: "New Review Alert",
+    creditCost: 5,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[4],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Get instantly notified when a new review is submitted on your product pages.",
+    createdAt: new Date("2025-01-02"),
+    updatedAt: new Date("2025-01-02"),
+  },
+  {
+    title: "Affiliate Performance Report",
+    creditCost: 13,
+    triggerMode: "Manual",
+    state: "Published",
+    folder: folders[5],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Track performance of each affiliate partner including clicks, conversions, and payouts.",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-12"),
+  },
+  {
+    title: "Customer Support Analyzer",
+    creditCost: 15,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[6],
+    isPinned: true,
+    isActive: true,
+    hasError: true,
+    description:
+      "Analyze customer support tickets for common issues and agent performance.",
+    createdAt: new Date("2024-12-30"),
+    updatedAt: new Date("2025-01-10"),
+  },
+  {
+    title: "Coupon Usage Tracker",
+    creditCost: 7,
+    triggerMode: "Manual",
+    state: "Draft",
+    folder: folders[7],
+    isPinned: false,
+    isActive: false,
+    hasError: false,
+    description:
+      "Monitor how customers are using discount codes and identify top-performing promotions.",
+    createdAt: new Date("2025-01-06"),
+    updatedAt: new Date("2025-01-06"),
+  },
+  {
+    title: "Churn Risk Detector",
+    creditCost: 20,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[8],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Predict which users are likely to churn based on behavior and engagement patterns.",
+    createdAt: new Date("2025-01-07"),
+    updatedAt: new Date("2025-01-14"),
+  },
+  {
+    title: "Social Mentions Tracker",
+    creditCost: 11,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[9],
+    isPinned: false,
+    isActive: true,
+    hasError: true,
+    description:
+      "Track mentions of your brand across social media platforms in real time.",
+    createdAt: new Date("2025-01-03"),
+    updatedAt: new Date("2025-01-09"),
+  },
+  {
+    title: "VIP Customer Monitor",
+    creditCost: 9,
+    triggerMode: "Scheduled",
+    state: "Published",
+    folder: folders[10],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Keep track of your most valuable customers and get alerts on their activity.",
+    createdAt: new Date("2025-01-05"),
+    updatedAt: new Date("2025-01-11"),
+  },
+  {
+    title: "Refund Pattern Detector",
+    creditCost: 12,
+    triggerMode: "Scheduled",
+    state: "Draft",
+    folder: folders[11],
+    isPinned: false,
+    isActive: false,
+    hasError: false,
+    description:
+      "Identify patterns in product returns and refunds to detect potential product issues.",
+    createdAt: new Date("2025-01-04"),
+    updatedAt: new Date("2025-01-04"),
+  },
+  {
+    title: "Campaign ROI Calculator",
+    creditCost: 13,
+    triggerMode: "Manual",
+    state: "Published",
+    folder: folders[12],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Calculate return on investment for each of your marketing campaigns using real-time data.",
+    createdAt: new Date("2024-12-29"),
+    updatedAt: new Date("2025-01-08"),
+  },
+  {
+    title: "Data Sync Audit",
+    creditCost: 8,
+    triggerMode: "Manual",
+    state: "Published",
+    folder: folders[0],
+    isPinned: false,
+    isActive: true,
+    hasError: false,
+    description:
+      "Run audits to detect data mismatches and sync failures between connected systems.",
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-13"),
+  },
+  {
+    title: "Form Submissions Collector",
+    creditCost: 10,
+    triggerMode: "Webhook",
+    state: "Published",
+    folder: folders[1],
+    isPinned: true,
+    isActive: true,
+    hasError: false,
+    description:
+      "Collect and organize all form submissions from your site into a central dashboard.",
+    createdAt: new Date("2025-01-02"),
+    updatedAt: new Date("2025-01-10"),
+  },
+];

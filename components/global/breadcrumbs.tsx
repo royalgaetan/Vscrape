@@ -40,12 +40,12 @@ const Breadcrumbs = () => {
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>
+                  <BreadcrumbSeparator />
                 </>
               );
             })}
 
-            {/* <BreadcrumbSeparator />
-          <BreadcrumbItem>
+            {/* <BreadcrumbItem>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1">
                 <BreadcrumbEllipsis className="h-4 w-4" />
@@ -57,7 +57,7 @@ const Breadcrumbs = () => {
                 <DropdownMenuItem>GitHub</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </BreadcrumbItem> */}
+          </BreadcrumbItem>  */}
           </BreadcrumbList>
         </Breadcrumb>
       )}

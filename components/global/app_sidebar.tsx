@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Bug,
+  ChevronDown,
   ChevronRight,
   Headset,
   HelpCircle,
@@ -15,6 +16,7 @@ import {
   Search,
   Settings,
   Shapes,
+  Squircle,
   Terminal,
   Trash2,
   Workflow,
@@ -24,8 +26,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";
-import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
-import SettingsDialog from "../../app/(protected)/_settings/settings_dialog";
+import { Sidebar, SidebarContent } from "../ui/sidebar";
 import { Button } from "../ui/button";
 import { sidebarPathType } from "@/lib/types";
 import { COLORS } from "@/lib/colors";
@@ -43,6 +44,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { folders } from "@/lib/fake_data";
 
 export const sidebarPaths: sidebarPathType[] = [
   { name: "Home", path: "/home", icon: Home, type: "main" },
@@ -84,6 +86,8 @@ export const moreButtonPaths: moreButtonPathType[] = [
 ];
 
 const AppSidebar = () => {
+  const [isWorkflowsButtonExpanded, setWorkflowsButtonExpanded] =
+    useState(false);
   const { isPanSidebarOpen, panSidebarType, setOpenPanSidebar } =
     usePanSidebar();
   const pathname = usePathname();
@@ -105,97 +109,129 @@ const AppSidebar = () => {
   return (
     <Sidebar>
       <SidebarContent
-        className={`flex flex-col h-full items-start font-bold pt-4 pb-3 pl-2 pr-4 bg-[${COLORS.sidebarColor}]`}
+        className={`flex flex-col justify-between gap-0 max-h- overflow-y-hidden items-start font-bold pt-4 pr-0 bg-[${COLORS.sidebarColor}]`}
       >
-        <div className="mb-4 ml-2">
+        <div className="mb-0 ml-2 pl-2 h-10">
           <LogoAndText />
         </div>
-        {/* Main Icons */}
-        <div className="flex flex-col w-full h-auto">
-          {sidebarPaths
-            .filter((item) => item.type === "main")
-            .map((item) => {
-              if (item.name === "Inbox") {
-                return (
-                  <button
-                    key={item.path}
-                    className={cn("mb-[1px]")}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      togglePanSidebar("inbox");
-                    }}
-                  >
-                    <SidebarButton
-                      isSelected={pathname === item.path}
-                      item={item}
-                    />
-                  </button>
-                );
-              } else if (item.name === "Search") {
-                return (
-                  <button
-                    key={item.path}
-                    className={cn("mb-[1px]")}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setOpenSearchDialog(true);
-                    }}
-                  >
-                    <SidebarButton
-                      isSelected={pathname === item.path}
-                      item={item}
-                    />
-                  </button>
-                );
-              } else {
-                return (
-                  <button
-                    key={item.path}
-                    className={cn(
-                      "mb-[1px]",
-                      item.name === "Templates" && "-mb-2"
-                    )}
-                    onClick={() => {
-                      setOpenPanSidebar(false, "inbox");
-                    }}
-                  >
-                    {item.name === "Generate" && <Separator className="my-1" />}
-                    <SidebarButton
-                      isSelected={pathname === item.path}
-                      item={item}
-                    />
-                  </button>
-                );
-              }
-            })}
-        </div>
 
-        {/* Expandable Icons */}
-        <div className="flex flex-1 w-full">
-          <div className="flex flex-col w-full overflow-x-auto">
+        <div className="h-px relative inset-0 w-full flex flex-1">
+          <div
+            className={`absolute top-0 z-30 pointer-events-none bg-gradient-to-b from-[#F8F8F7] from-30% to-transparent h-5 w-full`}
+          ></div>
+
+          <div className="w-full flex flex-col  overflow-y-auto scrollbar-hide pr-4 pt-4 pl-2">
+            {sidebarPaths
+              .filter((item) => item.type === "main")
+              .map((item) => {
+                if (item.name === "Inbox") {
+                  return (
+                    <button
+                      key={item.path}
+                      className={cn("mb-[1px]")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        togglePanSidebar("inbox");
+                      }}
+                    >
+                      <SidebarButton
+                        isSelected={pathname === item.path}
+                        item={item}
+                      />
+                    </button>
+                  );
+                } else if (item.name === "Search") {
+                  return (
+                    <button
+                      key={item.path}
+                      className={cn("mb-[1px]")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setOpenSearchDialog(true);
+                      }}
+                    >
+                      <SidebarButton
+                        isSelected={pathname === item.path}
+                        item={item}
+                      />
+                    </button>
+                  );
+                } else {
+                  return (
+                    <button
+                      key={item.path}
+                      className={cn(
+                        "mb-[1px]",
+                        item.name === "Templates" && "-mb-2"
+                      )}
+                      onClick={() => {
+                        setOpenPanSidebar(false, "inbox");
+                      }}
+                    >
+                      {item.name === "Generate" && (
+                        <Separator className="my-1" />
+                      )}
+                      <SidebarButton
+                        isSelected={pathname === item.path}
+                        item={item}
+                      />
+                    </button>
+                  );
+                }
+              })}
+
+            {/* Expandable Icons */}
             {sidebarPaths
               .filter((item) => item.type === "expandable")
               .map((item) => {
                 return (
-                  <button
-                    key={item.path}
-                    onClick={() => {
-                      setOpenPanSidebar(false, "inbox");
-                    }}
-                  >
-                    <SidebarButton
-                      isSelected={pathname === item.path}
-                      item={item}
-                    />
-                  </button>
+                  <span key={item.path} className="w-full text-teal-700 my-2">
+                    <button
+                      className="w-full"
+                      onClick={() => {
+                        setOpenPanSidebar(false, "inbox");
+                      }}
+                    >
+                      <SidebarButton
+                        onIconClicked={() => {
+                          setWorkflowsButtonExpanded((prev) => !prev);
+                        }}
+                        isSelected={pathname === item.path}
+                        item={item}
+                        isExpanded={isWorkflowsButtonExpanded}
+                      />
+                    </button>
+
+                    {/* Workflow Expanded Items */}
+                    {isWorkflowsButtonExpanded && item.name === "Workflows" && (
+                      <div className="flex flex-col pl-6">
+                        {folders.map((folder) => {
+                          return (
+                            <SidebarButton
+                              key={folder.folderName}
+                              // isSelected={pathname === item.path}
+                              isSelected={false}
+                              iconFillColor={folder.folderColor}
+                              item={{
+                                icon: Squircle,
+                                name: folder.folderName,
+                                type: "main",
+                                path: `/workflows/folder/${folder.folderPath}`,
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+                  </span>
                 );
               })}
           </div>
         </div>
 
-        <Separator className="my-0" />
         {/* Icon-only Icons */}
-        <SidebarFooter className="flex w-full h-8 m-0 p-0">
+        <Separator className="my-0" />
+        <div className="flex w-full h-10 m-0 p-0 pl-2">
           <div className="flex flex-1 gap-0">
             {sidebarPaths
               .filter((item) => item.type === "icon-only")
@@ -247,7 +283,7 @@ const AppSidebar = () => {
                 }
               })}
           </div>
-        </SidebarFooter>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
@@ -259,10 +295,18 @@ export const SidebarButton = ({
   item,
   isLink = true,
   isSelected,
+  isExpanded,
+  iconFillColor,
+  iconStrokeColor,
+  onIconClicked,
 }: {
   item: sidebarPathType;
   isLink?: boolean;
+  isExpanded?: boolean;
   isSelected: boolean;
+  iconFillColor?: string;
+  iconStrokeColor?: string;
+  onIconClicked?: () => void;
 }) => {
   const Icon = item.icon;
 
@@ -276,14 +320,23 @@ export const SidebarButton = ({
           )}
         >
           {/* Icon */}
-          <div className="">
+          <button
+            className="inset-0"
+            onClick={(e) => {
+              e.preventDefault();
+              onIconClicked && onIconClicked();
+            }}
+          >
             <SidebarIcon
               defaultIcon={Icon}
               isExpandable={item.type === "expandable"}
               type="icon"
               isSelected={isSelected}
+              isExpanded={isExpanded}
+              iconFillColor={iconFillColor}
+              iconStrokeColor={iconStrokeColor}
             />
-          </div>
+          </button>
 
           {/* Text */}
           <span
@@ -334,14 +387,21 @@ export const SidebarIcon = ({
   defaultIcon,
   isSelected,
   isExpandable,
+  isExpanded,
   type,
+  iconFillColor,
+  iconStrokeColor,
 }: {
   defaultIcon: LucideIcon;
   isSelected: boolean | undefined;
   isExpandable: boolean;
+  isExpanded?: boolean;
+  iconFillColor?: string;
+  iconStrokeColor?: string;
   type: "actionBtn" | "icon";
 }) => {
   const Icon = defaultIcon;
+  const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
   return (
     <div className="">
       <div
@@ -357,8 +417,10 @@ export const SidebarIcon = ({
             isSelected
               ? "stroke-[#333333] stroke-[1.7px] size-4"
               : "stroke-neutral-500 stroke-[1.4px] size-4",
+            iconFillColor ? `stroke-none` : "fill-none",
             type === "actionBtn" && "stroke-[2.2px]"
           )}
+          fill={iconFillColor}
         />
       </div>
 
@@ -370,7 +432,7 @@ export const SidebarIcon = ({
             "hidden group-hover/sidebarButton:block"
           )}
         >
-          <ChevronRight
+          <ChevronIcon
             className={cn(
               isSelected
                 ? "stroke-[#333333] stroke-[2.2px] size-4"

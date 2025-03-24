@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { format, formatDistanceToNow, subDays } from "date-fns";
 import {
   BarChart3,
   Bell,
@@ -20,6 +21,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatNumber = (n: number) => Intl.NumberFormat("en-US").format(n);
+
+export const getTimeAgoWithLimit = (date: Date, suffix?: boolean) => {
+  // If date if more than 1 month
+  if (date.getTime() > subDays(Date.now(), 29).getTime()) {
+    return formatDistanceToNow(date, {
+      addSuffix: true,
+    });
+  } else {
+    return `${suffix ? "on " : ""}${format(date, "dd MMM yyyy")}`;
+  }
+};
 
 export const isSearchTermFound = ({
   text,

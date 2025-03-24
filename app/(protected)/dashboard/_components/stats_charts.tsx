@@ -115,7 +115,6 @@ const StatsCharts = ({
             content={
               <ChartTooltipContent
                 className="min-w-[10rem] bg-neutral-700/80 text-white text-xs p-2"
-                hideLabel
                 indicator="line"
               />
             }

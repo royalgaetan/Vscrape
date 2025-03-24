@@ -4,6 +4,7 @@ import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -158,7 +159,13 @@ const ChartTooltipContent = React.forwardRef<
         return null;
       }
 
-      return <div className={cn("font-medium", labelClassName)}>{value}</div>;
+      return (
+        <div className={cn("font-medium", labelClassName)}>
+          {item.payload["date"] instanceof Date
+            ? format(item.payload["date"], "dd MMM yyyy")
+            : value}
+        </div>
+      );
     }, [
       label,
       labelFormatter,

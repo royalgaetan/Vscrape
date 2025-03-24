@@ -50,12 +50,15 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 
           <div
             ref={mainContainerRef}
-            className="w-full max-h-[100vh] overflow-auto"
+            className={cn(
+              "w-full max-h-[100vh] overflow-auto",
+              pathname.startsWith("/workflows") && "overflow-y-scroll"
+            )}
           >
             {/* Main Header */}
             <div
               className={cn(
-                "h-[8vh] sticky top-0 bg-white",
+                "h-[8vh] z-[50] sticky top-0 bg-white",
                 pathname === "/dashboard" &&
                   "bg-transparent pointer-events-none"
               )}
@@ -64,7 +67,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
 
             {/* Page Content */}
-            <div className="overscroll-y-auto h-fit">{children}</div>
+            <div className={cn("overscroll-y-auto h-fit")}>{children}</div>
           </div>
         </main>
       </div>
