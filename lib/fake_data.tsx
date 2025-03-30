@@ -8,7 +8,6 @@ import { folderType } from "@/app/(protected)/workflows/layout";
 import { importedFile } from "@/app/(protected)/_settings/import/import_settings";
 import { ChatReply, knowledgeBase, userProfile } from "./types";
 import { workflowTemplateType } from "@/app/(protected)/templates/_components/template_card";
-import { avatarBackgroundColors2 } from "./constants";
 import {
   Activity,
   Airplay,
@@ -268,7 +267,6 @@ import { WorkflowTemplatePreview } from "@/components/global/workflow_template_p
 import { ChatItemType } from "@/app/(protected)/chats/chats_pansidebar";
 
 export const generateWorkflowLogo = () => {
-  // const bgColor = getRandomElement(avatarBackgroundColors2);
   const IconName = getRandomElement(lucideIconNames);
 
   return (

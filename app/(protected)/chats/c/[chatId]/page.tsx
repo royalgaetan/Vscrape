@@ -11,9 +11,7 @@ import { generateAvatar } from "@/lib/avatar";
 const SingleChatPage = () => {
   const chatHistoryContainerRef = useRef<HTMLDivElement>(null);
   const { chatId } = useParams();
-  const [avatarPath, setAvatarPath] = useState(
-    generateAvatar()?.toDataUri ?? ""
-  );
+  const [avatarPath] = useState(generateAvatar()?.toDataUri ?? "");
 
   useEffect(() => {
     if (chatHistoryContainerRef.current) {

@@ -1,4 +1,3 @@
-import { statsMetricType } from "@/app/(protected)/dashboard/_components/stats_section";
 import { formatISO, startOfToday, startOfTomorrow } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { statsData } from "./fake_data";
