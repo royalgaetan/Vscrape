@@ -11,6 +11,7 @@ import {
   Inbox,
   LayoutDashboard,
   LucideIcon,
+  MessageCircleMoreIcon,
   Plus,
   Rocket,
   Search,
@@ -19,11 +20,12 @@ import {
   Squircle,
   Terminal,
   Trash2,
+  WandSparkles,
   Workflow,
 } from "lucide-react";
 import LogoAndText from "@/app/(auth)/_components/logo_and_text";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { Sidebar, SidebarContent } from "../ui/sidebar";
@@ -56,7 +58,7 @@ export const sidebarPaths: sidebarPathType[] = [
   },
   { name: "Search", path: "", icon: Search, type: "main" },
   { name: "Inbox", path: "", icon: Inbox, type: "main" },
-  { name: "Generate", path: "/generate", icon: Terminal, type: "main" },
+  { name: "Generate", path: "/chats", icon: WandSparkles, type: "main" },
   {
     name: "Templates",
     path: "/templates",
@@ -120,114 +122,148 @@ const AppSidebar = () => {
             className={`absolute top-0 z-30 pointer-events-none bg-gradient-to-b from-[#F8F8F7] from-30% to-transparent h-5 w-full`}
           ></div>
 
-          <div className="w-full flex flex-col overflow-y-auto scrollbar-hide pr-4 pt-4 pl-2">
-            {/* Main Icons */}
+          <div className="w-full flex flex-col overflow-y-auto scrollbar-hide pr-4 pt-4 pl-2 gap-[0.3px]">
+            {/* Main & Expandable Icons */}
             {sidebarPaths
-              .filter((item) => item.type === "main")
+              .filter(
+                (item) => item.type === "main" || item.type === "expandable"
+              )
               .map((item) => {
                 if (item.name === "Inbox") {
                   return (
-                    <button
-                      key={item.path}
-                      className={cn("mb-[1px]")}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        togglePanSidebar("inbox");
-                      }}
-                    >
+                    <div key={item.path} className={cn("mb-[1px]")}>
                       <SidebarButton
                         isSelected={pathname === item.path}
                         item={item}
+                        onIconClicked={() => {
+                          togglePanSidebar("inbox");
+                        }}
+                        onButtonClicked={() => {
+                          togglePanSidebar("inbox");
+                        }}
                       />
-                    </button>
+                    </div>
                   );
                 } else if (item.name === "Search") {
                   return (
-                    <button
-                      key={item.path}
-                      className={cn("mb-[1px]")}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setOpenSearchDialog(true);
-                      }}
-                    >
+                    <div key={item.path} className={cn("mb-[1px]")}>
                       <SidebarButton
                         isSelected={pathname === item.path}
                         item={item}
+                        onIconClicked={() => {
+                          setOpenSearchDialog(true);
+                        }}
+                        onButtonClicked={() => {
+                          setOpenSearchDialog(true);
+                        }}
                       />
-                    </button>
+                    </div>
                   );
-                } else {
+                } else if (item.name === "Generate") {
                   return (
-                    <button
-                      key={item.path}
-                      className={cn(
-                        "mb-[1px]",
-                        item.name === "Templates" && "-mb-2"
-                      )}
-                      onClick={() => {
-                        setOpenPanSidebar(false, "inbox");
-                      }}
-                    >
-                      {item.name === "Generate" && (
-                        <Separator className="my-1" />
-                      )}
+                    <>
+                      <Separator className="my-1" />
                       <SidebarButton
-                        isSelected={pathname === item.path}
+                        isSelected={pathname.startsWith("/chats")}
+                        onButtonClicked={() => {
+                          setOpenPanSidebar(false, "inbox");
+                        }}
+                        onIconClicked={() => {
+                          setOpenPanSidebar(false, "inbox");
+                          redirect(item.path);
+                        }}
                         item={item}
+                        cta={[
+                          {
+                            defaultIcon: MessageCircleMoreIcon,
+                            iconStrokeWidth: "4.3px",
+                            isExpandable: false,
+                            isSelected: undefined,
+                            type: "actionBtn",
+                            onIconClick: () => {
+                              setOpenPanSidebar(false, "inbox");
+                              togglePanSidebar("chats");
+                            },
+                          },
+                        ]}
                       />
-                    </button>
+                    </>
                   );
-                }
-              })}
-
-            {/* Expandable Icons */}
-            {sidebarPaths
-              .filter((item) => item.type === "expandable")
-              .map((item) => {
-                return (
-                  <span key={item.path} className="w-full my-2">
-                    <button
-                      className="w-full"
-                      onClick={() => {
-                        setOpenPanSidebar(false, "inbox");
-                      }}
-                    >
+                } else if (item.name === "Workflows") {
+                  return (
+                    <span key={item.path} className="w-full my-2">
                       <SidebarButton
                         onIconClicked={() => {
                           setWorkflowsButtonExpanded((prev) => !prev);
                         }}
+                        onButtonClicked={() => {
+                          setOpenPanSidebar(false, "inbox");
+                        }}
                         isSelected={pathname === item.path}
                         item={item}
                         isExpanded={isWorkflowsButtonExpanded}
+                        cta={[
+                          {
+                            defaultIcon: Plus,
+                            isExpandable: false,
+                            isSelected: undefined,
+                            type: "actionBtn",
+                            onIconClick: () => {},
+                          },
+                        ]}
                       />
-                    </button>
 
-                    {/* Workflow Expanded Items */}
-                    {isWorkflowsButtonExpanded && item.name === "Workflows" && (
-                      <div className="flex flex-col pl-6">
-                        {folders.map((folder) => {
-                          return (
-                            <SidebarButton
-                              key={folder.folderName}
-                              isSelected={
-                                pathname ===
-                                `/workflows/folders/${folder.folderPath}`
-                              }
-                              iconFillColor={folder.folderColor}
-                              item={{
-                                icon: Squircle,
-                                name: folder.folderName,
-                                type: "main",
-                                path: `/workflows/folders/${folder.folderPath}`,
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                    )}
-                  </span>
-                );
+                      {/* Workflow Expanded Items */}
+                      {isWorkflowsButtonExpanded && (
+                        <div className="flex flex-col pl-6">
+                          {folders.map((folder) => {
+                            return (
+                              <SidebarButton
+                                key={folder.folderName}
+                                isSelected={
+                                  pathname ===
+                                  `/workflows/folders/${folder.folderPath}`
+                                }
+                                iconFillColor={folder.folderColor}
+                                item={{
+                                  icon: Squircle,
+                                  name: folder.folderName,
+                                  type: "main",
+                                  path: `/workflows/folders/${folder.folderPath}`,
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                    </span>
+                  );
+                } else {
+                  return (
+                    <div
+                      key={item.path}
+                      className={cn(
+                        item.name === "Templates" && "-mb-2"
+                      )}
+                    >
+                      <SidebarButton
+                        onButtonClicked={() => {
+                          setOpenPanSidebar(false, "inbox");
+                        }}
+                        onIconClicked={() => {
+                          setOpenPanSidebar(false, "inbox");
+                          redirect(item.path);
+                        }}
+                        isSelected={
+                          item.name === "Templates"
+                            ? pathname.startsWith("/templates")
+                            : pathname === item.path
+                        }
+                        item={item}
+                      />
+                    </div>
+                  );
+                }
               })}
           </div>
         </div>
@@ -242,38 +278,35 @@ const AppSidebar = () => {
                 .map((item) => {
                   if (item.name === "Settings") {
                     return (
-                      <button
-                        key={`${item.path}_settings`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setOpenSettingsDialog(true, "account");
-                        }}
-                      >
+                      <div key={`${item.path}_settings`}>
                         <SidebarButton
                           isSelected={pathname === item.path}
                           item={item}
+                          onIconClicked={() => {
+                            setOpenSettingsDialog(true, "account");
+                          }}
                         />
-                      </button>
+                      </div>
                     );
                   } else if (item.name === "More") {
-                    return <MoreButton item={item} key={`${item.path}_more`} />;
+                    return (
+                      <div key={`${item.path}_more`}>
+                        <MoreButton item={item} />
+                      </div>
+                    );
                   } else if (item.name === "Trash") {
                     return (
                       <div
                         key={`${item.path}_trash`}
                         className="flex flex-1 justify-end"
                       >
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
+                        <SidebarButton
+                          isSelected={pathname === item.path}
+                          item={item}
+                          onIconClicked={() => {
                             togglePanSidebar("trash");
                           }}
-                        >
-                          <SidebarButton
-                            isSelected={pathname === item.path}
-                            item={item}
-                          />
-                        </button>
+                        />
                       </div>
                     );
                   } else {
@@ -303,7 +336,9 @@ export const SidebarButton = ({
   isExpanded,
   iconFillColor,
   iconStrokeColor,
+  cta,
   onIconClicked,
+  onButtonClicked,
 }: {
   item: sidebarPathType;
   isLink?: boolean;
@@ -312,6 +347,9 @@ export const SidebarButton = ({
   iconFillColor?: string;
   iconStrokeColor?: string;
   onIconClicked?: () => void;
+  onButtonClicked?: () => void;
+
+  cta?: SidebarIconProps[];
 }) => {
   const Icon = item.icon;
 
@@ -325,50 +363,62 @@ export const SidebarButton = ({
           )}
         >
           {/* Icon */}
-          <div
-            className="inset-0"
-            onClick={(e) => {
-              e.preventDefault();
+          <SidebarIcon
+            onIconClick={() => {
               onIconClicked && onIconClicked();
             }}
-          >
-            <SidebarIcon
-              defaultIcon={Icon}
-              isExpandable={item.type === "expandable"}
-              type="icon"
-              isSelected={isSelected}
-              isExpanded={isExpanded}
-              iconFillColor={iconFillColor}
-              iconStrokeColor={iconStrokeColor}
-            />
-          </div>
+            defaultIcon={Icon}
+            isExpandable={item.type === "expandable"}
+            type="icon"
+            isSelected={isSelected}
+            isExpanded={isExpanded}
+            iconFillColor={iconFillColor}
+            iconStrokeColor={iconStrokeColor}
+          />
 
           {/* Text */}
-          <span
+          <div
+            role="button"
+            onClick={() => {
+              onButtonClicked && onButtonClicked();
+            }}
             className={cn(
-              "text-xs font-medium flex flex-1 truncate",
+              "text-xs font-medium flex flex-1 truncate h-full items-center",
               isSelected && "font-bold text-[#333333]/90"
             )}
           >
             {item.name}
-          </span>
+          </div>
 
           {/* Action Buttons */}
-          {item.type === "expandable" && (
-            <SidebarIcon
-              defaultIcon={Plus}
-              isExpandable={false}
-              isSelected={undefined}
-              type="actionBtn"
-            />
+          {cta && cta.length > 0 && (
+            <div className="flex">
+              {cta.map((button, idx) => (
+                <SidebarIcon
+                  key={`${item.name}_${idx.toString()}`}
+                  defaultIcon={button.defaultIcon}
+                  isExpandable={button.isExpandable}
+                  isSelected={button.isSelected}
+                  iconStrokeWidth={"2px"}
+                  iconStrokeColor={button.iconStrokeColor}
+                  type={button.type}
+                  onIconClick={() => {
+                    button.onIconClick && button.onIconClick();
+                  }}
+                />
+              ))}
+            </div>
           )}
         </div>
       </SidebarItemWrapper>
     );
   } else if (item.type === "icon-only") {
     return (
-      <Button
-        variant={"ghost"}
+      <div
+        role="button"
+        onClick={() => {
+          onIconClicked && onIconClicked();
+        }}
         className={cn(
           "w-auto transition-all duration-300 h-8 flex justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer mb-[0.9px] px-3 rounded-sm",
           isSelected && "bg-neutral-200/60"
@@ -381,13 +431,47 @@ export const SidebarButton = ({
           type="icon"
           isSelected={isSelected}
         />
-      </Button>
+      </div>
     );
   } else {
     return <div></div>;
   }
 };
 
+export const SidebarItemWrapper = ({
+  isLink,
+  item,
+  children,
+}: {
+  isLink: boolean;
+  item: sidebarPathType;
+  children: React.ReactNode;
+}) => {
+  let className = "w-full group/sidebarButton transition-all duration-300";
+
+  if (isLink) {
+    return (
+      <Link className={className} href={item.path}>
+        {children}
+      </Link>
+    );
+  } else {
+    return <div className={className}>{children}</div>;
+  }
+};
+
+export type SidebarIconProps = {
+  defaultIcon: LucideIcon;
+  isSelected: boolean | undefined;
+  isExpandable: boolean;
+  isExpanded?: boolean;
+  iconFillColor?: string;
+  iconStrokeColor?: string;
+  iconStrokeSize?: string;
+  iconStrokeWidth?: number | string;
+  type: "actionBtn" | "icon";
+  onIconClick?: () => void;
+};
 export const SidebarIcon = ({
   defaultIcon,
   isSelected,
@@ -395,20 +479,22 @@ export const SidebarIcon = ({
   isExpanded,
   type,
   iconFillColor,
+  iconStrokeWidth,
   iconStrokeColor,
-}: {
-  defaultIcon: LucideIcon;
-  isSelected: boolean | undefined;
-  isExpandable: boolean;
-  isExpanded?: boolean;
-  iconFillColor?: string;
-  iconStrokeColor?: string;
-  type: "actionBtn" | "icon";
-}) => {
+  iconStrokeSize,
+  onIconClick,
+}: SidebarIconProps) => {
   const Icon = defaultIcon;
   const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
   return (
-    <div className="">
+    <div
+      role="button"
+      className=""
+      onClick={(e) => {
+        e.preventDefault();
+        onIconClick && onIconClick();
+      }}
+    >
       <div
         className={cn(
           "p-[2.7px]",
@@ -419,13 +505,13 @@ export const SidebarIcon = ({
       >
         <Icon
           className={cn(
-            isSelected
-              ? "stroke-[#333333] stroke-[1.7px] size-4"
-              : "stroke-neutral-500 stroke-[1.4px] size-4",
+            isSelected ? "stroke-[#333333]" : "stroke-neutral-500",
             iconFillColor ? `stroke-none` : "fill-none",
             type === "actionBtn" && "stroke-[2.2px]"
           )}
+          size={iconStrokeSize ?? "1rem"}
           fill={iconFillColor}
+          strokeWidth={iconStrokeWidth ?? "1.7px"}
         />
       </div>
 
@@ -450,37 +536,6 @@ export const SidebarIcon = ({
   );
 };
 
-export const SidebarItemWrapper = ({
-  isLink,
-  item,
-  children,
-}: {
-  isLink: boolean;
-  item: sidebarPathType;
-  children: React.ReactNode;
-}) => {
-  let className = "w-full group/sidebarButton transition-all duration-300";
-
-  if (isLink) {
-    return (
-      <Link className={className} href={item.path}>
-        {children}
-      </Link>
-    );
-  } else {
-    return (
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-        }}
-        className={className}
-      >
-        {children}
-      </button>
-    );
-  }
-};
-
 export const MoreButton = ({ item }: { item: sidebarPathType }) => {
   const { setOpenMoreDialog } = useAppDialog();
   const pathname = usePathname();
@@ -494,16 +549,13 @@ export const MoreButton = ({ item }: { item: sidebarPathType }) => {
         {moreButtonPaths.map((p, i) => {
           const Icon = p.icon;
           return (
-            <button
-              key={`${i.toString()}`}
-              onClick={() => setOpenMoreDialog(true, p.path)}
-            >
-              <DropdownMenuItem>
+            <div key={`${i.toString()}`}>
+              <DropdownMenuItem onClick={() => setOpenMoreDialog(true, p.path)}>
                 <Icon className="stroke-neul-600" />
                 <span className="text-neutral-600">{p.name}</span>
               </DropdownMenuItem>
               {i === 1 && <DropdownMenuSeparator />}
-            </button>
+            </div>
           );
         })}
       </DropdownMenuContent>

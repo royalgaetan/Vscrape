@@ -20,6 +20,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const generateUniqueId = ({
+  prefix,
+  isDateSensitive = false,
+}: {
+  prefix?: string;
+  isDateSensitive?: boolean;
+}): string => {
+  const p = prefix ? `${prefix}_` : "";
+  const d = isDateSensitive ? `_${new Date(Date.now()).getTime()}` : "";
+  const r1 = Math.random().toString(36).slice(2, 9);
+  const r2 = Math.random().toString(36).slice(2, 9);
+  const r3 = Math.random().toString(36).slice(2, 9);
+  return `${p}${r1}${r2}${r3}${d}`;
+};
+
+export const getRandomElement = <T>(arr: Array<T>): T =>
+  arr[Math.floor(Math.random() * arr.length)];
+
 export const formatNumber = (n: number) => Intl.NumberFormat("en-US").format(n);
 
 export const getTimeAgoWithLimit = (date: Date, suffix?: boolean) => {
@@ -31,6 +49,21 @@ export const getTimeAgoWithLimit = (date: Date, suffix?: boolean) => {
   } else {
     return `${suffix ? "on " : ""}${format(date, "MMM dd, yyyy")}`;
   }
+};
+
+export const formatLargeNumber = (num: number): string => {
+  if (num < 1000) return num.toString(); // No abbreviation if < 1000
+
+  const units = ["K", "M", "B", "T"]; // Kilo, Million, Billion, Trillion
+  let unitIndex = -1;
+  let formattedNum = num;
+
+  while (formattedNum >= 1000 && unitIndex < units.length - 1) {
+    formattedNum /= 1000;
+    unitIndex++;
+  }
+
+  return `${parseFloat(formattedNum.toFixed(1))}${units[unitIndex]}`;
 };
 
 export const isSearchTermFound = ({
@@ -94,6 +127,21 @@ export const removeDiacritics = (str: string): string => {
     .replace(/[\u0300-\u036f]/g, ""); // Remove the diacritical marks (accents).
 };
 
+export const isElementInViewport = (
+  parent: HTMLElement,
+  child: HTMLElement
+): boolean => {
+  const parentRect = parent.getBoundingClientRect();
+  const childRect = child.getBoundingClientRect();
+
+  return (
+    childRect.top >= parentRect.top &&
+    childRect.bottom <= parentRect.bottom &&
+    childRect.left >= parentRect.left &&
+    childRect.right <= parentRect.right
+  );
+};
+
 export const waitForElementById = (
   id: string,
   timeout = 5000
@@ -134,7 +182,9 @@ export const scrollToEl = ({
   parentId,
   id,
   offsetTopMargin = 15,
+  offsetLeftMargin = 0,
 }: {
+  offsetLeftMargin?: number;
   offsetTopMargin?: number;
   parentId?: string;
   id: string;
@@ -144,6 +194,7 @@ export const scrollToEl = ({
   if (el && parent) {
     parent.scrollTo({
       top: el.offsetTop - offsetTopMargin,
+      left: el.offsetLeft - offsetLeftMargin,
       behavior: "smooth",
     });
   } else {

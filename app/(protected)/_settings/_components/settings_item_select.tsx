@@ -7,11 +7,18 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
 import React from "react";
 
 export type SettingItemSelectDataType = Record<
   string,
-  { value: string; label: string; disabled?: boolean }[]
+  {
+    value: string;
+    label: string;
+    disabled?: boolean;
+    icon?: LucideIcon;
+    iconClassName?: string;
+  }[]
 >;
 
 const SettingItemSelect = ({
@@ -50,13 +57,22 @@ const SettingItemSelect = ({
             <SelectGroup key={groupName}>
               {groupName !== "" && <SelectLabel>{groupName}</SelectLabel>}
               {options.map((opt) => {
+                const Icon = opt.icon;
                 return (
                   <SelectItem
                     key={opt.value}
                     value={opt.value}
                     disabled={opt.disabled}
                   >
-                    {opt.label}
+                    {Icon && (
+                      <Icon
+                        className={cn(
+                          "mr-0 size-3 stroke-[1.8px]",
+                          opt.iconClassName
+                        )}
+                      />
+                    )}{" "}
+                    <span> {opt.label}</span>
                   </SelectItem>
                 );
               })}

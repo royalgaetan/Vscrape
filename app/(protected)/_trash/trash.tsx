@@ -4,7 +4,7 @@ import { trashItems } from "@/lib/fake_data";
 import { Trash2Icon, Undo2, Workflow } from "lucide-react";
 import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Button } from "@/components/ui/button";
-import { cn, getIconColor, removeDiacritics } from "@/lib/utils";
+import { cn, removeDiacritics } from "@/lib/utils";
 
 export type trashItemType = {
   title: string;

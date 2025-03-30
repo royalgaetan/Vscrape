@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { fakeWorkflows } from "@/lib/fake_data";
 
 import {
   cn,
@@ -223,6 +222,7 @@ export const WorkflowDetailItem = ({
   textColor,
   cta,
   iconColor,
+  overallClassname,
 }: {
   icon: LucideIcon;
   val: React.ReactNode;
@@ -230,6 +230,7 @@ export const WorkflowDetailItem = ({
   textColor?: string;
   iconColor?: string;
   cta?: React.ReactNode;
+  overallClassname?: string;
 }) => {
   const Icon = icon;
   const [showMoreText, setShowMoreText] = useState<boolean>();
@@ -245,7 +246,8 @@ export const WorkflowDetailItem = ({
     <div
       className={cn(
         "flex items-start gap-2 group",
-        isLongText === undefined && "h-4"
+        isLongText === undefined && "h-4",
+        overallClassname
       )}
     >
       <div>

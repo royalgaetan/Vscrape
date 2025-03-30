@@ -2,7 +2,6 @@ import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { WORKFLOW_COLORS } from "@/lib/colors";
 import { cn, formatNumber } from "@/lib/utils";
 import {
   AlarmClockCheck,
@@ -16,7 +15,6 @@ import {
   Play,
   Squircle,
   WebhookIcon,
-  Workflow,
   X,
   Zap,
 } from "lucide-react";
@@ -92,14 +90,14 @@ const WorkflowCard = ({
   return (
     <div
       className={cn(
-        "cursor-pointer group mb-3 w-full gap-1 p-0 rounded-lg border border-gray-100 hover:border-gray-300/80 transition-all duration-100 overflow-clip",
-        isSelected && "border-gray-300/80",
+        "cursor-pointer group mb-3 w-full gap-1 p-0 bg-transparent hover:bg-neutral-100/45 border-neutral-200 border rounded-2xl overflow-clip",
+        isSelected && "border-neutral-400 border-[2.7px] bg-neutral-100/45",
         workflow.hasError &&
           !isSelected &&
-          "border-red-100 hover:border-red-300/80",
+          "border-red-100 hover:border-red-300/80 hover:bg-red-100/60 bg-red-100/30",
         workflow.hasError &&
           isSelected &&
-          "border-red-300/80 hover:border-red-300/80"
+          "border-red-300/80 hover:border-red-300/80 hover:bg-red-100/60 bg-red-100/60"
       )}
     >
       <div className="flex flex-1 gap-3 w-full px-4 py-4 h-[5.5rem]">
@@ -108,15 +106,15 @@ const WorkflowCard = ({
           onClick={() => {
             onClick && onClick();
           }}
-          className="h-9 w-9 rounded-full bg-primary/70 flex justify-center items-center relative"
+          className="h-9 w-9 rounded-full bg-primary/80 flex justify-center items-center relative"
           //   style={{ backgroundColor: WORKFLOW_COLORS[workflow.folderColor] }}
         >
           <TriggerModeIcon className="stroke-white size-5" />
 
           {/* Last test: Error Indicator */}
           {workflow.hasError && (
-            <div className="absolute border-[3px] border-white -bottom-1 -right-1 bg-primary rounded-full bg-red-500 p-[4.2px] w-5 h-4 flex align-middle justify-center items-center ">
-              <X className="stroke-white stroke-[4px]" />
+            <div className="absolute border-[3px] border-red-100/100 -bottom-1 -right-1 bg-primary rounded-full bg-red-500 p-[4.2px] w-5 h-4 flex align-middle justify-center items-center">
+              <X className="stroke-white stroke-[4px] size-2 translate-x-[0.8px]" />
             </div>
           )}
         </button>
@@ -263,20 +261,6 @@ const WorkflowCard = ({
           </Button>
         </div>
       </div>
-
-      {/* Colored Border */}
-      <div
-        className={cn(
-          "w-full h-1 group-hover:bg-primary/20 bg-primary/10",
-          isSelected && "bg-primary/20",
-          isSelected &&
-            workflow.hasError &&
-            "bg-red-500/40 group-hover:bg-red-500/40",
-          workflow.hasError &&
-            !isSelected &&
-            "bg-red-500/20 group-hover:bg-red-500/40"
-        )}
-      ></div>
     </div>
   );
 };

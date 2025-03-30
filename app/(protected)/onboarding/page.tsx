@@ -61,8 +61,6 @@ const OnboaringPage = () => {
 
     carouselApi.on("select", () => {
       setCurrentCarousel(carouselApi?.selectedScrollSnap() + 1);
-      console.log("@@selectedScrollSnap", currentCarousel);
-      console.log("@@length", carouselLength);
     });
   }, [carouselApi]);
 

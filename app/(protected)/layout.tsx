@@ -27,7 +27,17 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         setOpenPanSidebar(false, "inbox");
       });
     }
-  }, []);
+  }, [pathname]);
+
+  useEffect(() => {
+    // If Current Path is Chat Single Page: scroll to bottom
+    if (mainContainerRef.current && pathname.startsWith("/chats/c/")) {
+      mainContainerRef.current.scrollTo({
+        behavior: "instant",
+        top: mainContainerRef.current.scrollHeight,
+      });
+    }
+  }, [pathname]);
 
   if (isLoading) {
     return <CustomLoader />;
@@ -41,7 +51,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       style={{ "--sidebar-width": SIDEBAR_WIDTH } as React.CSSProperties}
     >
       <div className="flex flex-1 h-full w-full">
-        <div className="relative top-0 left-0 z-50 h-full">
+        <div className="relative top-0 left-0 z-[48] h-full">
           <AppSidebar />
         </div>
         <main className="flex flex-1 m-0 pl-5 relative">
@@ -52,13 +62,15 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             ref={mainContainerRef}
             className={cn(
               "w-full max-h-[100vh] overflow-auto",
-              pathname.startsWith("/workflows") && "overflow-y-scroll"
+              pathname.startsWith("/workflows") && "overflow-y-scroll",
+              pathname.startsWith("/templates") && "overflow-y-scroll",
+              pathname.startsWith("/chats/c/") && "overflow-y-scroll"
             )}
           >
             {/* Main Header */}
             <div
               className={cn(
-                "h-[8vh] z-[50] sticky top-0 bg-white",
+                "h-[8vh] z-[46] sticky top-0 bg-white",
                 pathname === "/dashboard" &&
                   "bg-transparent pointer-events-none"
               )}

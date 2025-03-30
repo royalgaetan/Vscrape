@@ -6,7 +6,6 @@ import {
   FileJson,
   FileText,
   FileCode,
-  Zap,
   FileDown,
   Eye,
   MoreHorizontal,

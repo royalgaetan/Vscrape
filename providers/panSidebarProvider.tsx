@@ -6,7 +6,7 @@ export const PanSidebarContext = createContext<panSidebarContextType | null>(
   null
 );
 
-export type panSidebarType = "trash" | "inbox";
+export type panSidebarType = "trash" | "inbox" | "chats";
 export type inboxOptionsType = {
   filter?: keyof typeof inboxFilterOptions;
   scrollToId?: string;

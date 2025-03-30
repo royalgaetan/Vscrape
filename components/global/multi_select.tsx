@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { CheckIcon, ChevronDown, XIcon } from "lucide-react";
+import { CheckIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Popover,
   PopoverContent,
@@ -25,12 +24,18 @@ const MultiSelect = ({
   selectedValues = [],
   triggerClassName,
   label,
+  popoverAlignment,
+  popoverSide,
+  popoverClassName,
 }: {
   data: SettingItemSelectDataType;
   handleSelect: (value: string) => void;
   selectedValues?: string[];
   label: string;
   triggerClassName?: string;
+  popoverClassName?: string;
+  popoverAlignment?: "end" | "center" | "start";
+  popoverSide?: "top" | "right" | "bottom" | "left";
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -39,18 +44,23 @@ const MultiSelect = ({
       <PopoverTrigger>
         <Button
           variant="outline"
-          role="combobox"
           aria-expanded={open}
           className={cn(
-            "h-8 w-44 truncate pl-2 pr-1 flex gap-1",
+            "h-8 w-44 truncate pl-2 pr-1 flex flex-1 gap-1",
             triggerClassName
           )}
         >
-          <div className="flex flex-1 font-normal">{label}</div>
-          <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+          <div className="font-normal w-full text-start truncate">{label}</div>
+          <div className="">
+            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+          </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 truncate p-0">
+      <PopoverContent
+        className={cn("w-64 truncate p-0", popoverClassName)}
+        side={popoverSide}
+        align={popoverAlignment}
+      >
         <Command>
           <CommandInput className="px-2" />
           <Separator />
@@ -58,23 +68,32 @@ const MultiSelect = ({
             <CommandEmpty>No results found.</CommandEmpty>
             {Object.entries(data).map(([groupName, options], idx) => {
               return (
-                <>
-                  <CommandGroup>
-                    {options.map((option) => (
+                <CommandGroup key={groupName} heading={groupName}>
+                  {options.map((option) => {
+                    const Icon = option.icon;
+                    return (
                       <CommandItem
                         key={option.value}
                         value={option.value}
                         onSelect={(value) => handleSelect(value)}
                         className="flex items-center justify-between"
                       >
+                        {Icon && (
+                          <Icon
+                            className={cn(
+                              "mr-0 size-3 stroke-[1.8px]",
+                              option.iconClassName
+                            )}
+                          />
+                        )}
                         <span className="truncate w-56">{option.label}</span>
                         {selectedValues.includes(option.value) && (
                           <CheckIcon className="h-4 w-4" />
                         )}
                       </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </>
+                    );
+                  })}
+                </CommandGroup>
               );
             })}
           </CommandList>

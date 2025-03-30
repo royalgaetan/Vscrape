@@ -6,6 +6,7 @@ import {
   PencilLineIcon,
   Shapes,
   SparklesIcon,
+  WandSparkles,
 } from "lucide-react";
 import React from "react";
 import { useAppDialog } from "@/hooks/useAppDialog";
@@ -37,9 +38,9 @@ const Home = () => {
 
           <GetStartedOption
             text={"Build one in less than 1 sec"}
-            Icon={SparklesIcon}
+            Icon={WandSparkles}
             iconColor="stroke-blue-400"
-            onClick={() => redirect("/generate")}
+            onClick={() => redirect("/chats")}
           />
 
           <GetStartedOption

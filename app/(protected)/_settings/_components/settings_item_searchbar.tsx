@@ -36,7 +36,7 @@ const SettingItemSearchBar = ({
   return (
     <div
       className={cn(
-        "w-60 flex flex-1 items-center rounded-md border-2 border-gray-300 bg-slate-100/40 px-0 py-0 text-xs focus:border-primary/60 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all duration-300",
+        "w-80 flex flex-1 items-center rounded-md border-2 border-gray-300 bg-slate-100/40 px-0 py-0 text-xs focus:border-primary/60 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all duration-300",
         className
       )}
     >

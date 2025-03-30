@@ -9,6 +9,24 @@ export type sidebarPathType = {
   type: "expandable" | "icon-only" | "main";
 };
 
+export type userProfile = {
+  name: string;
+  avatar: string | undefined;
+};
+
+export type ChatBubbleFrom = "user" | "model";
+
+export type ChatReply = {
+  from: ChatBubbleFrom;
+  content: React.ReactNode;
+  createdAt: Date;
+};
+
+export type knowledgeBase = {
+  name: string;
+  id: string;
+};
+
 export type planNames = "Free" | "Plus" | "Business";
 
 export type PlanType = {

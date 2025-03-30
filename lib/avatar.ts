@@ -3,12 +3,12 @@ import { notionists } from "@dicebear/collection";
 import { avatarBackgroundColors } from "./constants";
 import { generateHexRandomString } from "./crypto";
 
-export const generateAvatar = (customSeed?: string) => {
+export const generateAvatar = (customSeed?: string, bgColors?: string[]) => {
   try {
     const seed = customSeed ?? generateHexRandomString();
     return createAvatar(notionists, {
       seed,
-      backgroundColor: avatarBackgroundColors,
+      backgroundColor: bgColors ?? avatarBackgroundColors,
       backgroundType: ["solid"],
     });
   } catch (e) {

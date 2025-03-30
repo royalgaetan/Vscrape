@@ -57,6 +57,36 @@ export const avatarBackgroundColors = [
   "c06c84", // Soft Plum
 ];
 
+export const avatarBackgroundColors2 = [
+  "#93c5fd", // Blue-300
+  "#a5b4fc", // Indigo-300
+  "#c4b5fd", // Purple-300
+  "#f0abfc", // Fuchsia-300
+  "#f9a8d4", // Pink-300
+  "#fda4af", // Rose-300
+  "#fca5a5", // Red-300
+  "#fdba74", // Orange-300
+  "#fcd34d", // Amber-300
+  "#fde047", // Yellow-300
+  "#bef264", // Lime-300
+  "#86efac", // Green-300
+  "#5eead4", // Teal-300
+  "#67e8f9", // Cyan-300
+  "#7dd3fc", // Sky-300
+  "#a3e635", // Lime-400
+  "#4ade80", // Green-400
+  "#2dd4bf", // Teal-400
+  "#22d3ee", // Cyan-400
+  "#38bdf8", // Sky-400
+  "#60a5fa", // Blue-400
+  "#818cf8", // Indigo-400
+  "#a78bfa", // Purple-400
+  "#d8b4fe", // Violet-300
+  "#e879f9", // Fuchsia-400
+  "#f472b6", // Pink-400
+  "#fb7185", // Rose-400
+];
+
 export const reportTypes = [
   { label: "UI Display Issue", value: "ui_issue" },
   { label: "Feature Not Working", value: "feature_not_working" },

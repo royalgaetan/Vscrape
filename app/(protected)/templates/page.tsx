@@ -1,13 +1,18 @@
-import { Shapes } from "lucide-react";
 import React from "react";
+import WorkflowTemplatesList from "./_components/templates_list";
+import { fakeWorkflowTemplates } from "@/lib/fake_data";
 
-const Templates = () => {
+const page = () => {
   return (
-    <div className="h-[90vh] w-full flex flex-col justify-center items-center text-center">
-      <Shapes className="size-10 stroke-emerald-600 mb-4" />
-      <h2 className="text-3xl text-[#333] font-semibold">Templates</h2>
+    <div className="mt-0 pt-0">
+      <WorkflowTemplatesList
+        categoryType="All"
+        workflowTemplatesList={fakeWorkflowTemplates.sort(
+          (a, b) => b.downloads - a.downloads
+        )}
+      />
     </div>
   );
 };
 
-export default Templates;
+export default page;

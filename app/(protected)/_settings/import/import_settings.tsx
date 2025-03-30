@@ -1,14 +1,7 @@
 import React, { useState } from "react";
 import SettingDialogHeader from "../_components/settings_dialog_header";
 import SettingsItemField from "../_components/settings_item_field";
-import {
-  Code2,
-  FileJson,
-  FileText,
-  ImportIcon,
-  Link,
-  LucideIcon,
-} from "lucide-react";
+import { ImportIcon, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { fakeImportedFiles } from "@/lib/fake_data";

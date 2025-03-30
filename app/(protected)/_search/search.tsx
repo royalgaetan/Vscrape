@@ -377,6 +377,7 @@ export const SearchableActionItem = ({
         // If Item is a Sidebar item
         else if (typeType === "Actions") {
           // Redirect to corresponding Item page and remove current dialog
+          setOpenPanSidebar(false, "inbox");
           setOpenSearchDialog(false);
           redirect(item.path);
         }

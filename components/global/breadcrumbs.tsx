@@ -18,6 +18,7 @@ import { redirect, usePathname } from "next/navigation";
 import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import { folders } from "@/lib/fake_data";
 import { Squircle } from "lucide-react";
+import { workflowTemplateCategories } from "@/app/(protected)/templates/_components/templates_list";
 
 const Breadcrumbs = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -30,6 +31,21 @@ const Breadcrumbs = () => {
     return folders.find((f) => f.folderPath === folderId)?.folderName;
   };
 
+  const getTemplateCategoryName = (categoryPath: string) => {
+    return Object.entries(workflowTemplateCategories).find(
+      ([name, path]) => categoryPath === path
+    )?.[0];
+  };
+
+  const isATemplateCategory = (currentPath: string) => {
+    return (
+      pathSplitted[pathSplitted.length - 2] === "categories" &&
+      pathSplitted.length === 4 &&
+      currentPath !== "categories" &&
+      currentPath !== "templates"
+    );
+  };
+
   const isAFolder = (currentPath: string) => {
     return (
       pathSplitted[pathSplitted.length - 2] === "folders" &&
@@ -40,7 +56,11 @@ const Breadcrumbs = () => {
   };
 
   const isLinkDisabled = (currentPath: string) => {
-    return isAFolder(currentPath) || pathname === `/${currentPath}`;
+    return (
+      isAFolder(currentPath) ||
+      isATemplateCategory(currentPath) ||
+      pathname === `/${currentPath}`
+    );
   };
 
   return (
@@ -101,30 +121,80 @@ const Breadcrumbs = () => {
                 );
               }
 
+              // If item is "categories" form "/templates/categories"
+              if (pathSplitted[1] === "templates" && path === "categories") {
+                return (
+                  <>
+                    <BreadcrumbItem>
+                      <DropdownMenu
+                        open={isDropdownOpen}
+                        onOpenChange={setDropdownOpen}
+                      >
+                        <DropdownMenuTrigger className="flex items-center gap-1">
+                          <BreadcrumbEllipsis className="h-4 w-4" />
+                          <span className="sr-only">
+                            {capitalizeFirstLetter(path)}
+                          </span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="start"
+                          className="w-52 max-h-[60vh] overflow-y-auto"
+                        >
+                          <div className="w-full text-xs text-muted-foreground justify-start mb-1 px-3 pt-2">
+                            Categories
+                          </div>
+                          {Object.entries(workflowTemplateCategories).map(
+                            ([categoryName, categoryPath]) => (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setDropdownOpen(false);
+                                  redirect(
+                                    `/templates/categories/${categoryPath}`
+                                  );
+                                }}
+                                key={categoryPath}
+                                className="truncate w-full"
+                              >
+                                <span>
+                                  {capitalizeFirstLetter(categoryName)}
+                                </span>
+                              </DropdownMenuItem>
+                            )
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="last:hidden" />
+                  </>
+                );
+              }
+
               return (
-                <span key={path}>
-                  <BreadcrumbItem>
+                <>
+                  <BreadcrumbItem key={path}>
                     <BreadcrumbLink
                       aria-disabled={isLinkDisabled(path)}
                       className={cn(
                         isLinkDisabled(path) && "pointer-events-none"
                       )}
                       href={
-                        isAFolder(path)
-                          ? `/workflows/folders/${path}`
+                        isAFolder(path) || isATemplateCategory(path)
+                          ? `#`
                           : `/${path}`
                       }
                     >
                       {/* If item if "folders" form "/workflows/folders" */}
-                      {isAFolder(path)
-                        ? getFolderName(pathSplitted[3])
-                        : capitalizeFirstLetter(path)}
+                      {isAFolder(path) && getFolderName(pathSplitted[3])}
+                      {isATemplateCategory(path) &&
+                        getTemplateCategoryName(pathSplitted[3])}
+                      {!isAFolder(path) &&
+                        !isATemplateCategory(path) &&
+                        capitalizeFirstLetter(path)}
                     </BreadcrumbLink>
-                    <br />
                   </BreadcrumbItem>
 
                   <BreadcrumbSeparator className="last:hidden" />
-                </span>
+                </>
               );
             })}
           </BreadcrumbList>

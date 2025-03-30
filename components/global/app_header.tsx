@@ -19,12 +19,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import SettingsDialog from "@/app/(protected)/_settings/settings_dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDialog } from "@/hooks/useAppDialog";
 import { formatNumber } from "@/lib/utils";
 
 const AppHeader = () => {
+  const { setOpenSettingsDialog } = useAppDialog();
   const [avatarImage, setAvatarImage] = useState("");
 
   useEffect(() => {
@@ -58,6 +58,9 @@ const AppHeader = () => {
         <Button
           variant={"default"}
           className="rounded-3xl h-8 -ml-2 gap-1 px-3"
+          onClick={() => {
+            setOpenSettingsDialog(true, "plans");
+          }}
         >
           <CoinsIcon className="stroke-white" />
           <span className="text-xs">{formatNumber(13403)} </span>

@@ -5,7 +5,7 @@ import { CoinsIcon, LucideIcon, RouteIcon, Zap } from "lucide-react";
 import { cn, formatNumber } from "@/lib/utils";
 import StatsCharts from "./stats_charts";
 import { statsData } from "@/lib/fake_data";
-import { max, min, startOfToday, startOfTomorrow, subDays } from "date-fns";
+import { max, min, startOfToday, subDays } from "date-fns";
 import DatePickerWithRange from "@/components/global/date_range_picker";
 import { DateRange } from "react-day-picker";
 import MultiSelect from "@/components/global/multi_select";
@@ -57,6 +57,25 @@ const StatsAndMetricsSection = () => {
     );
   };
 
+  const getWorkflowSelectLabel = () => {
+    if (workflowsSelected.length === 0) {
+      return "Select a workflow";
+    } else if (workflowsSelected.length === 1) {
+      const val = Object.keys(statsData).find(
+        (s) => s === workflowsSelected[0]
+      );
+      if (val) {
+        return val;
+      } else {
+        return "1 workflow selected";
+      }
+    } else if (areAllWorkflowsSelected()) {
+      return "All";
+    } else {
+      return `${workflowsSelected.length} workflows selected`;
+    }
+  };
+
   return (
     <div className="mt-4 w-full flex flex-col gap-3">
       {/* Header */}
@@ -67,22 +86,16 @@ const StatsAndMetricsSection = () => {
           <div className="w-min flex gap-2">
             {/* Select a Workflow */}
             <MultiSelect
-              triggerClassName="w-32"
-              label={
-                workflowsSelected.length === 0
-                  ? "Select a workflow"
-                  : areAllWorkflowsSelected()
-                  ? "All"
-                  : `${workflowsSelected.length} selected`
-              }
+              triggerClassName="w-44"
+              label={getWorkflowSelectLabel()}
               data={{
-                All: [
+                "": [
                   {
-                    label: "All",
+                    label: "Select All",
                     value: "all",
                   },
                 ],
-                Workflows: statsWorkflowsNames.map((w) => ({
+                "Your Workflows": statsWorkflowsNames.map((w) => ({
                   value: w,
                   label: w,
                 })),
