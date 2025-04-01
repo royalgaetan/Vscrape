@@ -59,6 +59,19 @@ export const onboardingFormSchema = z.object({
   }),
 });
 
+// Create Workflow Form
+export const createWorkflowFormSchema = z.object({
+  name: z
+    .string()
+    .min(2, {
+      message: "The workflow name must be at least 2 characters long.",
+    })
+    .max(255, { message: "The workflow name must not exceed 255 characters." }),
+  folder: z
+    .string()
+    .min(1, { message: "Please select a folder for your workflow." }),
+});
+
 // Support Form
 export const supportFormSchema = z.object({
   email: emailSchema,

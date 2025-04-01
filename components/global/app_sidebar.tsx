@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import {
   Bug,
   ChevronDown,
@@ -47,6 +47,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { folders } from "@/lib/fake_data";
+import CreateWorkflowDialog from "@/app/(protected)/workflows/_components/create_workflow_dialog";
 
 export const sidebarPaths: sidebarPathType[] = [
   { name: "Home", path: "/home", icon: Home, type: "main" },
@@ -94,7 +95,11 @@ const AppSidebar = () => {
     usePanSidebar();
   const pathname = usePathname();
 
-  const { setOpenSettingsDialog, setOpenSearchDialog } = useAppDialog();
+  const {
+    setOpenSettingsDialog,
+    setOpenSearchDialog,
+    setCreateWorkflowDialogOpen,
+  } = useAppDialog();
 
   const togglePanSidebar = (type: panSidebarType) => {
     if (isPanSidebarOpen) {
@@ -174,17 +179,17 @@ const AppSidebar = () => {
                         }}
                         item={item}
                         cta={[
-                          {
-                            defaultIcon: MessageCircleMoreIcon,
-                            iconStrokeWidth: "4.3px",
-                            isExpandable: false,
-                            isSelected: undefined,
-                            type: "actionBtn",
-                            onIconClick: () => {
+                          <SidebarIcon
+                            defaultIcon={MessageCircleMoreIcon}
+                            iconStrokeWidth={"4.3px"}
+                            isExpandable={false}
+                            isSelected={undefined}
+                            type={"actionBtn"}
+                            onIconClick={() => {
                               setOpenPanSidebar(false, "inbox");
                               togglePanSidebar("chats");
-                            },
-                          },
+                            }}
+                          />,
                         ]}
                       />
                     </>
@@ -203,13 +208,16 @@ const AppSidebar = () => {
                         item={item}
                         isExpanded={isWorkflowsButtonExpanded}
                         cta={[
-                          {
-                            defaultIcon: Plus,
-                            isExpandable: false,
-                            isSelected: undefined,
-                            type: "actionBtn",
-                            onIconClick: () => {},
-                          },
+                          <SidebarIcon
+                            defaultIcon={Plus}
+                            isExpandable={false}
+                            isSelected={undefined}
+                            type={"actionBtn"}
+                            onIconClick={() => {
+                              setOpenPanSidebar(false, "inbox");
+                              setCreateWorkflowDialogOpen(true);
+                            }}
+                          />,
                         ]}
                       />
 
@@ -242,9 +250,7 @@ const AppSidebar = () => {
                   return (
                     <div
                       key={item.path}
-                      className={cn(
-                        item.name === "Templates" && "-mb-2"
-                      )}
+                      className={cn(item.name === "Templates" && "-mb-2")}
                     >
                       <SidebarButton
                         onButtonClicked={() => {
@@ -349,7 +355,7 @@ export const SidebarButton = ({
   onIconClicked?: () => void;
   onButtonClicked?: () => void;
 
-  cta?: SidebarIconProps[];
+  cta?: React.ReactNode[];
 }) => {
   const Icon = item.icon;
 
@@ -392,21 +398,10 @@ export const SidebarButton = ({
 
           {/* Action Buttons */}
           {cta && cta.length > 0 && (
-            <div className="flex">
-              {cta.map((button, idx) => (
-                <SidebarIcon
-                  key={`${item.name}_${idx.toString()}`}
-                  defaultIcon={button.defaultIcon}
-                  isExpandable={button.isExpandable}
-                  isSelected={button.isSelected}
-                  iconStrokeWidth={"2px"}
-                  iconStrokeColor={button.iconStrokeColor}
-                  type={button.type}
-                  onIconClick={() => {
-                    button.onIconClick && button.onIconClick();
-                  }}
-                />
-              ))}
+            <div className="flex items-center">
+              {cta.map((element, idx) => {
+                return <>{element}</>;
+              })}
             </div>
           )}
         </div>
@@ -491,8 +486,10 @@ export const SidebarIcon = ({
       role="button"
       className=""
       onClick={(e) => {
-        e.preventDefault();
-        onIconClick && onIconClick();
+        if (onIconClick) {
+          e.preventDefault();
+          onIconClick();
+        }
       }}
     >
       <div

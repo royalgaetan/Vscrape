@@ -17,10 +17,15 @@ type AppDialogContextValues = {
   isMoreDialogOpen: boolean;
   setOpenMoreDialog: (isOpen: boolean, tab: moreTabValue) => void;
   moreDialogCurrentTab: moreTabValue;
+
   // Settings
   setOpenSettingsDialog: (isOpen: boolean, tabIndex: string) => void;
   isSettingDialogOpen: boolean;
   settingsDialogCurrentTab: string;
+
+  // Create A Workflow
+  isCreateWorkflowDialogOpen: boolean;
+  setCreateWorkflowDialogOpen: (isOpen: boolean) => void;
 };
 
 export const AppDialogProvider = ({
@@ -56,6 +61,10 @@ export const AppDialogProvider = ({
     setIsSettingDialogOpen(isOpen);
   };
 
+  // Create A Workflow Dialog States
+  const [isCreateWorkflowDialogOpen, setCreateWorkflowDialogOpen] =
+    useState(false);
+
   return (
     <AppDialogContext.Provider
       value={{
@@ -69,6 +78,8 @@ export const AppDialogProvider = ({
         setOpenSettingsDialog,
         isSettingDialogOpen,
         settingsDialogCurrentTab,
+        isCreateWorkflowDialogOpen,
+        setCreateWorkflowDialogOpen,
       }}
     >
       {children}

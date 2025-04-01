@@ -1,35 +1,22 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
-import ChatTextarea from "../../_components/chat_textarea";
+import React, { useState } from "react";
 import { LucideArrowRight } from "lucide-react";
-import ChatBubble from "../../_components/chat_bubble";
 import { fakeConversation1 } from "@/lib/fake_data";
 import { generateAvatar } from "@/lib/avatar";
+import ChatBubble from "../_components/chat_bubble";
+import ChatTextarea from "../_components/chat_textarea";
 
 const SingleChatPage = () => {
-  const chatHistoryContainerRef = useRef<HTMLDivElement>(null);
   const { chatId } = useParams();
   const [avatarPath] = useState(generateAvatar()?.toDataUri ?? "");
 
-  useEffect(() => {
-    if (chatHistoryContainerRef.current) {
-      chatHistoryContainerRef.current.scrollTo({
-        behavior: "smooth",
-        top: document.documentElement.scrollHeight,
-      });
-    }
-  }, []);
-
   return (
-    <div className="w-[max(60%,500px)]">
-      <div className="relative flex flex-col h-full min-h-auto justify-end">
+    <div className="flex flex-col justify-center items-center">
+      <div className="relative flex flex-col h-full min-h-auto justify-end w-[max(60%,500px)]">
         {/* Chat History */}
-        <div
-          ref={chatHistoryContainerRef}
-          className="relative z-[20] pb-44 flex flex-1"
-        >
+        <div className="relative z-[20] pb-44 flex flex-1 justify-center">
           <div className="flex flex-col">
             {fakeConversation1.map((chatReply, idx) => (
               <ChatBubble
@@ -43,7 +30,7 @@ const SingleChatPage = () => {
         {/* Chat Textarea */}
       </div>
       <div className="absolute bottom-0 right-0 z-[21] flex flex-1 justify-center w-full">
-        <div className="w-[max(59%,500px)] bg-transparent relative">
+        <div className="w-[max(60%,500px)] -ml-5 bg-transparent relative">
           <ChatTextarea
             onChatSubmit={(userText) => {}}
             submitButtonText=""

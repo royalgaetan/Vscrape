@@ -12,6 +12,7 @@ import React from "react";
 import { useAppDialog } from "@/hooks/useAppDialog";
 import { cn } from "@/lib/utils";
 import { redirect } from "next/navigation";
+import CreateWorkflowDialog from "../workflows/_components/create_workflow_dialog";
 
 const Home = () => {
   const { setOpenSettingsDialog } = useAppDialog();
@@ -29,12 +30,14 @@ const Home = () => {
         </div>
 
         <div className="w-full gap-3 flex justify-center items-center">
-          <GetStartedOption
-            text={"Create a workflow from scratch"}
-            Icon={PencilLineIcon}
-            iconColor="stroke-orange-400"
-            onClick={() => {}}
-          />
+          <CreateWorkflowDialog>
+            <GetStartedOption
+              text={"Create a workflow from scratch"}
+              Icon={PencilLineIcon}
+              iconColor="stroke-orange-400"
+              // onClick={(e) => e?.preventDefault()}
+            />
+          </CreateWorkflowDialog>
 
           <GetStartedOption
             text={"Build one in less than 1 sec"}
@@ -73,11 +76,13 @@ export const GetStartedOption = ({
   text: string;
   Icon: LucideIcon;
   iconColor: string;
-  onClick: () => void;
+  onClick?: (e?: React.MouseEvent) => void;
 }) => {
   return (
     <button
-      onClick={() => onClick()}
+      onClick={(e) => {
+        onClick && onClick(e);
+      }}
       className="w-44 h-32 flex-col rounded-2xl pt-2 pb-3 pl-4 pr-3 group bg-muted-foreground/[0.03] hover:bg-muted-foreground/[0.05] border-[2.2px] border-muted-foreground/5 hover:border-muted-foreground/10 transition-all duration-200"
     >
       <div className="h-16 flex items-end">

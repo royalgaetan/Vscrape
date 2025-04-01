@@ -21,11 +21,14 @@ import {
 } from "../ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDialog } from "@/hooks/useAppDialog";
-import { formatNumber } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
+import CreateWorkflowDialog from "@/app/(protected)/workflows/_components/create_workflow_dialog";
+import { usePathname } from "next/navigation";
 
 const AppHeader = () => {
   const { setOpenSettingsDialog } = useAppDialog();
   const [avatarImage, setAvatarImage] = useState("");
+  const pathname = usePathname();
 
   useEffect(() => {
     setAvatarImage(generateAvatar()?.toDataUri() ?? "");
@@ -34,17 +37,22 @@ const AppHeader = () => {
   return (
     <div className="flex justify-between w-full h-fit">
       {/* Breadcrumbs */}
-      <div className="flex flex-1 items-start text-xs py-4 pr-10">
+      <div className={cn("flex flex-1 items-start text-xs py-4 pr-10")}>
         <Breadcrumbs />
       </div>
 
       {/* Action Items */}
       <div className="flex justify-center items-center py-2 px-6 gap-3">
         {/* Create a new Workflow */}
-        <Button variant={"outline"} className="rounded-3xl h-8 mr-2 gap-1 px-3">
-          <PlusIcon className="stroke-primary" />
-          <span className="text-xs">Create a workflow</span>
-        </Button>
+        <CreateWorkflowDialog>
+          <Button
+            variant={"outline"}
+            className="rounded-3xl h-8 mr-2 gap-1 px-3"
+          >
+            <PlusIcon className="stroke-primary" />
+            <span className="text-xs">Create a workflow</span>
+          </Button>
+        </CreateWorkflowDialog>
 
         {/* Get Free Credits */}
         {/* <Button

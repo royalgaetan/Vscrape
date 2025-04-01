@@ -24,6 +24,8 @@ import {
   Zap,
   ArrowRight,
   LucideChevronRight,
+  Plus,
+  MessageCircleMoreIcon,
 } from "lucide-react";
 import { useAppDialog } from "@/hooks/useAppDialog";
 import { useAuth } from "@/hooks/useAuth";
@@ -105,11 +107,27 @@ const SearchModal = () => {
       .filter((item) => item.name !== "Search" && item.name !== "More")
       .map((item) => Object.assign(item, { filter: "Actions" as const }));
 
+    searchableItems.Actions.unshift({
+      icon: Plus,
+      name: "Create a Workflow",
+      path: "",
+      filter: "Actions",
+      type: "icon-only",
+    });
+
     searchableItems.Actions.push(
       ...moreButtonPaths.map((item) =>
         Object.assign(item, { filter: "Actions" as const })
       )
     );
+
+    searchableItems.Actions.push({
+      icon: MessageCircleMoreIcon,
+      name: "Chats",
+      path: "",
+      filter: "Actions",
+      type: "icon-only",
+    });
 
     // Get All Settings Items
     searchableItems.Settings = settingSidebarPaths.map((item) =>
@@ -341,8 +359,12 @@ export const SearchableActionItem = ({
   item: settingsDialogItemType | sidebarPathType | moreButtonPathType;
   typeType: "Actions" | "Settings";
 }) => {
-  const { setOpenSettingsDialog, setOpenMoreDialog, setOpenSearchDialog } =
-    useAppDialog();
+  const {
+    setCreateWorkflowDialogOpen,
+    setOpenSettingsDialog,
+    setOpenMoreDialog,
+    setOpenSearchDialog,
+  } = useAppDialog();
   const { setOpenPanSidebar } = usePanSidebar();
   const Icon = item.icon;
   return (
@@ -360,18 +382,35 @@ export const SearchableActionItem = ({
         }
 
         // If Item is Inbox or Trash
-        else if (item.name === "Trash" || item.name === "Inbox") {
-          // Open Pan Sidebar: with either Trash or Inbox open
-          setOpenPanSidebar(true, item.name === "Trash" ? "trash" : "inbox");
+        else if (
+          item.name === "Trash" ||
+          item.name === "Inbox" ||
+          item.name === "Chats"
+        ) {
+          // Open Pan Sidebar: with either Trash, Inbox or Chats open
+          setOpenPanSidebar(
+            true,
+            item.name === "Trash"
+              ? "trash"
+              : item.name === "Chats"
+              ? "chats"
+              : "inbox"
+          );
         }
 
         // If Item is a Settings Item or "Settings" itself
         else if (typeType === "Settings" || item.name === "Settings") {
-          // Open Settings Dialogs and open the corresponding tab
+          // Open Settings Dialog and open the corresponding tab
           setOpenSettingsDialog(
             true,
             item.name === "Settings" ? "account" : item.path
           );
+        }
+
+        // If Item is a "Create a Workflow"
+        else if (typeType === "Actions" && item.name === "Create a Workflow") {
+          // Open Create Workflow Dialog
+          setCreateWorkflowDialogOpen(true);
         }
 
         // If Item is a Sidebar item

@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { HomeTextareaPlaceholders } from "@/lib/constants";
 import { fakeKnowledgeBases } from "@/lib/fake_data";
 import { cn } from "@/lib/utils";
-import { Database, LucideIcon, SparklesIcon, Terminal } from "lucide-react";
+import { Database, LucideIcon, SparklesIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 const ChatTextarea = ({
@@ -173,13 +173,14 @@ const ChatTextarea = ({
                   label: "AI Knowledge",
                   value: "ai",
                   icon: SparklesIcon,
-                  iconClassName: "stroke-primary",
+                  iconClassName: "stroke-primary fill-primary",
                 },
               ],
               "Knowledge Bases": fakeKnowledgeBases.map((kb) => ({
                 label: kb.name,
                 value: kb.id,
                 icon: Database,
+                iconClassName: "stroke-neutral-600 fill-none",
               })),
             }}
             selectedValues={

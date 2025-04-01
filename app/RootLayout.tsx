@@ -1,8 +1,6 @@
-import { geistSans, openSans } from "@/lib/fonts";
-import "./globals.css";
 import { appName } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { AppDialogProvider } from "@/providers/appDialogProvider";
+import AppDialogProvider from "@/providers/appDialogProvider";
 import { AuthProvider } from "@/providers/authProvider";
 import { PanSidebarProvider } from "@/providers/panSidebarProvider";
 
@@ -26,7 +24,7 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          `${geistSans.variable} antialiased`,
+          `${geistMono.variable} antialiased`,
           "h-full w-full flex flex-1 justify-center items-center"
         )}
       >

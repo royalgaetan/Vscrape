@@ -9,7 +9,7 @@ export type folderType = {
 
 const WorkflowLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="w-full h-full flex justify-center">
+    <div className="w-full h-full flex justify-center pl-5">
       <div className="flex flex-col gap-0 w-[75vw] h-full pr-7 pl-4 pb-10 overflow-x-clip items-start justify-start">
         {/* Header */}
         <div className="mb-3">

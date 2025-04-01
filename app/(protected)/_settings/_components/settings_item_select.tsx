@@ -18,6 +18,7 @@ export type SettingItemSelectDataType = Record<
     disabled?: boolean;
     icon?: LucideIcon;
     iconClassName?: string;
+    iconColorHex?: string;
   }[]
 >;
 
@@ -71,8 +72,8 @@ const SettingItemSelect = ({
                           opt.iconClassName
                         )}
                       />
-                    )}{" "}
-                    <span> {opt.label}</span>
+                    )}
+                    {opt.label}
                   </SelectItem>
                 );
               })}

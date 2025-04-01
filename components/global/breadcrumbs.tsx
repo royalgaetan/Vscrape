@@ -20,22 +20,22 @@ import { folders } from "@/lib/fake_data";
 import { Squircle } from "lucide-react";
 import { workflowTemplateCategories } from "@/app/(protected)/templates/_components/templates_list";
 
+export const getFolderName = (folderId: string) => {
+  return folders.find((f) => f.folderPath === folderId)?.folderName;
+};
+
+export const getTemplateCategoryName = (categoryPath: string) => {
+  return Object.entries(workflowTemplateCategories).find(
+    ([name, path]) => categoryPath === path
+  )?.[0];
+};
+
 const Breadcrumbs = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
   const pathSplitted = pathname.split("/");
   const showBreadcrumb =
     pathname.includes("/workflows") || pathname.includes("/templates");
-
-  const getFolderName = (folderId: string) => {
-    return folders.find((f) => f.folderPath === folderId)?.folderName;
-  };
-
-  const getTemplateCategoryName = (categoryPath: string) => {
-    return Object.entries(workflowTemplateCategories).find(
-      ([name, path]) => categoryPath === path
-    )?.[0];
-  };
 
   const isATemplateCategory = (currentPath: string) => {
     return (

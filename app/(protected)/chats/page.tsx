@@ -1,18 +1,18 @@
 "use client";
 import { Terminal, WandSparkles } from "lucide-react";
 import React from "react";
-import ChatTextarea from "./_components/chat_textarea";
 import { redirect } from "next/navigation";
 import { generateUniqueId } from "@/lib/utils";
+import ChatTextarea from "../c/_components/chat_textarea";
 
 const Generate = () => {
   const startConversation = (userText?: string) => {
     const chatId = generateUniqueId({ prefix: "" });
-    redirect(`/chats/c/${chatId}`);
+    redirect(`/c/${chatId}`);
   };
 
   return (
-    <div className="h-[90vh] w-full flex flex-col justify-start items-center">
+    <div className="h-[90vh] w-full flex flex-col justify-start items-center pl-4">
       <div className="mb-7 mt-20 text-center flex flex-col gap-4 items-center">
         <div>
           <WandSparkles className="size-10 stroke-primary/60" />

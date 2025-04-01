@@ -114,7 +114,7 @@ const ChatItem = ({ item }: { item: ChatItemType }) => {
       onClick={() => {
         // Redirect to Chat Single Page
         setOpenPanSidebar(false, "chats");
-        redirect(`/chats/c/${item.chatId}`);
+        redirect(`/c/${item.chatId}`);
       }}
       className="group/chatItem w-full h-12 my-1 px-5 py-3 hover:bg-neutral-200/40  bg-white cursor-pointer flex justify-start items-center transition-all duration-200"
     >

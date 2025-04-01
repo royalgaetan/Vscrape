@@ -7,7 +7,7 @@ import StatsAndMetricsSection from "./_components/stats_section";
 
 const Dashboard = () => {
   return (
-    <div className="flex flex-1 h-full items-start justify-center w-full pr-7 pl-4">
+    <div className="flex flex-1 h-full items-start justify-center w-full pr-7 pl-10">
       {/* Stats & Cards: Left Section */}
       <div className="flex flex-1 w-full mr-[19rem] -mt-4">
         <div className="flex flex-col pr-4 w-full">

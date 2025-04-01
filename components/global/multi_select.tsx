@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import { CheckIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,8 +27,10 @@ const MultiSelect = ({
   popoverAlignment,
   popoverSide,
   popoverClassName,
+  selectionMode = "multi",
 }: {
   data: SettingItemSelectDataType;
+  selectionMode?: "single" | "multi";
   handleSelect: (value: string) => void;
   selectedValues?: string[];
   label: string;
@@ -44,6 +46,7 @@ const MultiSelect = ({
       <PopoverTrigger>
         <Button
           variant="outline"
+          role="button"
           aria-expanded={open}
           className={cn(
             "h-8 w-44 truncate pl-2 pr-1 flex flex-1 gap-1",
@@ -75,7 +78,13 @@ const MultiSelect = ({
                       <CommandItem
                         key={option.value}
                         value={option.value}
-                        onSelect={(value) => handleSelect(value)}
+                        onSelect={(value) => {
+                          // If selection Mode is "Single": close the popover after item selected
+                          handleSelect(value);
+                          if (selectionMode === "single") {
+                            setOpen(false);
+                          }
+                        }}
                         className="flex items-center justify-between"
                       >
                         {Icon && (
@@ -84,9 +93,12 @@ const MultiSelect = ({
                               "mr-0 size-3 stroke-[1.8px]",
                               option.iconClassName
                             )}
+                            fill={option.iconColorHex}
                           />
                         )}
-                        <span className="truncate w-56">{option.label}</span>
+                        <span className="truncate w-56 flex-1 justify-start">
+                          {option.label}
+                        </span>
                         {selectedValues.includes(option.value) && (
                           <CheckIcon className="h-4 w-4" />
                         )}
