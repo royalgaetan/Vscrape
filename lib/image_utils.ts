@@ -1,7 +1,7 @@
 import { createAvatar } from "@dicebear/core";
 import { notionists } from "@dicebear/collection";
 import { avatarBackgroundColors } from "./constants";
-import { generateHexRandomString } from "./crypto";
+import { generateHexRandomString } from "./numbers_utils";
 
 export const generateAvatar = (customSeed?: string, bgColors?: string[]) => {
   try {
@@ -14,4 +14,8 @@ export const generateAvatar = (customSeed?: string, bgColors?: string[]) => {
   } catch (e) {
     console.log("🟠@Unable to generate avatar:", e);
   }
+};
+
+export const isImage = (fileName: string): boolean => {
+  return /\.(jpg|jpeg|png|gif|bmp|svg)$/i.test(fileName);
 };

@@ -1,6 +1,5 @@
 import { Separator } from "@/components/ui/separator";
 import React from "react";
-import SettingItemSearchBar from "../../_settings/_components/settings_item_searchbar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SidebarIcon } from "@/components/global/app_sidebar";

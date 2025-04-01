@@ -1,7 +1,7 @@
 import { XAxis, CartesianGrid, AreaChart, Area, Bar, BarChart } from "recharts";
 
 import React from "react";
-import { getFakeStatData } from "@/lib/fake_data";
+import { getFakeStatData, getStatsData } from "@/lib/fake_data";
 import {
   ChartConfig,
   ChartContainer,
@@ -14,7 +14,6 @@ import { format } from "date-fns";
 import { statsMetricType } from "./stats_section";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
-import { getStatsData } from "@/lib/stats_data";
 
 export type statsDataItemType = Record<
   string,

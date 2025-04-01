@@ -2,7 +2,7 @@
 import { Terminal, WandSparkles } from "lucide-react";
 import React from "react";
 import { redirect } from "next/navigation";
-import { generateUniqueId } from "@/lib/utils";
+import { generateUniqueId } from "@/lib/numbers_utils";
 import ChatTextarea from "../c/_components/chat_textarea";
 
 const Generate = () => {

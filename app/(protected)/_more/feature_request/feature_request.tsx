@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { featureRequestSchema } from "@/lib/schema_validation";
-import { delay } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Rocket } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -23,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { featureCategories, featureFrequencyOfUse } from "@/lib/constants";
+import { delay } from "@/lib/numbers_utils";
 
 const FeatureRequest = () => {
   const [isLoading, setIsLoading] = useState(false);

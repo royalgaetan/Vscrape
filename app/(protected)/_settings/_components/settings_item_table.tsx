@@ -17,14 +17,15 @@ import {
 } from "@/components/ui/tooltip";
 import { Check, CircleSmallIcon, Loader2 } from "lucide-react";
 import { SessionType } from "../sessions/sessions_settings";
-import { camelToSentenceCase, cn, maskApiKey } from "@/lib/utils";
 import { BillingHistoryType } from "../billing/billing_settings";
 import { ConnectedAppType } from "../integrations/integration_settings";
 import { format } from "date-fns";
 import { ApiKeyType, WebhookType } from "@/lib/types";
-import { isImage } from "@/lib/image";
+import { isImage } from "@/lib/image_utils";
 import Image from "next/image";
 import { useCopy2Clipboard } from "@/hooks/useCopy2Clipboard";
+import { camelToSentenceCase, maskApiKey } from "@/lib/string_utils";
+import { cn } from "@/lib/utils";
 
 const SettingItemTable = ({
   data,

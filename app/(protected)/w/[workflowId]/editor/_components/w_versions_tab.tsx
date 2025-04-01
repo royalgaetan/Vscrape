@@ -2,7 +2,8 @@ import { trashItemType } from "@/app/(protected)/_trash/trash";
 import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Button } from "@/components/ui/button";
 import { trashItems } from "@/lib/fake_data";
-import { capitalizeFirstLetter, cn } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/string_utils";
+import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { Eye, HistoryIcon, UndoDot } from "lucide-react";
 import React from "react";
@@ -34,7 +35,7 @@ export default WVersionsTab;
 
 const VersionItem = ({ item }: { item: trashItemType }) => {
   return (
-    <div className="group/versionItem w-full my-1 pl-3 pr-2 py-1 hover:bg-neutral-200/40  bg-white cursor-pointer flex justify-start items-start transition-all duration-200">
+    <div className="group/versionItem w-full my-1 pl-3 pr-2 py-1 h-11 hover:bg-neutral-200/40  bg-white cursor-pointer flex justify-start items-center transition-all duration-200">
       {/* Icon */}
       <div className="w-8 mr-2 pt-1 flex justify-center align-top  group-hover/versionItem:opacity-90">
         <HistoryIcon className="size-5 stroke-muted-foreground" />

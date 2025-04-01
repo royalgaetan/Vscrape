@@ -2,11 +2,23 @@ import { InboxItemType } from "@/app/(protected)/_inbox/inbox";
 import { trashItemType } from "@/app/(protected)/_trash/trash";
 import { statsDataItemType } from "@/app/(protected)/dashboard/_components/stats_charts";
 import { WorkflowCardType } from "@/app/(protected)/workflows/_components/workflow_card";
-import { subDays, startOfYesterday, startOfToday } from "date-fns";
-import { WORKFLOW_COLORS } from "./colors";
+import {
+  subDays,
+  startOfYesterday,
+  startOfToday,
+  formatISO,
+  startOfTomorrow,
+} from "date-fns";
+import { WORKFLOW_COLORS } from "./colors_utils";
 import { folderType } from "@/app/(protected)/workflows/layout";
 import { importedFile } from "@/app/(protected)/_settings/import/import_settings";
-import { ChatReply, knowledgeBase, userProfile } from "./types";
+import {
+  ChatReply,
+  knowledgeBase,
+  RunItemType,
+  PhaseItemType,
+  userProfile,
+} from "./types";
 import { workflowTemplateType } from "@/app/(protected)/templates/_components/template_card";
 import {
   Activity,
@@ -261,10 +273,11 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { getRandomElement } from "./utils";
-import { generateAvatar } from "./avatar";
 import { WorkflowTemplatePreview } from "@/components/global/workflow_template_preview";
 import { ChatItemType } from "@/app/(protected)/chats/chats_pansidebar";
+import { DateRange } from "react-day-picker";
+import { generateAvatar } from "./image_utils";
+import { getRandomElement } from "./numbers_utils";
 
 export const generateWorkflowLogo = () => {
   const IconName = getRandomElement(lucideIconNames);
@@ -272,6 +285,88 @@ export const generateWorkflowLogo = () => {
   return (
     <IconName className="text-white stroke-white stroke-4 h-fill w-fill" />
   );
+};
+
+export const getStatsData = (
+  periodSelected: DateRange | undefined,
+  workflowsSelected: string[]
+) => {
+  const dateFrom = periodSelected?.from ?? startOfToday();
+  const dateTo = periodSelected?.to ?? startOfTomorrow();
+
+  // Get only data from workflows selected
+  const onlyWorkflowSelectedObj = Object.fromEntries(
+    Object.entries(statsData).filter(([n, vals]) =>
+      workflowsSelected.includes(n)
+    )
+  );
+
+  // Get only stats whose dates are within the period selected
+  const onlyDatesSelectedArr = Object.values(onlyWorkflowSelectedObj)
+    .flatMap((i) => i)
+    .filter(
+      (val) =>
+        val.date.getTime() >= dateFrom.getTime() &&
+        val.date.getTime() <= dateTo.getTime()
+    );
+
+  // Reduce the date, and merge data of same dates
+  const mergedDates = Object.values(
+    onlyDatesSelectedArr.reduce((acc, curr) => {
+      const key = formatISO(curr.date);
+
+      if (!acc[key]) {
+        acc[key] = { ...curr };
+      } else {
+        acc[key].workflow_execution_succeed += curr.workflow_execution_succeed;
+        acc[key].workflow_execution_failed += curr.workflow_execution_failed;
+        acc[key].phase_execution_succeed += curr.phase_execution_succeed;
+        acc[key].phase_execution_failed += curr.phase_execution_failed;
+        acc[key].phase_credit_succeed += curr.phase_credit_succeed;
+        acc[key].phase_credit_failed += curr.phase_credit_failed;
+      }
+
+      return acc;
+    }, {} as Record<string, (typeof onlyDatesSelectedArr)[number]>)
+  );
+
+  return mergedDates.sort((a, b) => a.date.getTime() - b.date.getTime());
+};
+
+export const statsNumber = (
+  periodSelected: DateRange | undefined,
+  workflowsSelected: string[]
+) => {
+  if (workflowsSelected.length === 0 || periodSelected === undefined) {
+    return {
+      workflow_execution_number: null,
+      phase_execution_number: null,
+      phase_credit_succeed: null,
+    };
+  }
+  const sum = getStatsData(periodSelected, workflowsSelected).reduce(
+    (acc, curr) => {
+      acc.workflow_execution_number +=
+        curr.workflow_execution_succeed + curr.workflow_execution_failed;
+      acc.phase_execution_number +=
+        curr.phase_execution_succeed + curr.phase_execution_failed;
+
+      acc.phase_credit_succeed += curr.phase_credit_succeed;
+
+      return acc;
+    },
+    {
+      workflow_execution_number: 0,
+      phase_execution_number: 0,
+      phase_credit_succeed: 0,
+    }
+  );
+
+  return {
+    workflow_execution_number: sum.workflow_execution_number,
+    phase_execution_number: sum.phase_execution_number,
+    phase_credit_succeed: sum.phase_credit_succeed,
+  };
 };
 
 // Array of Lucide icon names
@@ -2923,5 +3018,179 @@ export const allChats: ChatItemType[] = [
     chatTitle: "Schedule auto-generated SEO reports every week",
     chatHistory: fakeConversation1,
     lastMessageDate: new Date("2025-03-30T22:20:27"),
+  },
+];
+
+export const fakeRuns: RunItemType[] = [
+  {
+    runId: "3Jsqz1e085Ssaw1e6qwwJ29Slsd",
+    startedAt: new Date("2025-03-30T10:30:07"),
+    creditConsumed: 13,
+    status: "paused",
+    isInternalTest: true,
+  },
+  {
+    runId: "KDnahlunmi2e92ssa5sieflke",
+    startedAt: new Date("2025-02-30T22:20:39"),
+    creditConsumed: 3,
+    status: "running",
+    isInternalTest: false,
+  },
+  {
+    runId: "vsepko92rjuw2xr2q885z",
+    startedAt: new Date("2025-03-13T21:20:41"),
+    creditConsumed: 39,
+    status: "failed",
+    isInternalTest: false,
+  },
+  {
+    runId: "bh65nhlunmi2esa5sin3s",
+    startedAt: new Date("2025-03-20T19:21:44"),
+    creditConsumed: 102,
+    status: "success",
+    isInternalTest: true,
+  },
+  {
+    runId: "c1wot88orhwnv8deiqgk0",
+    startedAt: new Date("2025-03-30T10:30:02"),
+    creditConsumed: 6,
+    status: "paused",
+    isInternalTest: true,
+  },
+  {
+    runId: "torwe0nscds6552dti1wj",
+    startedAt: new Date("2025-02-18T09:20:18"),
+    creditConsumed: 37,
+    status: "running",
+    isInternalTest: false,
+  },
+  {
+    runId: "y2l6z1e085dw1e6qww8ur",
+    startedAt: new Date("2025-03-14T10:30:09"),
+    creditConsumed: 12,
+    status: "success",
+    isInternalTest: false,
+  },
+  {
+    runId: "ncy7entfu7m17q6wu4b92",
+    startedAt: new Date("2025-03-20T03:28:11"),
+    creditConsumed: 10,
+    status: "failed",
+    isInternalTest: true,
+  },
+  {
+    runId: "hb9ok1q0n1zd1pv7x973y",
+    startedAt: new Date("2025-04-01T07:28:04"),
+    creditConsumed: 9,
+    status: "failed",
+    isInternalTest: true,
+  },
+  {
+    runId: "40sbc1tlojati7mlnvzge",
+    startedAt: new Date("2025-04-01T06:29:01"),
+    creditConsumed: 56,
+    status: "success",
+    isInternalTest: true,
+  },
+];
+
+export const fakePhases: PhaseItemType[] = [
+  {
+    startedAt: new Date("2025-03-30T10:30:07"),
+    durationMs: 1003,
+    title: "Launch Browser",
+    creditConsumed: 4,
+    status: "paused",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:10"),
+    durationMs: 2050,
+    title: "Navigate to URL",
+    creditConsumed: 3,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:13"),
+    durationMs: 1578,
+    title: "Wait for Page Load",
+    creditConsumed: 2,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:16"),
+    durationMs: 1200,
+    title: "Extract Data",
+    creditConsumed: 5,
+    status: "failed",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:20"),
+    durationMs: 980,
+    title: "Validate Extracted Data",
+    creditConsumed: 3,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:22"),
+    durationMs: 2500,
+    title: "Format Data",
+    creditConsumed: 2,
+    status: "running",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:26"),
+    durationMs: 3150,
+    title: "Store Data in Database",
+    creditConsumed: 6,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:30"),
+    durationMs: 1750,
+    title: "Trigger API Request",
+    creditConsumed: 4,
+    status: "running",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:33"),
+    durationMs: 2450,
+    title: "Handle API Response",
+    creditConsumed: 3,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:36"),
+    durationMs: 1850,
+    title: "Check for Errors",
+    creditConsumed: 2,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:39"),
+    durationMs: 950,
+    title: "Send Notification",
+    creditConsumed: 1,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:41"),
+    durationMs: 2750,
+    title: "Generate Report",
+    creditConsumed: 4,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:45"),
+    durationMs: 800,
+    title: "Close Browser",
+    creditConsumed: 1,
+    status: "success",
+  },
+  {
+    startedAt: new Date("2025-03-30T10:30:47"),
+    durationMs: 1300,
+    title: "Archive Workflow Logs",
+    creditConsumed: 2,
+    status: "success",
   },
 ];

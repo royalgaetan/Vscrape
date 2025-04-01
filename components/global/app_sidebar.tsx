@@ -31,7 +31,7 @@ import { Separator } from "../ui/separator";
 import { Sidebar, SidebarContent } from "../ui/sidebar";
 import { Button } from "../ui/button";
 import { sidebarPathType } from "@/lib/types";
-import { COLORS } from "@/lib/colors";
+import { COLORS } from "@/lib/colors_utils";
 import { moreButtonPathType } from "@/app/(protected)/_more/more_dialog";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
 import { panSidebarType } from "@/providers/panSidebarProvider";

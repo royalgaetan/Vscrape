@@ -1,4 +1,4 @@
-import { generateAvatar } from "@/lib/avatar";
+import { generateAvatar } from "@/lib/image_utils";
 import React, { useState } from "react";
 import Image from "next/image";
 import { RefreshCwIcon } from "lucide-react";

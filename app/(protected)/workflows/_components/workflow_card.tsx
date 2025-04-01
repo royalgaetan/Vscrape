@@ -2,7 +2,7 @@ import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { cn, formatNumber } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   AlarmClockCheck,
   CoinsIcon,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { folderType } from "../layout";
+import { formatNumber } from "@/lib/string_utils";
 
 export type WorkflowTriggerMode = "Manual" | "Scheduled" | "Webhook";
 export type WorkflowState = "Draft" | "Published" | "Unpublished";

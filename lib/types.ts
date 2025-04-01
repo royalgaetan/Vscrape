@@ -1,5 +1,4 @@
 import { LucideIcon } from "lucide-react";
-import { appFeatures } from "./constants";
 import React from "react";
 
 export type sidebarPathType = {
@@ -59,3 +58,23 @@ export type WebhookType = {
   eventTriggers: string[];
   action: React.ReactNode;
 };
+
+export type RunResultsType = "failed" | "success" | "paused" | "running";
+
+export type RunItemType = {
+  runId: string;
+  startedAt: Date;
+  creditConsumed: number;
+  status: RunResultsType;
+  isInternalTest: boolean;
+};
+
+export type PhaseItemType = {
+  title: string;
+  status: RunResultsType;
+  durationMs: number;
+  startedAt: Date;
+  creditConsumed: number;
+};
+
+export type PhaseLog = {};

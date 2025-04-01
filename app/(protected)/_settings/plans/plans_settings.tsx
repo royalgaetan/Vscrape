@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SettingDialogHeader from "../_components/settings_dialog_header";
-import { COLORS } from "@/lib/colors";
+import { COLORS, getIconColor } from "@/lib/colors_utils";
 import {
   CheckIcon,
   Cloudy,
@@ -30,7 +30,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn, formatNumber, getIconColor } from "@/lib/utils";
+import { formatNumber } from "@/lib/string_utils";
+import { cn } from "@/lib/utils";
 export type CreditOption = {
   value: string;
   label: string;

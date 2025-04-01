@@ -13,7 +13,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn, capitalizeFirstLetter, isSearchTermFound } from "@/lib/utils";
 import {
   Settings,
   Check,
@@ -44,6 +43,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { moreButtonPathType } from "../_more/more_dialog";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
+import { capitalizeFirstLetter, isSearchTermFound } from "@/lib/string_utils";
+import { cn } from "@/lib/utils";
 
 export const searchFilterOptions = {
   Default: { icon: Filter, title: "No filter" },

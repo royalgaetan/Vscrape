@@ -4,7 +4,7 @@ import SettingsItemField from "../_components/settings_item_field";
 import SettingItemThemeSwitcher, {
   themeType,
 } from "../_components/settings_item_theme_switcher";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/string_utils";
 import SettingItemSelect from "../_components/settings_item_select";
 import { appLanguages, appTimezones } from "@/lib/constants";
 

@@ -4,7 +4,8 @@ import { trashItems } from "@/lib/fake_data";
 import { Trash2Icon, Undo2, Workflow } from "lucide-react";
 import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Button } from "@/components/ui/button";
-import { cn, removeDiacritics } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { removeDiacritics } from "@/lib/string_utils";
 
 export type trashItemType = {
   title: string;
@@ -71,7 +72,7 @@ export default Trash;
 
 const TrashItem = ({ item }: { item: trashItemType }) => {
   return (
-    <div className="group/trashItem w-full my-1 px-5 py-1 hover:bg-neutral-200/40  bg-white cursor-pointer flex justify-start items-start transition-all duration-200">
+    <div className="group/trashItem w-full my-1 px-5 py-1 hover:bg-neutral-200/40  bg-white cursor-pointer flex h-11 justify-start items-center transition-all duration-200">
       {/* Icon */}
       <div className="w-8 mr-2 pt-1 flex justify-center align-top  group-hover/trashItem:opacity-90">
         <Workflow className="size-5 stroke-muted-foreground" />

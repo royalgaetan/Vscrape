@@ -4,11 +4,12 @@ import SettingsItemField from "../_components/settings_item_field";
 import SettingDialogHeader from "../_components/settings_dialog_header";
 import { Button } from "@/components/ui/button";
 import SettingItemTable from "../_components/settings_item_table";
-import { removeDiacritics, scrollToEl } from "@/lib/utils";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { appsConnectionList } from "@/lib/constants";
 import SettingItemSearchBar from "../_components/settings_item_searchbar";
+import { removeDiacritics } from "@/lib/string_utils";
+import { scrollToEl } from "@/lib/dom_utils";
 
 export type ConnectedAppType = {
   appLogoPath: string;

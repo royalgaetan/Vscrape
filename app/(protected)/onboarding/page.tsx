@@ -27,7 +27,7 @@ import { onboardingFormSchema } from "@/lib/schema_validation";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { generateAvatar } from "@/lib/avatar";
+import { generateAvatar } from "@/lib/image_utils";
 import { RefreshCwIcon } from "lucide-react";
 import {
   Carousel,

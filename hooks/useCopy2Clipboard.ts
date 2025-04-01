@@ -1,6 +1,7 @@
 "use client";
 
-import { copyToClipboard, delay } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/dom_utils";
+import { delay } from "@/lib/numbers_utils";
 import { useState } from "react";
 
 export const useCopy2Clipboard = () => {

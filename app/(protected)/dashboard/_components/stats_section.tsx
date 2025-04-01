@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import SettingItemSelect from "../../_settings/_components/settings_item_select";
 import DashboardHeader from "./dashboard_header";
 import { CoinsIcon, LucideIcon, RouteIcon, Zap } from "lucide-react";
-import { cn, formatNumber } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import StatsCharts from "./stats_charts";
-import { statsData } from "@/lib/fake_data";
+import { statsData, statsNumber } from "@/lib/fake_data";
 import { max, min, startOfToday, subDays } from "date-fns";
 import DatePickerWithRange from "@/components/global/date_range_picker";
 import { DateRange } from "react-day-picker";
 import MultiSelect from "@/components/global/multi_select";
-import { statsNumber } from "@/lib/stats_data";
+import { formatNumber } from "@/lib/string_utils";
 
 export type statsMetricType =
   | "workflow_execution"

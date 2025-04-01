@@ -4,13 +4,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  cn,
-  formatLargeNumber,
-  formatNumber,
-  getRandomElement,
-  getTimeAgoWithLimit,
-} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { workflowTemplateType } from "./template_card";
 import { Coins, Shapes, Star, Text, UserPen } from "lucide-react";
@@ -22,6 +16,9 @@ import { getTriggerModeIcon } from "../../workflows/_components/workflow_card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { WorkflowTemplatePreview } from "@/components/global/workflow_template_preview";
+import { getRandomElement } from "@/lib/numbers_utils";
+import { formatLargeNumber, getTimeAgoWithLimit } from "@/lib/date_time_utils";
+import { formatNumber } from "@/lib/string_utils";
 
 const TemplateDialog = ({
   children,

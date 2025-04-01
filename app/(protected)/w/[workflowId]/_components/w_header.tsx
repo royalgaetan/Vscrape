@@ -8,7 +8,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn, delay } from "@/lib/utils";
+import { delay } from "@/lib/numbers_utils";
+import { cn } from "@/lib/utils";
 import {
   Check,
   ChevronLeft,
@@ -29,24 +30,25 @@ import React, { useEffect, useState } from "react";
 export type WMode = "Editor" | "Runs";
 export const wTabs: WMode[] = ["Editor", "Runs"];
 
-export const getWMode = (pathname: string): WMode | null => {
-  if (!pathname.startsWith("/w/")) return null;
+export const getWMode = (pathname: string): WMode | undefined => {
+  if (!pathname.startsWith("/w/")) return undefined;
   const pathnameArr = pathname.split("/");
   const pathnameLast = pathnameArr[pathnameArr.length - 1];
+  const pathnameBeforeLast = pathnameArr[pathnameArr.length - 2];
 
   if (pathnameLast === "editor") {
     return "Editor";
-  } else if (pathnameLast === "runs") {
+  } else if (pathnameLast === "runs" || pathnameBeforeLast === "runs") {
     return "Runs";
   } else {
-    return null;
+    return undefined;
   }
 };
 
 const WHeader = () => {
   const { workflowId } = useParams();
   const pathname = usePathname();
-  const [selectedTab, setSelectedTab] = useState<WMode>("Editor");
+  const [selectedTab, setSelectedTab] = useState<WMode | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
   const [SavingResultIcon, setSavingResultIcon] = useState<
     LucideIcon | undefined
@@ -54,7 +56,7 @@ const WHeader = () => {
 
   useEffect(() => {
     if (pathname) {
-      setSelectedTab(getWMode(pathname) ?? "Editor");
+      setSelectedTab(getWMode(pathname));
     }
   }, [pathname]);
 
@@ -71,7 +73,7 @@ const WHeader = () => {
   return (
     <div className="w-full h-[7vh] flex items-center px-3 border-b overflow-clip bg-neutral-100">
       <Tabs
-        defaultValue={selectedTab}
+        value={selectedTab}
         className="flex flex-1 justify-between items-center"
       >
         {/* Back Buttons + Workflow Info Details */}
@@ -110,26 +112,32 @@ const WHeader = () => {
         </div>
 
         {/* Mode Switcher: Editor | Runs */}
-        <TabsList className="w-[30%] flex justify-center items-center bg-transparent">
-          <div className="w-fit space-x-1 bg-white px-2 rounded-full ">
-            {wTabs.map((mode) => {
-              return (
-                <TabsTrigger
-                  className={cn(
-                    "w-[8vw] data-[state=active]:bg-primary/70 data-[state=active]:text-white my-1 text-xs"
-                  )}
-                  onClick={() => {
-                    redirect(`/w/${workflowId}/${mode.toLocaleLowerCase()}`);
-                  }}
-                  key={mode}
-                  value={mode}
-                >
-                  {mode}
-                </TabsTrigger>
-              );
-            })}
-          </div>
-        </TabsList>
+        {!selectedTab ? (
+          <>
+            <Loader2 className="animate-spin text-neutral-500" />
+          </>
+        ) : (
+          <TabsList className="w-[30%] flex justify-center items-center bg-transparent">
+            <div className="w-fit space-x-1 bg-white px-2 rounded-full ">
+              {wTabs.map((mode) => {
+                return (
+                  <TabsTrigger
+                    className={cn(
+                      "w-[8vw] data-[state=active]:bg-primary/70 data-[state=active]:text-white my-1 text-xs"
+                    )}
+                    onClick={() => {
+                      redirect(`/w/${workflowId}/${mode.toLocaleLowerCase()}`);
+                    }}
+                    key={mode}
+                    value={mode}
+                  >
+                    {mode}
+                  </TabsTrigger>
+                );
+              })}
+            </div>
+          </TabsList>
+        )}
 
         <div className="w-[30%] flex justify-end items-center">
           {/* Action Buttons: if "Workflow Editor" */}
@@ -169,7 +177,7 @@ const WHeader = () => {
             <div className="flex gap-1">
               <Button
                 variant={"default"}
-                className="!bg-emerald-700 text-white rounded-2xl h-7 text-xs gap-1 px-3"
+                className="text-white rounded-2xl h-7 text-xs gap-1 px-3"
               >
                 <LucideBugPlay className="stroke-white" />
                 <span className="">Run New Test</span>

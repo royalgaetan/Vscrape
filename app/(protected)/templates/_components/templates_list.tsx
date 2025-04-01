@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import {
-  cn,
-  getRandomElement,
-  isElementInViewport,
-  isSearchTermFound,
-  waitForElementById,
-} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import SettingItemSearchBar from "../../_settings/_components/settings_item_searchbar";
 import Link from "next/link";
@@ -17,6 +11,9 @@ import { avatarBackgroundColors2 } from "@/lib/constants";
 import Image from "next/image";
 import { lucideIconNames } from "@/lib/fake_data";
 import TemplateDialog from "./template_dialog";
+import { isSearchTermFound } from "@/lib/string_utils";
+import { isElementInViewport, waitForElementById } from "@/lib/dom_utils";
+import { getRandomElement } from "@/lib/numbers_utils";
 
 export const workflowTemplateCategories: Record<string, string> = {
   "Lead & Customer": "lead-customer",

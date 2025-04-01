@@ -11,14 +11,11 @@ import {
   MoreHorizontal,
   Database,
 } from "lucide-react";
-import {
-  capitalizeFirstLetter,
-  cn,
-  formatFileSize,
-  getTimeAgoWithLimit,
-} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SidebarIcon } from "@/components/global/app_sidebar";
+import { capitalizeFirstLetter, formatFileSize } from "@/lib/string_utils";
+import { getTimeAgoWithLimit } from "@/lib/date_time_utils";
 
 export const getFileIcon = (fileType: importedFileType): LucideIcon => {
   switch (fileType) {

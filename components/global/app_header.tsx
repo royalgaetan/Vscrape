@@ -1,6 +1,6 @@
 "use client";
 
-import { generateAvatar } from "@/lib/avatar";
+import { generateAvatar } from "@/lib/image_utils";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -21,9 +21,10 @@ import {
 } from "../ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDialog } from "@/hooks/useAppDialog";
-import { cn, formatNumber } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import CreateWorkflowDialog from "@/app/(protected)/workflows/_components/create_workflow_dialog";
 import { usePathname } from "next/navigation";
+import { formatNumber } from "@/lib/string_utils";
 
 const AppHeader = () => {
   const { setOpenSettingsDialog } = useAppDialog();

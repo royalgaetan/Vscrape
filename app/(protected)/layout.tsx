@@ -7,13 +7,13 @@ import CustomLoader from "@/components/global/loader";
 import AppSidebar from "@/components/global/app_sidebar";
 import AppHeader from "@/components/global/app_header";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { SIDEBAR_WIDTH } from "@/lib/values";
 import { AppPanSidebar } from "@/components/global/app_pan_sidebar";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
 import MoreDialog from "./_more/more_dialog";
 import SearchModal from "./_search/search";
 import SettingsDialog from "./_settings/settings_dialog";
 import { cn } from "@/lib/utils";
+import { SIDEBAR_WIDTH } from "@/lib/constants";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const mainContainerRef = useRef<HTMLDivElement>(null);

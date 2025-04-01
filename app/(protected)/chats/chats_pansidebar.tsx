@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import SettingItemSearchBar from "../_settings/_components/settings_item_searchbar";
-import { capitalizeFirstLetter, cn, removeDiacritics } from "@/lib/utils";
 import { allChats } from "@/lib/fake_data";
 import { MessageCircle, Pen, Plus, Trash2Icon } from "lucide-react";
 import { SidebarIcon } from "@/components/global/app_sidebar";
@@ -9,6 +8,8 @@ import { ChatReply } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
 import { redirect } from "next/navigation";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
+import { cn } from "@/lib/utils";
+import { capitalizeFirstLetter, removeDiacritics } from "@/lib/string_utils";
 
 export type ChatItemType = {
   chatId: string;

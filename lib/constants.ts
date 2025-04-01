@@ -25,6 +25,8 @@ import {
 import { AppsConnectionType, planNames, PlanType } from "./types";
 
 export const appName = "Vscrape";
+export const SIDEBAR_WIDTH = "14rem";
+export const SIDEBAR_WIDTH_MOBILE = "18rem";
 
 export const appUseCases = {
   "Competitor Price Tracking": BarChart,

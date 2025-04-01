@@ -4,7 +4,7 @@ import AppSidebar from "@/components/global/app_sidebar";
 import NotFoundComponent from "@/components/global/not_found_component";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { SIDEBAR_WIDTH } from "@/lib/values";
+import { SIDEBAR_WIDTH } from "@/lib/constants";
 import React from "react";
 
 const NotFound = () => {

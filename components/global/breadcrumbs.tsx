@@ -15,10 +15,11 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { redirect, usePathname } from "next/navigation";
-import { capitalizeFirstLetter, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { folders } from "@/lib/fake_data";
 import { Squircle } from "lucide-react";
 import { workflowTemplateCategories } from "@/app/(protected)/templates/_components/templates_list";
+import { capitalizeFirstLetter } from "@/lib/string_utils";
 
 export const getFolderName = (folderId: string) => {
   return folders.find((f) => f.folderPath === folderId)?.folderName;

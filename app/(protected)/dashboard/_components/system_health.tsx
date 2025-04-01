@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { capitalizeFirstLetter, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   Activity,
   BadgeInfo,
@@ -20,6 +20,7 @@ import {
   LucideIcon,
   Play,
 } from "lucide-react";
+import { capitalizeFirstLetter } from "@/lib/string_utils";
 
 export type SystemHealthStatus = "error" | "alert" | "running" | "success";
 

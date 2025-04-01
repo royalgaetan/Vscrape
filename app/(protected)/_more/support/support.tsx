@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { userEmail } from "@/lib/fake_data";
 import { supportFormSchema } from "@/lib/schema_validation";
-import { delay } from "@/lib/utils";
+import { delay } from "@/lib/numbers_utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Headset, Loader2 } from "lucide-react";
 import React, { useState } from "react";

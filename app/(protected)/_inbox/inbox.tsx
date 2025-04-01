@@ -15,13 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
-  capitalizeFirstLetter,
-  cn,
   isAccordionElementOpen,
-  isSearchTermFound,
   scrollToEl,
   waitForElementById,
-} from "@/lib/utils";
+} from "@/lib/dom_utils";
 import { SidebarIcon } from "@/components/global/app_sidebar";
 import {
   ArchiveIcon,
@@ -38,6 +35,8 @@ import { inboxItems } from "@/lib/fake_data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow, isToday } from "date-fns";
 import { usePanSidebar } from "@/hooks/usePanSidebar";
+import { capitalizeFirstLetter, isSearchTermFound } from "@/lib/string_utils";
+import { cn } from "@/lib/utils";
 
 export const inboxFilterOptions = {
   default: { icon: InboxIcon, title: "Inbox" },

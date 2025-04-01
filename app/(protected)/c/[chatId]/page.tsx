@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { LucideArrowRight } from "lucide-react";
 import { fakeConversation1 } from "@/lib/fake_data";
-import { generateAvatar } from "@/lib/avatar";
+import { generateAvatar } from "@/lib/image_utils";
 import ChatBubble from "../_components/chat_bubble";
 import ChatTextarea from "../_components/chat_textarea";
 
