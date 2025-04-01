@@ -1,6 +1,6 @@
 import { format, formatDistanceToNow, subDays } from "date-fns";
 
-export const formatDuration = (ms: number): string => {
+export const formatDurationFromMs = (ms: number): string => {
   if (ms < 1000) return `${ms} ms`;
 
   const seconds = ms / 1000;

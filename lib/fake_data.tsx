@@ -18,6 +18,9 @@ import {
   RunItemType,
   PhaseItemType,
   userProfile,
+  PhaseLog,
+  PhaseOutput,
+  PhaseInput,
 } from "./types";
 import { workflowTemplateType } from "@/app/(protected)/templates/_components/template_card";
 import {
@@ -367,6 +370,127 @@ export const statsNumber = (
     phase_execution_number: sum.phase_execution_number,
     phase_credit_succeed: sum.phase_credit_succeed,
   };
+};
+
+export const fakeBigJSON = {
+  label: "Main Output",
+  type: "JSON",
+  value: {
+    id: "out_123456",
+    timestamp: "2025-03-30T12:45:00Z",
+    status: "completed",
+    user: {
+      id: "user_789",
+      name: "John Doe",
+      email: "john.doe@example.com",
+      preferences: {
+        notifications: true,
+        theme: "dark",
+        language: "en",
+        security: {
+          twoFactorAuth: true,
+          backupCodes: ["A1B2C3", "D4E5F6", "G7H8I9"],
+        },
+      },
+    },
+    workflow: {
+      id: "wf_001",
+      name: "E-commerce Order Processing",
+      steps: [
+        {
+          stepId: "step_1",
+          name: "Fetch Order Details",
+          durationMs: 1200,
+          output: {
+            orderId: "ORD_1001",
+            customer: {
+              id: "cust_456",
+              name: "Alice Brown",
+              email: "alice@example.com",
+            },
+            items: [
+              {
+                itemId: "item_001",
+                name: "Smartphone",
+                quantity: 1,
+                price: 699.99,
+                metadata: {
+                  brand: "TechBrand",
+                  model: "X1000",
+                  specs: {
+                    storage: "128GB",
+                    color: "Black",
+                    battery: "4000mAh",
+                  },
+                },
+              },
+              {
+                itemId: "item_002",
+                name: "Wireless Earbuds",
+                quantity: 1,
+                price: 129.99,
+                metadata: {
+                  brand: "AudioTech",
+                  color: "White",
+                  features: {
+                    noiseCancellation: true,
+                    batteryLife: "24h",
+                  },
+                },
+              },
+            ],
+          },
+        },
+        {
+          stepId: "step_2",
+          name: "Payment Verification",
+          durationMs: 800,
+          output: {
+            paymentStatus: "approved",
+            transactionId: "TXN_78910",
+            method: "Credit Card",
+            card: {
+              type: "Visa",
+              last4: "1234",
+              expiry: "12/27",
+              billingAddress: {
+                street: "123 Elm St",
+                city: "Metropolis",
+                zip: "54321",
+                country: "USA",
+              },
+            },
+          },
+        },
+        {
+          stepId: "step_3",
+          name: "Order Fulfillment",
+          durationMs: 1500,
+          output: {
+            warehouse: {
+              id: "WH_03",
+              location: "Los Angeles",
+              itemsPacked: [
+                {
+                  itemId: "item_001",
+                  status: "Packed",
+                },
+                {
+                  itemId: "item_002",
+                  status: "Packed",
+                },
+              ],
+            },
+            shipping: {
+              carrier: "FastShip",
+              trackingNumber: "FS_987654321",
+              estimatedDelivery: "2025-04-03T18:00:00Z",
+            },
+          },
+        },
+      ],
+    },
+  },
 };
 
 // Array of Lucide icon names
@@ -3094,6 +3218,77 @@ export const fakeRuns: RunItemType[] = [
   },
 ];
 
+export const fakeDataInputs: PhaseInput[] = [
+  { label: "URL", type: "string", value: "https://example.com/data" },
+  { label: "Max Entries", type: "number", value: 100 },
+  { label: "Enable Pagination", type: "boolean", value: true },
+  { label: "Headers", type: "JSON", value: { Authorization: "Bearer token" } },
+  { label: "Timeout", type: "number", value: 5000 },
+];
+
+export const fakeDataOutputs: PhaseOutput[] = [
+  { label: "Extracted Items", type: "number", value: 87 },
+  {
+    label: "Data Sample",
+    type: "JSON",
+    value: fakeBigJSON,
+  },
+  { label: "Errors Encountered", type: "null", value: null },
+];
+
+export const fakePhaseLog: PhaseLog[] = [
+  {
+    time: new Date("2025-03-30T10:30:17"),
+    level: "Info",
+    message: "Workflow execution started.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:18"),
+    level: "Info",
+    message: "Fetching data from source.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:19"),
+    level: "Alert",
+    message: "Pagination limit reached.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:20"),
+    level: "Info",
+    message: "Processing extracted data.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:21"),
+    level: "Failed",
+    message: "Error parsing JSON response.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:22"),
+    level: "Info",
+    message: "Retrying failed request.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:23"),
+    level: "Failed",
+    message: "Timeout reached while fetching data.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:24"),
+    level: "Alert",
+    message: "Partial data extracted due to errors. Click to see more",
+  },
+  {
+    time: new Date("2025-03-30T10:30:25"),
+    level: "Info",
+    message: "Logging workflow results.",
+  },
+  {
+    time: new Date("2025-03-30T10:30:26"),
+    level: "Failed",
+    message: "Workflow terminated due to critical error.",
+  },
+];
+
 export const fakePhases: PhaseItemType[] = [
   {
     startedAt: new Date("2025-03-30T10:30:07"),
@@ -3101,6 +3296,9 @@ export const fakePhases: PhaseItemType[] = [
     title: "Launch Browser",
     creditConsumed: 4,
     status: "paused",
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:10"),
@@ -3108,6 +3306,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Navigate to URL",
     creditConsumed: 3,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:13"),
@@ -3115,6 +3317,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Wait for Page Load",
     creditConsumed: 2,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:16"),
@@ -3122,6 +3328,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Extract Data",
     creditConsumed: 5,
     status: "failed",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:20"),
@@ -3129,6 +3339,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Validate Extracted Data",
     creditConsumed: 3,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:22"),
@@ -3136,6 +3350,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Format Data",
     creditConsumed: 2,
     status: "running",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:26"),
@@ -3143,6 +3361,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Store Data in Database",
     creditConsumed: 6,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:30"),
@@ -3150,6 +3372,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Trigger API Request",
     creditConsumed: 4,
     status: "running",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:33"),
@@ -3157,6 +3383,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Handle API Response",
     creditConsumed: 3,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:36"),
@@ -3164,6 +3394,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Check for Errors",
     creditConsumed: 2,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:39"),
@@ -3171,6 +3405,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Send Notification",
     creditConsumed: 1,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:41"),
@@ -3178,6 +3416,10 @@ export const fakePhases: PhaseItemType[] = [
     title: "Generate Report",
     creditConsumed: 4,
     status: "success",
+
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:45"),
@@ -3185,6 +3427,9 @@ export const fakePhases: PhaseItemType[] = [
     title: "Close Browser",
     creditConsumed: 1,
     status: "success",
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
   {
     startedAt: new Date("2025-03-30T10:30:47"),
@@ -3192,5 +3437,8 @@ export const fakePhases: PhaseItemType[] = [
     title: "Archive Workflow Logs",
     creditConsumed: 2,
     status: "success",
+    dataInputs: fakeDataInputs,
+    dataOutputs: fakeDataOutputs,
+    logs: fakePhaseLog,
   },
 ];

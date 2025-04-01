@@ -1,6 +1,6 @@
 import { LucideIcon } from "lucide-react";
 
-const RunDetailItem = ({
+const RunDetailItemLine = ({
   LeadingIcon,
   label,
   detail,
@@ -24,4 +24,4 @@ const RunDetailItem = ({
   );
 };
 
-export default RunDetailItem;
+export default RunDetailItemLine;

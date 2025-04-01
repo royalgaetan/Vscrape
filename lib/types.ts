@@ -75,6 +75,26 @@ export type PhaseItemType = {
   durationMs: number;
   startedAt: Date;
   creditConsumed: number;
+  dataInputs: PhaseInput[];
+  dataOutputs: PhaseOutput[];
+  logs: PhaseLog[];
 };
 
-export type PhaseLog = {};
+export type PhaseInput = {
+  label: string;
+  type: boolean | string | number | null | "JSON";
+  value: any;
+};
+
+export type PhaseOutput = {
+  label: string;
+  type: "boolean" | "string" | "number" | "null" | "JSON";
+  value: any;
+};
+
+export type PhaseLogLevel = "Info" | "Alert" | "Success" | "Failed";
+export type PhaseLog = {
+  time: Date;
+  level: PhaseLogLevel;
+  message: string;
+};

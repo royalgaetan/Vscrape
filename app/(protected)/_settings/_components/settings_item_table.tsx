@@ -20,7 +20,7 @@ import { SessionType } from "../sessions/sessions_settings";
 import { BillingHistoryType } from "../billing/billing_settings";
 import { ConnectedAppType } from "../integrations/integration_settings";
 import { format } from "date-fns";
-import { ApiKeyType, WebhookType } from "@/lib/types";
+import { ApiKeyType, PhaseLog, WebhookType } from "@/lib/types";
 import { isImage } from "@/lib/image_utils";
 import Image from "next/image";
 import { useCopy2Clipboard } from "@/hooks/useCopy2Clipboard";
@@ -40,6 +40,7 @@ const SettingItemTable = ({
     | "connectedApps"
     | "apiKeys"
     | "webhooks"
+    | "phaseLogs"
     | "";
   data:
     | SessionType[]
@@ -47,6 +48,7 @@ const SettingItemTable = ({
     | ConnectedAppType[]
     | ApiKeyType[]
     | WebhookType[]
+    | PhaseLog[]
     | any[];
   isLoading: boolean;
   onRefresh: () => void;
@@ -143,11 +145,17 @@ const CustomTableCell = ({
         dataType === "apiKeys" && index === 2 && "w-28",
         dataType === "apiKeys" && index === 2 && "max-w-28 mr-5",
         dataType === "webhooks" && index === 2 && "max-w-7",
-        dataType === "webhooks" && index === 4 && "max-w-7"
+        dataType === "phaseLogs" && index === 0 && "min-w-[6.5rem]",
+        dataType === "phaseLogs" && index === 1 && "min-w-[5rem]"
       )}
     >
       {/* Handle val as Date */}
-      {val instanceof Date && <DateCell date={val} />}
+      {val instanceof Date && (
+        <DateCell
+          date={val}
+          timeFormat={dataType === "phaseLogs" ? "HH:mm:s" : undefined}
+        />
+      )}
       {/* Handle val as Image */}
       {typeof val === "string" && isImage(val) && <ImageCell imagePath={val} />}
 
@@ -164,7 +172,10 @@ const CustomTableCell = ({
       {/* Handle val as Text */}
       {typeof val === "string" && !isImage(val) && !isSecretKey && (
         <div className="flex flex-1 items-center gap-1 break-all overflow-hidden">
-          <TextCell text={val} />
+          <TextCell
+            text={val}
+            className={dataType === "phaseLogs" ? "line-clamp-6" : undefined}
+          />
           {dataType === "sessions" && item.isActive && index === 1 && (
             <TooltipProvider>
               <Tooltip>
@@ -191,7 +202,13 @@ const CustomTableCell = ({
 
 export default SettingItemTable;
 
-export const TextCell = ({ text }: { text: string }) => {
+export const TextCell = ({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) => {
   return (
     <p
       className={cn(
@@ -201,7 +218,10 @@ export const TextCell = ({ text }: { text: string }) => {
         text === "Disabled" && "text-yellow-500 font-semibold",
         text === "Expired" && "text-red-700 font-semibold",
         text === "Failed" && "text-red-700 font-semibold",
-        text === "Revoked" && "text-red-700 font-semibold"
+        text === "Revoked" && "text-red-700 font-semibold",
+        text === "Info" && "text-cyan-600 font-semibold",
+        text === "Alert" && "text-yellow-500 font-semibold",
+        className
       )}
     >
       {text}
@@ -209,14 +229,22 @@ export const TextCell = ({ text }: { text: string }) => {
   );
 };
 
-export const DateCell = ({ date }: { date: Date }) => {
+export const DateCell = ({
+  date,
+  dateFormat,
+  timeFormat,
+}: {
+  date: Date;
+  dateFormat?: string;
+  timeFormat?: string;
+}) => {
   return (
     <div className="flex flex-col justify-start">
       <div className="font-semibold text-[#333]">
-        {format(date, "MMMM dd, yyyy")}
+        {format(date, dateFormat ?? "MMMM dd, yyyy")}
       </div>
       <div className="font-normal text-muted-foreground">
-        {format(date, "HH:mm")}
+        {format(date, timeFormat ?? "HH:mm")}
       </div>
     </div>
   );

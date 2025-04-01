@@ -1,5 +1,4 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { fakePhases, fakeRuns } from "@/lib/fake_data";
 import { RunItemType, PhaseItemType } from "@/lib/types";
@@ -13,22 +12,20 @@ import {
   Clock,
   Coins,
   Loader2,
-  PauseCircleIcon,
 } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import PhaseItem from "../_components/w_phase_item";
 import PhaseDetail from "../_components/w_phase_details";
-import RunDetailItem from "../_components/w_run_detail_item";
 import { waitForElementById } from "@/lib/dom_utils";
 import { capitalizeFirstLetter } from "@/lib/string_utils";
+import RunDetailItemLine from "../_components/w_run_detail_itemline";
+import PhaseItemLine from "../_components/w_phase_itemline";
 
 const WRunSinglePage = () => {
   const { runId } = useParams();
   const pathname = usePathname();
   const [currentRun, setCurrentRun] = useState<RunItemType>();
   const [selectedPhase, setSelectedPhase] = useState<string>();
-  const phasesListRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (runId) {
@@ -77,7 +74,7 @@ const WRunSinglePage = () => {
                 <Separator />
 
                 <div className="flex flex-col gap-2 mt-4 mb-2">
-                  <RunDetailItem
+                  <RunDetailItemLine
                     LeadingIcon={BadgeInfo}
                     label={"Status"}
                     detail={
@@ -99,7 +96,7 @@ const WRunSinglePage = () => {
                     }
                   />
 
-                  <RunDetailItem
+                  <RunDetailItemLine
                     LeadingIcon={CalendarClock}
                     label={"Started At"}
                     detail={capitalizeFirstLetter(
@@ -109,13 +106,13 @@ const WRunSinglePage = () => {
                     )}
                   />
 
-                  <RunDetailItem
+                  <RunDetailItemLine
                     LeadingIcon={Clock}
                     label={"Duration"}
                     detail={"3 min"}
                   />
 
-                  <RunDetailItem
+                  <RunDetailItemLine
                     LeadingIcon={Coins}
                     label={"Credit Consumed"}
                     detail={currentRun.creditConsumed}
@@ -141,7 +138,7 @@ const WRunSinglePage = () => {
                   <div className="pl-4 pt-2 pr-1 w-full">
                     {fakePhases.map((phase, idx) => {
                       return (
-                        <PhaseItem
+                        <PhaseItemLine
                           onClick={() => {
                             if (selectedPhase === phase.title) {
                               setSelectedPhase(undefined);

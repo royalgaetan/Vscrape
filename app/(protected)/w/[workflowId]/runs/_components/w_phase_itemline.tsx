@@ -8,7 +8,7 @@ import {
   PauseCircleIcon,
 } from "lucide-react";
 
-const PhaseItem = ({
+const PhaseItemLine = ({
   phase,
   position,
   isSelected,
@@ -56,4 +56,4 @@ const PhaseItem = ({
   );
 };
 
-export default PhaseItem;
+export default PhaseItemLine;

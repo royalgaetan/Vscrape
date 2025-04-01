@@ -12,9 +12,9 @@ export const useCopy2Clipboard = () => {
     setIsTextBeingCopied(true);
     const res = await copyToClipboard(secretKey);
     setTextCopied(res);
-    await delay(200);
+    await delay(500);
     setIsTextBeingCopied(false);
-    await delay(1000);
+    await delay(1500);
     setTextCopied(null);
   };
 
