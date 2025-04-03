@@ -21,12 +21,10 @@ import {
   Coins,
   Loader2,
   LucideIcon,
-  Maximize,
   Maximize2,
   Pause,
   Workflow,
   X,
-  XCircle,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ReactJson from "react-json-view";

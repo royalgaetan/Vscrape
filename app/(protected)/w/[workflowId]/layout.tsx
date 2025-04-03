@@ -2,7 +2,6 @@
 import React from "react";
 import WFooter from "./_components/w_footer";
 import WHeader from "./_components/w_header";
-import WSidebar from "./_components/w_sidebar";
 import { WorkflowEditorProvider } from "@/providers/workflowEditorProvider";
 
 const WLayout = ({ children }: { children: React.ReactNode }) => {

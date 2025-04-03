@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LucideArrowRight } from "lucide-react";
 import { fakeConversation1 } from "@/lib/fake_data";
 import { generateAvatar } from "@/lib/image_utils";

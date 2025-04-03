@@ -4,11 +4,12 @@ import WorflowEditor from "./_components/w_editor";
 import WEditorSidebar from "./_components/w_sidebar_editor";
 import { useParams } from "next/navigation";
 import { DraftingCompass } from "lucide-react";
+import OptionbarEditor from "./_components/w_optionbar_editor";
 
 const WorkflowEditor = () => {
   const { workflowId } = useParams();
   return (
-    <div className="flex justify-center items-center h-full w-full relative">
+    <div className="flex justify-center items-center h-full w-full">
       <WEditorSidebar />
       {workflowId && typeof workflowId === "string" ? (
         <WorflowEditor workflowId={workflowId} />
@@ -20,6 +21,7 @@ const WorkflowEditor = () => {
           </span>
         </div>
       )}
+      <OptionbarEditor />
     </div>
   );
 };

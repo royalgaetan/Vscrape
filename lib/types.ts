@@ -103,7 +103,8 @@ export type PhaseLog = {
 export type WorkflowEditorToolItem = {
   label: string;
   creditCost: number;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  logoPath?: string;
   tooltip?: string;
   sectionName: keyof typeof workflowEditorSections;
 };

@@ -21,6 +21,8 @@ import { isSearchTermFound } from "@/lib/string_utils";
 import { WorkflowEditorToolItem } from "@/lib/types";
 import { Coins } from "lucide-react";
 import React, { useState } from "react";
+import Image from "next/image";
+import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 
 const WToolsTab = () => {
   const [searchContent, setSearchContent] = useState("");
@@ -86,10 +88,8 @@ const WToolsTab = () => {
                       return (
                         <ToolItemLine
                           key={item.label}
-                          item={{
-                            ...item,
-                            iconColor: sectionValues.iconColor,
-                          }}
+                          item={item}
+                          iconColor={sectionValues.iconColor}
                         />
                       );
                     })}
@@ -106,18 +106,41 @@ export default WToolsTab;
 
 const ToolItemLine = ({
   item,
+  iconColor,
 }: {
-  item: WorkflowEditorToolItem & { iconColor: string };
+  item: WorkflowEditorToolItem;
+  iconColor: string;
 }) => {
+  const { toggleOptionbar, isOptionbarOpen, optionbarItem } =
+    useWorkflowEditor();
   const Icon = item.icon;
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger
+          asChild
+          onClick={() => {
+            if (isOptionbarOpen && optionbarItem === item) {
+              toggleOptionbar(false);
+            } else {
+              toggleOptionbar(true, { iconColor: iconColor, ...item });
+            }
+          }}
+        >
           <div className="rounded-md select-none col-span-1 px-3 h-8 flex gap-2 justify-start items-center bg-neutral-100 hover:bg-neutral-200/80 cursor-pointer transition-all duration-100">
             {/* Icon */}
             <div className="size-4">
-              <Icon className={"size-4"} stroke={item.iconColor} />
+              {Icon && <Icon className={"size-4"} stroke={iconColor} />}
+              {item.logoPath && (
+                <div className="relative h-4 w-4 mb-2">
+                  <Image
+                    src={item.logoPath}
+                    alt={`${item.label} logo`}
+                    className="select-none object-contain"
+                    fill
+                  />
+                </div>
+              )}
             </div>
 
             {/* Label */}
