@@ -21,8 +21,54 @@ import {
   Cloudy,
   FileUp,
   Lightbulb,
+  Pickaxe,
+  Package,
+  Spline,
+  FileJson,
+  Image,
+  Smile,
+  PenLine,
+  Webhook,
+  AlarmClock,
+  Play,
+  BrainCircuitIcon,
+  Brain,
+  Globe,
+  FileSearch,
+  DatabaseIcon,
+  FileType2,
+  FileSpreadsheet,
+  FileCode,
+  FileImage,
+  FileVideo2,
+  FileVolume,
+  DatabaseZap,
+  Video,
+  Images,
+  Baseline,
+  Type,
+  TableProperties,
+  NotebookTextIcon,
+  MessageCircleMoreIcon,
+  Clock,
+  Split,
+  ZapIcon,
+  GitBranch,
+  Github,
+  Trello,
+  Slack,
+  FacebookIcon,
+  FigmaIcon,
+  Twitter,
+  Instagram,
 } from "lucide-react";
-import { AppsConnectionType, planNames, PlanType } from "./types";
+import {
+  AppsConnectionType,
+  planNames,
+  PlanType,
+  WorkflowEditorToolItem,
+} from "./types";
+import { WORKFLOW_COLORS } from "./colors_utils";
 
 export const appName = "Vscrape";
 export const SIDEBAR_WIDTH = "14rem";
@@ -41,6 +87,328 @@ export const appUseCases = {
   "Inventory Alerts": Bell,
   Other: MoreHorizontal,
 };
+
+export const workflowEditorSections = {
+  "Entry Point": {
+    iconColor: WORKFLOW_COLORS.slate,
+  },
+  "Data Reading": {
+    iconColor: WORKFLOW_COLORS.green,
+  },
+  Core: {
+    iconColor: WORKFLOW_COLORS.amber,
+  },
+  "Data Extraction": {
+    iconColor: WORKFLOW_COLORS.pink,
+  },
+  "Data Manipulation": {
+    iconColor: WORKFLOW_COLORS.blue,
+  },
+  "Data Conversion": {
+    iconColor: WORKFLOW_COLORS.yellow,
+  },
+  "Data Preview": {
+    iconColor: WORKFLOW_COLORS.teal,
+  },
+  "Data Sync": {
+    iconColor: WORKFLOW_COLORS.stone,
+  },
+} as const;
+
+export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
+  // Entry Points
+  {
+    label: "Webhook",
+    icon: Webhook,
+    creditCost: 2,
+    tooltip: "Trigger the workflow when an external service sends a request.",
+    sectionName: "Entry Point",
+  },
+  {
+    label: "Manual",
+    icon: Play,
+    creditCost: 0,
+    tooltip: "Manually start the workflow when needed.",
+    sectionName: "Entry Point",
+  },
+  {
+    label: "Cron",
+    icon: AlarmClock,
+    creditCost: 3,
+    tooltip: "Run the workflow on a scheduled time or interval.",
+    sectionName: "Entry Point",
+  },
+  {
+    label: "Form Input",
+    icon: PenLine,
+    creditCost: 1,
+    tooltip: "Start the workflow when a user submits a form.",
+    sectionName: "Entry Point",
+  },
+  {
+    label: "Chat Bot",
+    icon: MessageCircleMoreIcon,
+    creditCost: 3,
+    tooltip: "Trigger the workflow when the chat assistant receive a message",
+    sectionName: "Entry Point",
+  },
+
+  // Data Reading
+  {
+    label: "Web Scraper",
+    icon: Globe,
+    creditCost: 3,
+    tooltip: "",
+    sectionName: "Data Reading",
+  },
+  {
+    label: "File reader",
+    icon: FileSearch,
+    creditCost: 3,
+    tooltip: "",
+    sectionName: "Data Reading",
+  },
+  {
+    label: "Database reader",
+    icon: DatabaseIcon,
+    creditCost: 3,
+    tooltip: "",
+    sectionName: "Data Reading",
+  },
+
+  // Core
+  {
+    label: "Wait",
+    icon: Clock,
+    creditCost: 1,
+    tooltip: "Add a delay before moving to the next step",
+    sectionName: "Core",
+  },
+  {
+    label: "If/else Condition",
+    icon: Split,
+    creditCost: 1,
+    tooltip: "Add a condition if/else inside your workflow",
+    sectionName: "Core",
+  },
+  {
+    label: "Call Workflow",
+    icon: ZapIcon,
+    creditCost: 1,
+    tooltip: "Launch another workflow to take over",
+    sectionName: "Core",
+  },
+  {
+    label: "Branch",
+    icon: GitBranch,
+    creditCost: 1,
+    tooltip: "Add a multiple branch at any stage of the workflow",
+    sectionName: "Core",
+  },
+
+  // Data Extraction
+  {
+    label: "Extract Data",
+    icon: Pickaxe,
+    creditCost: 3,
+    tooltip: "Retrieve data from a webpage, API, or document.",
+    sectionName: "Data Extraction",
+  },
+  {
+    label: "Product List",
+    icon: Package,
+    creditCost: 2,
+    tooltip: "Extract a list of products from an e-commerce site.",
+    sectionName: "Data Extraction",
+  },
+  {
+    label: "Extract with AI",
+    icon: Brain,
+    creditCost: 5,
+    tooltip: "Use AI to extract structured data from unstructured sources.",
+    sectionName: "Data Extraction",
+  },
+  {
+    label: "Custom Path",
+    icon: Spline,
+    creditCost: 2,
+    tooltip: "Define a custom extraction path for structured data.",
+    sectionName: "Data Extraction",
+  },
+
+  // Data Manipulation
+  {
+    label: "Text Manipulation",
+    icon: Type,
+    creditCost: 4,
+    tooltip: "Enhance and modify any data text",
+    sectionName: "Data Manipulation",
+  },
+
+  {
+    label: "Sentiment Analysis",
+    icon: Smile,
+    creditCost: 4,
+    tooltip:
+      "Analyze a data and determine the overall sentiment (positive, negative, neutral).",
+    sectionName: "Data Manipulation",
+  },
+  {
+    label: "Data Enrichment",
+    icon: DatabaseZap,
+    creditCost: 13,
+    tooltip: "Fetch relevant data around data source",
+    sectionName: "Data Manipulation",
+  },
+  {
+    label: "Tag",
+    icon: Tag,
+    creditCost: 2,
+    tooltip: "Add or remove a tag your data",
+    sectionName: "Data Manipulation",
+  },
+  {
+    label: "Image Manipulation",
+    icon: Images,
+    creditCost: 2,
+    tooltip: "Modify, resize, or process images within the workflow.",
+    sectionName: "Data Manipulation",
+  },
+  {
+    label: "Video Manipulation",
+    icon: Video,
+    creditCost: 2,
+    tooltip: "Modify or edit videos within the workflow.",
+    sectionName: "Data Manipulation",
+  },
+
+  // Data Conversion
+  {
+    label: "to JSON",
+    icon: FileJson,
+    creditCost: 1,
+    tooltip: "Convert extracted or processed data into a JSON format.",
+    sectionName: "Data Conversion",
+  },
+  {
+    label: "to .TXT",
+    icon: FileType2,
+    creditCost: 1,
+    tooltip: "Convert data into a plain text format.",
+    sectionName: "Data Conversion",
+  },
+  {
+    label: "to CSV",
+    icon: FileSpreadsheet,
+    creditCost: 3,
+    tooltip: "Convert extracted or processed data into a CSV format.",
+    sectionName: "Data Conversion",
+  },
+  {
+    label: "to XML",
+    icon: FileCode,
+    creditCost: 3,
+    tooltip: "Convert extracted or processed data into a XML format.",
+    sectionName: "Data Conversion",
+  },
+  {
+    label: "Image Converter",
+    icon: FileImage,
+    creditCost: 3,
+    tooltip: "Convert any image into another format.",
+    sectionName: "Data Conversion",
+  },
+  {
+    label: "Video Converter",
+    icon: FileVideo2,
+    creditCost: 5,
+    tooltip: "Convert any video into another format.",
+    sectionName: "Data Conversion",
+  },
+  {
+    label: "Audio Converter",
+    icon: FileVolume,
+    creditCost: 2,
+    tooltip: "Convert any audio file into another format.",
+    sectionName: "Data Conversion",
+  },
+
+  // Dataa Preview
+
+  {
+    label: "PDF Viewer",
+    icon: NotebookTextIcon,
+    creditCost: 2,
+    tooltip: "Preview or render a PDF from a file or URL",
+    sectionName: "Data Preview",
+  },
+  {
+    label: "Docs Viewer",
+    icon: FileText,
+    creditCost: 2,
+    tooltip: "Preview or render your data inside a Word-like previewer",
+    sectionName: "Data Preview",
+  },
+  {
+    label: "Spreadsheet Viewer",
+    icon: TableProperties,
+    creditCost: 2,
+    tooltip: "Preview your data inside a Spreadsheet",
+    sectionName: "Data Preview",
+  },
+
+  // Data Sync
+
+  {
+    label: "Github",
+    icon: Github,
+    creditCost: 2,
+    tooltip: "Sync, remove, add data to your Github account",
+    sectionName: "Data Sync",
+  },
+  {
+    label: "Instagram",
+    icon: Instagram,
+    creditCost: 2,
+    tooltip: "Publish, remove or view data from your Instagram Account",
+    sectionName: "Data Sync",
+  },
+  {
+    label: "Twitter",
+    icon: Twitter,
+    creditCost: 2,
+    tooltip: "Publish, remove or view data from your Twitter Account",
+    sectionName: "Data Sync",
+  },
+  {
+    label: "Trello",
+    icon: Trello,
+    creditCost: 2,
+    tooltip: "Publish, remove or view data from your Trello Account",
+    sectionName: "Data Sync",
+  },
+  {
+    label: "Slack",
+    icon: Slack,
+    creditCost: 2,
+    tooltip: "Create a message or notification in Slack",
+    sectionName: "Data Sync",
+  },
+  {
+    label: "Facebook",
+    icon: FacebookIcon,
+    creditCost: 2,
+    tooltip: "Publish a post or story in your Facebook Account",
+    sectionName: "Data Sync",
+  },
+  {
+    label: "Figma",
+    icon: FigmaIcon,
+    creditCost: 2,
+    tooltip: "Add, edit or remove a Figma file",
+    sectionName: "Data Sync",
+  },
+];
 
 export const appUseCaseNames = Object.keys(
   appUseCases

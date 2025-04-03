@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import React from "react";
+import { workflowEditorSections } from "./constants";
 
 export type sidebarPathType = {
   name: string;
@@ -82,7 +83,7 @@ export type PhaseItemType = {
 
 export type PhaseInput = {
   label: string;
-  type: boolean | string | number | null | "JSON";
+  type: "JSON" | boolean | string | number | null;
   value: any;
 };
 
@@ -97,4 +98,12 @@ export type PhaseLog = {
   time: Date;
   level: PhaseLogLevel;
   message: string;
+};
+
+export type WorkflowEditorToolItem = {
+  label: string;
+  creditCost: number;
+  icon: LucideIcon;
+  tooltip?: string;
+  sectionName: keyof typeof workflowEditorSections;
 };

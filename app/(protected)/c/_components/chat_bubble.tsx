@@ -22,11 +22,13 @@ const ChatBubble = ({
   dismissModelAvatar,
   dismissUserAvatar,
   avatarClassName,
+  fontSize,
 }: {
   chatReply: ChatReply & { userAvatarPath: string };
   dismissUserAvatar?: boolean;
   dismissModelAvatar?: boolean;
   avatarClassName?: string;
+  fontSize?: string;
 }) => {
   const dismissAvatar =
     (chatReply.from === "user" && dismissUserAvatar) ||
@@ -79,7 +81,8 @@ const ChatBubble = ({
             className={cn(
               "w-[90%] bg-white h-max flex pt-2 pb-1 mt-3 text-sm items-center min-h-12 text-neutral-900 rounded-none text-left",
               chatReply.from === "user" &&
-                "w-fit pl-5 pb-2 pr-5 bg-neutral-200/80 rounded-2xl"
+                "w-fit pl-5 pb-2 pr-5 bg-neutral-200/80 rounded-2xl",
+              fontSize
             )}
           >
             {chatReply.content}

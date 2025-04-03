@@ -27,8 +27,8 @@ import {
 } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-export type WMode = "Editor" | "Runs";
-export const wTabs: WMode[] = ["Editor", "Runs"];
+export type WMode = "Editor" | "Runs" | "Versions";
+export const wTabs: WMode[] = ["Editor", "Versions", "Runs"];
 
 export const getWMode = (pathname: string): WMode | undefined => {
   if (!pathname.startsWith("/w/")) return undefined;
@@ -38,6 +38,8 @@ export const getWMode = (pathname: string): WMode | undefined => {
 
   if (pathnameLast === "editor") {
     return "Editor";
+  } else if (pathnameLast === "versions") {
+    return "Versions";
   } else if (pathnameLast === "runs" || pathnameBeforeLast === "runs") {
     return "Runs";
   } else {
@@ -111,11 +113,9 @@ const WHeader = () => {
           </div>
         </div>
 
-        {/* Mode Switcher: Editor | Runs */}
+        {/* Mode Switcher: Editor | Versions | Runs */}
         {!selectedTab ? (
-          <>
-            <Loader2 className="animate-spin text-neutral-500" />
-          </>
+          <Loader2 className="animate-spin text-neutral-500" />
         ) : (
           <TabsList className="w-[30%] flex justify-center items-center bg-transparent">
             <div className="w-fit space-x-1 bg-white px-2 rounded-full ">

@@ -4,7 +4,7 @@ import { RunItem } from "./w_sidebar_run_item";
 
 const WRunsSidebar = () => {
   return (
-    <div className="w-full h-full bg-white border-r items-start justify-start relative">
+    <div className="min-w-[18rem] max-w-[18rem] h-full bg-white border-r items-start justify-start relative">
       <div className="flex flex-col w-full h-full overflow-y-scroll overflow-x-clip">
         <h2 className="text-2xl font-semibold text-[#333] px-4 mb-3 mt-4">
           All Runs

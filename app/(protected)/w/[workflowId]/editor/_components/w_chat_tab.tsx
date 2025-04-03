@@ -18,6 +18,7 @@ const WChatTab = () => {
             chatReply={{ userAvatarPath: avatarPath, ...chatReply }}
             dismissUserAvatar
             avatarClassName="size-6"
+            fontSize="text-xs"
           />
         ))}
       </div>

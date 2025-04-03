@@ -17,11 +17,11 @@ export const generateUniqueId = ({
   prefix?: string;
   isDateSensitive?: boolean;
 }): string => {
-  // const p = prefix ? `${prefix}_` : "";
-  // const d = isDateSensitive ? `_${new Date(Date.now()).getTime()}` : "";
-  // const r1 = Math.random().toString(36).slice(2, 9);
-  // const r2 = Math.random().toString(36).slice(2, 9);
-  // const r3 = Math.random().toString(36).slice(2, 9);
-  // return `${p}${r1}${r2}${r3}${d}`;
-  return generateHexRandomString();
+  const p = prefix ? `${prefix}_` : "";
+  const d = isDateSensitive ? `_${new Date(Date.now()).getTime()}` : "";
+  const r1 = Math.random().toString(36).slice(2, 9);
+  const r2 = Math.random().toString(36).slice(2, 9);
+  const r3 = Math.random().toString(36).slice(2, 9);
+  return `${p}${r1}${r2}${r3}${d}`;
+  // return generateHexRandomString();
 };

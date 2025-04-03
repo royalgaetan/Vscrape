@@ -21,14 +21,17 @@ export const COLORS = {
 export const WORKFLOW_COLORS = {
   red: "#EF4444", // red-500
   amber: "#F59E0B", // amber-500
+  lime: "#84cc16", // lime-500
   green: "#10B981", // green-500
   teal: "#0D9488", // teal-500
   blue: "#3B82F6", // blue-500
   indigo: "#9333EA", // indigo-500
   purple: "#8B5CF6", // purple-500
+  fuchsia: "#d946ef", // fuchsia-500
   pink: "#F43F5E", // pink-500
   yellow: "#D97706", // yellow-500
   slate: "#64748B", // slate-500
+  stone: "#78716c", // stone-500
 };
 
 export const getIconColor = (icon: LucideIcon): string => {

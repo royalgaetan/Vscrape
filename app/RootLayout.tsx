@@ -1,8 +1,10 @@
 import { appName } from "@/lib/constants";
+import { geistSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import AppDialogProvider from "@/providers/appDialogProvider";
 import { AuthProvider } from "@/providers/authProvider";
 import { PanSidebarProvider } from "@/providers/panSidebarProvider";
+import { WorkflowEditorProvider } from "@/providers/workflowEditorProvider";
 
 export default function RootLayout({
   children,
@@ -24,7 +26,7 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          `${geistMono.variable} antialiased`,
+          `${geistSans.variable} antialiased`,
           "h-full w-full flex flex-1 justify-center items-center"
         )}
       >
