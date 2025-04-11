@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import {
   isAccordionElementOpen,
   scrollToEl,
-  waitForElementById,
+  waitForElement,
 } from "@/lib/dom_utils";
 import { SidebarIcon } from "@/components/global/app_sidebar";
 import {
@@ -72,7 +72,7 @@ const Inbox = () => {
     // Check if there's a Scrollto Element needed
     // And Click the element
     if (panSidebarType === "inbox" && panSidebarOptions?.scrollToId) {
-      waitForElementById(panSidebarOptions?.scrollToId)
+      waitForElement("id", panSidebarOptions?.scrollToId)
         .then(async (el) => {
           !isAccordionElementOpen(el.id) && el.click();
           scrollToEl({

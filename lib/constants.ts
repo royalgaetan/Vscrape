@@ -61,14 +61,15 @@ import {
   FigmaIcon,
   Twitter,
   Instagram,
+  DatabaseZapIcon,
+  FileTextIcon,
+  Merge,
+  CodeXmlIcon,
+  Send,
 } from "lucide-react";
-import {
-  AppsConnectionType,
-  planNames,
-  PlanType,
-  WorkflowEditorToolItem,
-} from "./types";
+import { AppsConnectionType, planNames, PlanType } from "./types";
 import { WORKFLOW_COLORS } from "./colors_utils";
+import { WorkflowEditorToolItem } from "./workflow_editor/w_types";
 
 export const appName = "Vscrape";
 export const SIDEBAR_WIDTH = "14rem";
@@ -120,35 +121,31 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Webhook",
     icon: Webhook,
-    creditCost: 2,
     tooltip: "Trigger the workflow when an external service sends a request.",
     sectionName: "Entry Point",
   },
   {
     label: "Manual",
     icon: Play,
-    creditCost: 0,
     tooltip: "Manually start the workflow when needed.",
     sectionName: "Entry Point",
   },
   {
     label: "Cron",
     icon: AlarmClock,
-    creditCost: 3,
     tooltip: "Run the workflow on a scheduled time or interval.",
     sectionName: "Entry Point",
   },
   {
     label: "Form Input",
     icon: PenLine,
-    creditCost: 1,
+
     tooltip: "Start the workflow when a user submits a form.",
     sectionName: "Entry Point",
   },
   {
     label: "Chat Bot",
     icon: MessageCircleMoreIcon,
-    creditCost: 3,
     tooltip: "Trigger the workflow when the chat assistant receive a message",
     sectionName: "Entry Point",
   },
@@ -157,21 +154,25 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Web Scraper",
     icon: Globe,
-    creditCost: 3,
     tooltip: "",
     sectionName: "Data Reading",
   },
   {
     label: "File reader",
     icon: FileSearch,
-    creditCost: 3,
     tooltip: "",
     sectionName: "Data Reading",
   },
   {
+    label: "Knowledge Base",
+    icon: DatabaseZapIcon,
+    tooltip: "",
+    sectionName: "Data Reading",
+  },
+
+  {
     label: "Database reader",
     icon: DatabaseIcon,
-    creditCost: 3,
     tooltip: "",
     sectionName: "Data Reading",
   },
@@ -180,29 +181,46 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Wait",
     icon: Clock,
-    creditCost: 1,
     tooltip: "Add a delay before moving to the next step",
     sectionName: "Core",
   },
   {
     label: "If/else Condition",
     icon: Split,
-    creditCost: 1,
+
     tooltip: "Add a condition if/else inside your workflow",
+    sectionName: "Core",
+  },
+
+  {
+    label: "Branch",
+    icon: GitBranch,
+
+    tooltip: "Add a multiple branch at any stage of the workflow",
+    sectionName: "Core",
+  },
+  {
+    label: "Merge",
+    icon: Merge,
+    tooltip: "Merge data into a single object",
     sectionName: "Core",
   },
   {
     label: "Call Workflow",
     icon: ZapIcon,
-    creditCost: 1,
     tooltip: "Launch another workflow to take over",
     sectionName: "Core",
   },
   {
-    label: "Branch",
-    icon: GitBranch,
-    creditCost: 1,
-    tooltip: "Add a multiple branch at any stage of the workflow",
+    label: "Call API",
+    icon: CodeXmlIcon,
+    tooltip: "Call an external API",
+    sectionName: "Core",
+  },
+  {
+    label: "Send",
+    icon: Send,
+    tooltip: "Send an email, SMS, leave a voicemail or launch a phone call",
     sectionName: "Core",
   },
 
@@ -210,28 +228,24 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Extract Data",
     icon: Pickaxe,
-    creditCost: 3,
     tooltip: "Retrieve data from a webpage, API, or document.",
     sectionName: "Data Extraction",
   },
   {
     label: "Product List",
     icon: Package,
-    creditCost: 2,
     tooltip: "Extract a list of products from an e-commerce site.",
     sectionName: "Data Extraction",
   },
   {
     label: "Extract with AI",
     icon: Brain,
-    creditCost: 5,
     tooltip: "Use AI to extract structured data from unstructured sources.",
     sectionName: "Data Extraction",
   },
   {
     label: "Custom Path",
     icon: Spline,
-    creditCost: 2,
     tooltip: "Define a custom extraction path for structured data.",
     sectionName: "Data Extraction",
   },
@@ -240,7 +254,6 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Text Manipulation",
     icon: Type,
-    creditCost: 4,
     tooltip: "Enhance and modify any data text",
     sectionName: "Data Manipulation",
   },
@@ -248,7 +261,6 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Sentiment Analysis",
     icon: Smile,
-    creditCost: 4,
     tooltip:
       "Analyze a data and determine the overall sentiment (positive, negative, neutral).",
     sectionName: "Data Manipulation",
@@ -256,28 +268,24 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Data Enrichment",
     icon: DatabaseZap,
-    creditCost: 13,
     tooltip: "Fetch relevant data around data source",
     sectionName: "Data Manipulation",
   },
   {
     label: "Tag",
     icon: Tag,
-    creditCost: 2,
     tooltip: "Add or remove a tag your data",
     sectionName: "Data Manipulation",
   },
   {
     label: "Image Manipulation",
     icon: Images,
-    creditCost: 2,
     tooltip: "Modify, resize, or process images within the workflow.",
     sectionName: "Data Manipulation",
   },
   {
     label: "Video Manipulation",
     icon: Video,
-    creditCost: 2,
     tooltip: "Modify or edit videos within the workflow.",
     sectionName: "Data Manipulation",
   },
@@ -286,49 +294,51 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "to JSON",
     icon: FileJson,
-    creditCost: 1,
+
     tooltip: "Convert extracted or processed data into a JSON format.",
     sectionName: "Data Conversion",
   },
   {
-    label: "to .TXT",
+    label: "to PDF",
+    icon: FileTextIcon,
+
+    tooltip: "Convert extracted or processed data into a PDF document.",
+    sectionName: "Data Conversion",
+  },
+  {
+    label: "to TXT",
     icon: FileType2,
-    creditCost: 1,
+
     tooltip: "Convert data into a plain text format.",
     sectionName: "Data Conversion",
   },
   {
     label: "to CSV",
     icon: FileSpreadsheet,
-    creditCost: 3,
     tooltip: "Convert extracted or processed data into a CSV format.",
     sectionName: "Data Conversion",
   },
   {
     label: "to XML",
     icon: FileCode,
-    creditCost: 3,
     tooltip: "Convert extracted or processed data into a XML format.",
     sectionName: "Data Conversion",
   },
   {
     label: "Image Converter",
     icon: FileImage,
-    creditCost: 3,
     tooltip: "Convert any image into another format.",
     sectionName: "Data Conversion",
   },
   {
     label: "Video Converter",
     icon: FileVideo2,
-    creditCost: 5,
     tooltip: "Convert any video into another format.",
     sectionName: "Data Conversion",
   },
   {
     label: "Audio Converter",
     icon: FileVolume,
-    creditCost: 2,
     tooltip: "Convert any audio file into another format.",
     sectionName: "Data Conversion",
   },
@@ -338,21 +348,18 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "PDF Viewer",
     icon: NotebookTextIcon,
-    creditCost: 2,
     tooltip: "Preview or render a PDF from a file or URL",
     sectionName: "Data Preview",
   },
   {
     label: "Docs Viewer",
     icon: FileText,
-    creditCost: 2,
     tooltip: "Preview or render your data inside a Word-like previewer",
     sectionName: "Data Preview",
   },
   {
     label: "Spreadsheet Viewer",
     icon: TableProperties,
-    creditCost: 2,
     tooltip: "Preview your data inside a Spreadsheet",
     sectionName: "Data Preview",
   },
@@ -362,14 +369,12 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Dropbox",
     logoPath: "/logos/dropbox.svg",
-    creditCost: 2,
     tooltip: "Sync and organize files automatically in Dropbox.",
     sectionName: "Data Sync",
   },
   {
     label: "Google Drive",
     logoPath: "/logos/google drive.svg",
-    creditCost: 2,
     tooltip: "Sync files and folders between workflows and Google Drive.",
     sectionName: "Data Sync",
   },
@@ -377,7 +382,6 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Airtable",
     logoPath: "/logos/airtable.svg",
-    creditCost: 2,
     tooltip: "Sync and manage Airtable records seamlessly.",
     sectionName: "Data Sync",
   },
@@ -385,7 +389,6 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Mailchimp",
     logoPath: "/logos/mailchimp.svg",
-    creditCost: 2,
     tooltip: "Automate email campaigns and sync subscriber lists.",
     sectionName: "Data Sync",
   },
@@ -393,21 +396,18 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Trello",
     logoPath: "/logos/trello.svg",
-    creditCost: 2,
     tooltip: "Manage Trello boards, lists, and cards automatically.",
     sectionName: "Data Sync",
   },
   {
     label: "Figma",
     logoPath: "/logos/figma.svg",
-    creditCost: 2,
     tooltip: "Retrieve designs and track changes in Figma.",
     sectionName: "Data Sync",
   },
   {
     label: "Github",
     logoPath: "/logos/github.svg",
-    creditCost: 2,
     tooltip: "Automate issues, pull requests, and repo management.",
     sectionName: "Data Sync",
   },
@@ -415,28 +415,24 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "HubSpot",
     logoPath: "/logos/hubspot.svg",
-    creditCost: 2,
     tooltip: "Manage contacts, deals, and automation within HubSpot.",
     sectionName: "Data Sync",
   },
   {
     label: "Zoom",
     logoPath: "/logos/zoom.svg",
-    creditCost: 2,
     tooltip: "Automate Zoom meeting scheduling and data sync.",
     sectionName: "Data Sync",
   },
   {
     label: "Slack",
     logoPath: "/logos/slack.svg",
-    creditCost: 2,
     tooltip: "Send messages and automate notifications in Slack.",
     sectionName: "Data Sync",
   },
   {
     label: "Asana",
     logoPath: "/logos/asana.svg",
-    creditCost: 2,
     tooltip: "Automate task creation and project management in Asana.",
     sectionName: "Data Sync",
   },
@@ -444,28 +440,24 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Notion",
     logoPath: "/logos/notion.svg",
-    creditCost: 2,
     tooltip: "Create and update Notion pages automatically.",
     sectionName: "Data Sync",
   },
   {
     label: "Shopify",
     logoPath: "/logos/shopify.svg",
-    creditCost: 2,
     tooltip: "Sync orders, products, and customer details with Shopify.",
     sectionName: "Data Sync",
   },
   {
     label: "WordPress",
     logoPath: "/logos/wordpress.svg",
-    creditCost: 2,
     tooltip: "Sync posts, pages, and custom fields with WordPress.",
     sectionName: "Data Sync",
   },
   {
     label: "Calendly",
     logoPath: "/logos/calendly.svg",
-    creditCost: 2,
     tooltip: "Automate meeting scheduling and follow-ups with Calendly.",
     sectionName: "Data Sync",
   },
@@ -473,7 +465,6 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "BigCommerce",
     logoPath: "/logos/bigcommerce.svg",
-    creditCost: 2,
     tooltip: "Sync products, orders, and customer data with BigCommerce.",
     sectionName: "Data Sync",
   },
@@ -481,7 +472,6 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
   {
     label: "Webflow",
     logoPath: "/logos/webflow.svg",
-    creditCost: 2,
     tooltip: "Automate Webflow site updates and CMS management.",
     sectionName: "Data Sync",
   },

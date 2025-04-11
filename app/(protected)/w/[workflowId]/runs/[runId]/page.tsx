@@ -16,7 +16,7 @@ import {
 import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import PhaseDetail from "../_components/w_phase_details";
-import { waitForElementById } from "@/lib/dom_utils";
+import { waitForElement } from "@/lib/dom_utils";
 import { capitalizeFirstLetter } from "@/lib/string_utils";
 import RunDetailItemLine from "../_components/w_run_detail_itemline";
 import PhaseItemLine from "../_components/w_phase_itemline";
@@ -33,7 +33,7 @@ const WRunSinglePage = () => {
       runFound && setCurrentRun(runFound);
     }
 
-    waitForElementById("phasesListContainer").then((el) => {
+    waitForElement("id", "phasesListContainer").then((el) => {
       el.scrollTo({
         top: el.scrollHeight,
         behavior: "smooth",

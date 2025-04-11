@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatDurationFromMs } from "@/lib/date_time_utils";
 import { capitalizeFirstLetter, formatNumber } from "@/lib/string_utils";
+import { cn } from "@/lib/utils";
 import {
   PhaseInput,
   PhaseItemType,
   PhaseLog,
   PhaseOutput,
   RunResultsType,
-} from "@/lib/types";
-import { cn } from "@/lib/utils";
+} from "@/lib/workflow_editor/w_types";
 import {
   Check,
   CircleDashedIcon,
@@ -28,6 +28,41 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ReactJson from "react-json-view";
+
+export const getPhaseStatusInfo = (
+  status: RunResultsType
+): { icon: LucideIcon; label: string; iconClassname?: string } => {
+  switch (status) {
+    case "failed":
+      return {
+        icon: X,
+        label: "Failed",
+      };
+    case "success":
+      return {
+        icon: Check,
+        label: "Completed",
+      };
+    case "paused":
+      return {
+        icon: Pause,
+        label: "Paused",
+        iconClassname: "stroke-none fill-neutral-600",
+      };
+    case "running":
+      return {
+        icon: Loader2,
+        label: "Running",
+        iconClassname: "animate-spin text-neutral-500",
+      };
+
+    default:
+      return {
+        icon: CircleDashedIcon,
+        label: "",
+      };
+  }
+};
 
 const PhaseDetail = ({ phase }: { phase: PhaseItemType | undefined }) => {
   const [isLoadingPhaseLogs, setLoadingPhaseLogs] = useState(false);
@@ -45,41 +80,6 @@ const PhaseDetail = ({ phase }: { phase: PhaseItemType | undefined }) => {
       setPhaseLogsData(phase.logs);
       setLoadingPhaseLogs(false);
     }, 700);
-  };
-
-  const getPhaseStatusInfo = (
-    status: RunResultsType
-  ): { icon: LucideIcon; label: string; iconClassname?: string } => {
-    switch (status) {
-      case "failed":
-        return {
-          icon: X,
-          label: "Failed",
-        };
-      case "success":
-        return {
-          icon: Check,
-          label: "Completed",
-        };
-      case "paused":
-        return {
-          icon: Pause,
-          label: "Paused",
-          iconClassname: "stroke-none fill-neutral-600",
-        };
-      case "running":
-        return {
-          icon: Loader2,
-          label: "Running",
-          iconClassname: "animate-spin text-neutral-500",
-        };
-
-      default:
-        return {
-          icon: CircleDashedIcon,
-          label: "",
-        };
-    }
   };
 
   return (

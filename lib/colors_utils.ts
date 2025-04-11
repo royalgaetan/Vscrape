@@ -19,19 +19,19 @@ export const COLORS = {
 };
 
 export const WORKFLOW_COLORS = {
-  red: "#EF4444", // red-500
-  amber: "#F59E0B", // amber-500
-  lime: "#84cc16", // lime-500
-  green: "#10B981", // green-500
-  teal: "#0D9488", // teal-500
-  blue: "#3B82F6", // blue-500
-  indigo: "#9333EA", // indigo-500
-  purple: "#8B5CF6", // purple-500
-  fuchsia: "#d946ef", // fuchsia-500
-  pink: "#F43F5E", // pink-500
-  yellow: "#D97706", // yellow-500
-  slate: "#64748B", // slate-500
-  stone: "#78716c", // stone-500
+  red: "#e66b6b", // softer red
+  amber: "#F59E0B", // golden amber
+  lime: "#9fcf4f", // fresh lime
+  green: "#4fbf8f", // minty green
+  teal: "#36a69a", // turquoise teal
+  blue: "#5b8ee6", // calm blue
+  indigo: "#7c70d8", // mid indigo
+  purple: "#a278d2", // soft violet
+  fuchsia: "#d762c5", // gentle fuchsia
+  pink: "#e4728c", // balanced pink
+  yellow: "#e2a84b", // sunny yellow
+  slate: "#76879d", // mid slate
+  stone: "#8f837a", // warm gray-brown
 };
 
 export const getIconColor = (icon: LucideIcon): string => {

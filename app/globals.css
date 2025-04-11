@@ -86,4 +86,49 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
   }
+
+  .editor-background-dots {
+    background-color: #f8f8f8 !important;
+    background-image: radial-gradient(
+      circle,
+      #d0d2d6 1px,
+      transparent 1px
+    ) !important;
+    background-size: 10px 10px !important;
+  }
+
+  .editor-background-lines {
+    background-color: white !important;
+    background-image: linear-gradient(to right, #d0d2d6 1px, transparent 1px),
+      linear-gradient(to bottom, #d0d2d6 1px, transparent 1px) !important;
+    background-size: 24px 24px !important;
+  }
+
+  .editor-background-noise {
+    background-color: #f8f8f8 !important;
+    background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png") !important;
+    background-size: auto !important;
+  }
+
+  .fill-area {
+    background-color: #6460aa;
+    z-index: -1;
+    position: absolute;
+    top: -320000px;
+    left: -320000px;
+    width: 640000px;
+    height: 640000px;
+  }
+
+  .background {
+    background-color: #ffffff;
+    opacity: 1;
+    background-image: linear-gradient(#f1f1f1 3.2px, transparent 3.2px),
+      linear-gradient(90deg, #f1f1f1 3.2px, transparent 3.2px),
+      linear-gradient(#f1f1f1 1.6px, transparent 1.6px),
+      linear-gradient(90deg, #f1f1f1 1.6px, #ffffff 1.6px);
+    background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    background-position: -3.2px -3.2px, -3.2px -3.2px, -1.6px -1.6px,
+      -1.6px -1.6px;
+  }
 }

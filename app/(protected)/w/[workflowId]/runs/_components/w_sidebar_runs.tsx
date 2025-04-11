@@ -5,7 +5,7 @@ import { RunItem } from "./w_sidebar_run_item";
 const WRunsSidebar = () => {
   return (
     <div className="min-w-[18rem] max-w-[18rem] h-full bg-white border-r items-start justify-start relative">
-      <div className="flex flex-col w-full h-full overflow-y-scroll overflow-x-clip">
+      <div className="flex flex-col w-full h-full overflow-y-scroll overflow-x-clip scrollbar-hide">
         <h2 className="text-2xl font-semibold text-[#333] px-4 mb-3 mt-4">
           All Runs
         </h2>
@@ -18,7 +18,9 @@ const WRunsSidebar = () => {
           ) : (
             <div className="h-px">
               {fakeRuns
-                .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+                .toSorted(
+                  (a, b) => b.startedAt.getTime() - a.startedAt.getTime()
+                )
                 .map((run) => {
                   return <RunItem key={run.runId} item={run} />;
                 })}

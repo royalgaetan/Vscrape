@@ -12,7 +12,7 @@ import Image from "next/image";
 import { lucideIconNames } from "@/lib/fake_data";
 import TemplateDialog from "./template_dialog";
 import { isSearchTermFound } from "@/lib/string_utils";
-import { isElementInViewport, waitForElementById } from "@/lib/dom_utils";
+import { isElementInViewport, waitForElement } from "@/lib/dom_utils";
 import { getRandomElement } from "@/lib/numbers_utils";
 
 export const workflowTemplateCategories: Record<string, string> = {
@@ -78,7 +78,7 @@ const WorkflowTemplatesList = ({
 
     // Scroll to element
     if (currentItemRef.current && scrollableContainerRef.current) {
-      waitForElementById(currentItemRef.current.id).then((el) => {
+      waitForElement("id", currentItemRef.current.id).then((el) => {
         if (!scrollableContainerRef.current) return;
         if (!isElementInViewport(scrollableContainerRef.current, el)) {
           scrollableContainerRef.current.scrollLeft =

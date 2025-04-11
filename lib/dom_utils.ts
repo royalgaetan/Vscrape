@@ -23,19 +23,37 @@ export const isElementInViewport = (
   );
 };
 
-export const waitForElementById = (
-  id: string,
+export type SelectorType = "id" | "class" | "data-attr";
+
+export const waitForElement = (
+  type: SelectorType,
+  selector: string,
   timeout = 5000
 ): Promise<HTMLElement> => {
   return new Promise((resolve, reject) => {
-    const el = document.getElementById(id);
+    let el: HTMLElement | null = null;
+
+    const getElement = () => {
+      switch (type) {
+        case "id":
+          return document.getElementById(selector);
+        case "class":
+          return document.querySelector(`.${selector}`) as HTMLElement;
+        case "data-attr":
+          return document.querySelector(`[${selector}]`) as HTMLElement;
+        default:
+          return null;
+      }
+    };
+
+    el = getElement();
     if (el) return resolve(el);
 
     const observer = new MutationObserver(() => {
-      const found = document.getElementById(id);
+      const found = getElement();
       if (found) {
         observer.disconnect();
-        resolve(found);
+        resolve(found as HTMLElement);
       }
     });
 
@@ -47,7 +65,6 @@ export const waitForElementById = (
     }, timeout);
   });
 };
-
 export const isAccordionElementOpen = (id: string) => {
   const element = document.getElementById(id);
   if (element) {

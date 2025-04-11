@@ -1,200 +1,154 @@
-"use client";
-import React from "react";
-import { SidebarIcon } from "@/components/global/app_sidebar";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import React, { useEffect, useRef, useState } from "react";
+import { NodeEditor, GetSchemes, ClassicPreset } from "rete";
+import CustomLoader from "@/components/global/loader";
+import { createRoot } from "react-dom/client";
+import { ReactPlugin, Presets, ReactArea2D } from "rete-react-plugin";
+import { AreaPlugin, AreaExtensions } from "rete-area-plugin";
 import {
-  BugPlayIcon,
-  DraftingCompass,
-  InfoIcon,
-  LockKeyholeOpenIcon,
-  LucideIcon,
-  Maximize,
-  MessageCircleMoreIcon,
-  Minus,
-  Play,
-  Plus,
-  Redo2,
-  Undo2,
-  UndoDotIcon,
-} from "lucide-react";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
-import SimpleTooltip from "@/components/global/simple_tooltip";
+  ConnectionPlugin,
+  Presets as ConnectionPresets,
+} from "rete-connection-plugin";
+import { DroppedToolItem } from "@/lib/workflow_editor/w_types";
+import { convertDropPositionToEditorCoords } from "@/lib/workflow_editor/convert_position_to_editor_coords";
+import CustomNode from "@/components/workflow_editor/custom_node";
+import { AddCustomBackground } from "@/lib/workflow_editor/add_custom_background";
 
-const WorflowEditor = ({
-  workflowId,
-  isHistory,
+export type Schemes = GetSchemes<
+  ClassicPreset.Node,
+  ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>
+>;
+export type AreaExtra = ReactArea2D<Schemes>;
+
+const WorkflowEditor = ({
+  elementDropped,
 }: {
-  workflowId: string;
-  isHistory?: boolean;
+  elementDropped?: DroppedToolItem;
 }) => {
-  const { isWChatOpen, setWChatOpen } = useWorkflowEditor();
+  const editorRef = useRef<HTMLDivElement>(null);
+  const initialisedRef = useRef<boolean>(false);
+  const [displayLoader, setDisplayLoader] = useState<boolean>(true);
+
+  // Editor + Plugins refs
+  const editorInstanceRef = useRef<NodeEditor<Schemes>>();
+  const areaInstanceRef = useRef<AreaPlugin<Schemes, AreaExtra>>();
+  const renderInstanceRef = useRef<ReactPlugin<Schemes, AreaExtra>>();
+  const connectionInstanceRef = useRef<ConnectionPlugin<Schemes, AreaExtra>>();
+  const socket = new ClassicPreset.Socket("socket");
+
+  async function createEditor() {
+    // Check if the editor div element has been loaded and Avoid double-initialization
+    if (!editorRef.current || initialisedRef.current) return;
+    initialisedRef.current = true;
+    // Remove Loader
+    setDisplayLoader(false);
+
+    // Init Editor, Area, Render and Connections
+    const editor = new NodeEditor<Schemes>();
+    const area = new AreaPlugin<Schemes, AreaExtra>(editorRef.current);
+    const render = new ReactPlugin<Schemes, AreaExtra>({ createRoot });
+    const connection = new ConnectionPlugin<Schemes, AreaExtra>();
+
+    // Add Presets and Custom UI to Render and Connections
+    connection.addPreset(ConnectionPresets.classic.setup());
+    render.addPreset(
+      Presets.classic.setup({
+        customize: {
+          node() {
+            return CustomNode;
+          },
+        },
+      })
+    );
+    // AddCustomBackground(area);
+
+    // Connect Editor to area and Area to Render and Connection
+    editor.use(area);
+    area.use(connection);
+    area.use(render);
+
+    // Restrict Zoom
+    AreaExtensions.restrictor(area, {
+      scaling: { min: 0.3, max: 1.3 },
+      // translation: {
+      //   top: -320,
+      //   left: -320,
+      //   bottom: 640,
+      //   right: 640,
+      // },
+    });
+    AreaExtensions.simpleNodesOrder(area);
+
+    // Add Selection Abilities
+    AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
+      accumulating: AreaExtensions.accumulateOnCtrl(),
+    });
+
+    // Assign edior + plugins to Refs: to avoid re-rendering of their values
+    editorInstanceRef.current = editor;
+    areaInstanceRef.current = area;
+    renderInstanceRef.current = render;
+    connectionInstanceRef.current = connection;
+
+    setTimeout(() => {
+      // wait until nodes rendered because they dont have predefined width and height
+      AreaExtensions.zoomAt(area, editor.getNodes());
+    }, 10);
+
+    return {
+      destroy: () => area.destroy(),
+    };
+  }
+  useEffect(() => {
+    createEditor();
+
+    if (editorInstanceRef.current) {
+      // editorInstanceRef.current.vie
+    }
+  }, []);
+
+  useEffect(() => {
+    if (elementDropped) {
+      onNodeAdded(elementDropped);
+    }
+  }, [elementDropped]);
+
+  const onNodeAdded = async (droppedItem: DroppedToolItem) => {
+    const editor = editorInstanceRef.current;
+    const area = areaInstanceRef.current;
+
+    if (!editor || !area) return;
+
+    const newNode = new ClassicPreset.Node(droppedItem.label);
+    newNode.addControl(
+      "custom",
+      new ClassicPreset.InputControl("text", { initial: "custom" })
+    );
+    newNode.addInput("custom", new ClassicPreset.Input(socket));
+    await editor.addNode(newNode);
+
+    const position = convertDropPositionToEditorCoords(
+      droppedItem.position ?? { x: 0, y: 0 },
+      area
+    );
+
+    await area.translate(newNode.id, position);
+    console.log("@DEBUG", "Node Added", newNode);
+  };
 
   return (
-    <div className="flex flex-col justify-center items-center h-full w-full relative">
-      <div className="flex flex-col justify-center items-center z-[20] relative group/workflowEditorArena">
-        <DraftingCompass className="size-12 stroke-primary mb-2 stroke-[2px]" />
-        <span className="text-neutral-800 text-3xl font-semibold">
-          {isHistory ? "Workflow History" : "Workflow Editor"}
-        </span>
-        <span className="text-neutral-500 text-sm mt-1 font-medium">
-          {workflowId}
-        </span>
-      </div>
-
-      {/* Workflow Editor Action Buttons */}
-      <div className="flex flex-1 items-end w-full absolute z-[21] bottom-0 px-3 pb-3">
-        {/* Info Button */}
-        <div className="flex justify-start items-center w-1/3">
-          <Button
-            variant={"ghost"}
-            className={cn(
-              "flex w-8 transition-all -ml-2 -mb-2 duration-300 h-8 justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm"
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-            }}
-          >
-            {/* Icon */}
-            <SidebarIcon
-              defaultIcon={InfoIcon}
-              isExpandable={false}
-              type="icon"
-              isSelected={undefined}
-            />
-          </Button>
+    <div className="flex flex-col w-full h-full justify-center items-center z-[20] relative group/workflowEditorArena">
+      {displayLoader && (
+        <div className="bg-white w-full h-full z-10 absolute top-0">
+          <CustomLoader text="Loading editor..." className="w-full h-full" />
         </div>
+      )}
 
-        {/* Execution Buttons */}
-        <div className="flex flex-1 gap-2 justify-center items-center w-1/3">
-          {isHistory && (
-            <Button
-              variant={"default"}
-              className="rounded-2xl h-7 text-xs gap-1 px-3 active:scale-[0.97]"
-            >
-              <UndoDotIcon className="stroke-white" />
-              <span className="">Revert this version</span>
-            </Button>
-          )}
-
-          {isHistory === undefined && (
-            <SimpleTooltip
-              tooltipText={isWChatOpen ? "Close Chat" : "Open Chat"}
-            >
-              <Button
-                onClick={() => setWChatOpen(!isWChatOpen)}
-                variant={"secondary"}
-                className={cn(
-                  "duration-0 rounded-2xl h-7 text-xs gap-1 px-3",
-                  isWChatOpen &&
-                    "bg-primary text-primary-foreground hover:bg-primary/90"
-                )}
-              >
-                <MessageCircleMoreIcon
-                  className={cn(
-                    "stroke-neutral-800",
-                    isWChatOpen && "stroke-white"
-                  )}
-                />
-              </Button>
-            </SimpleTooltip>
-          )}
-
-          {isHistory === undefined && (
-            <Button
-              variant={"default"}
-              className="!bg-yellow-500 hover:!bg-yellow-500/70 rounded-2xl h-7 text-xs gap-1 px-3 "
-            >
-              <BugPlayIcon className="stroke-white" />
-            </Button>
-          )}
-
-          {isHistory === undefined && <UndoRedoButtons />}
-
-          {isHistory === undefined && (
-            <Button
-              variant={"default"}
-              className="rounded-2xl h-7 text-xs gap-1 px-3 active:scale-[0.97]"
-            >
-              <Play className="stroke-white" />
-              <span className="">Execute</span>
-            </Button>
-          )}
-        </div>
-
-        {/* View Buttons */}
-        <div className="flex flex-1 justify-end items-center">
-          <ViewButtons />
-        </div>
-      </div>
+      <div
+        ref={editorRef}
+        className="h-full w-full editor-background-dots"
+      ></div>
     </div>
   );
 };
 
-export default WorflowEditor;
-
-export const ViewButtons = () => {
-  const viewIcons: { icon: LucideIcon; name: string }[] = [
-    {
-      icon: Plus,
-      name: "Zoom in",
-    },
-    {
-      icon: Minus,
-      name: "Zoom out",
-    },
-    {
-      icon: Maximize,
-      name: "Fit",
-    },
-    {
-      icon: LockKeyholeOpenIcon,
-      name: "Lock",
-    },
-  ];
-
-  return (
-    <div className="rounded-2xl border divide-y-2 overflow-clip flex flex-col w-7 h-min bg-white">
-      {viewIcons.map((el) => {
-        const Icon = el.icon;
-        return (
-          <button
-            key={el.name}
-            className="h-7 flex justify-center group/viewBtn items-center bg-transparent hover:bg-neutral-200 cursor-pointer"
-          >
-            <Icon className="size-4 stroke-neutral-700 group-active/viewBtn:scale-[0.80] transition-all duration-200" />
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-export const UndoRedoButtons = () => {
-  const doButtons: { icon: LucideIcon; name: string }[] = [
-    {
-      icon: Undo2,
-      name: "Undo",
-    },
-    {
-      icon: Redo2,
-      name: "Redo",
-    },
-  ];
-
-  return (
-    <div className="rounded-2xl border divide-x-2 overflow-clip flex h-7 w-min bg-white">
-      {doButtons.map((el) => {
-        const Icon = el.icon;
-        return (
-          <button
-            key={el.name}
-            className="w-10 flex justify-center group/viewBtn items-center bg-transparent hover:bg-neutral-200 cursor-pointer"
-          >
-            <Icon className="size-4 stroke-neutral-700 group-active/viewBtn:scale-[0.80] transition-all duration-200" />
-          </button>
-        );
-      })}
-    </div>
-  );
-};
+export default WorkflowEditor;
