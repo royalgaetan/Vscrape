@@ -47,7 +47,7 @@ const WorkflowList = ({
   return (
     <div className="relative mt-0 pt-0">
       {/* Header */}
-      <div className="sticky top-[8vh] z-40 bg-white w-full ">
+      <div className="sticky top-[7.8vh] z-40 bg-white w-full ">
         <WorkflowHeader
           headerText={folder.folderName}
           buttons={

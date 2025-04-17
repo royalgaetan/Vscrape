@@ -12,16 +12,6 @@ import {
 import { WORKFLOW_COLORS } from "./colors_utils";
 import { folderType } from "@/app/(protected)/workflows/layout";
 import { importedFile } from "@/app/(protected)/_settings/import/import_settings";
-import {
-  ChatReply,
-  knowledgeBase,
-  RunItemType,
-  PhaseItemType,
-  userProfile,
-  PhaseLog,
-  PhaseOutput,
-  PhaseInput,
-} from "./types";
 import { workflowTemplateType } from "@/app/(protected)/templates/_components/template_card";
 import {
   Activity,
@@ -281,6 +271,14 @@ import { ChatItemType } from "@/app/(protected)/chats/chats_pansidebar";
 import { DateRange } from "react-day-picker";
 import { generateAvatar } from "./image_utils";
 import { getRandomElement } from "./numbers_utils";
+import { ChatReply, knowledgeBase, userProfile } from "./types";
+import {
+  PhaseInput,
+  PhaseItemType,
+  PhaseLog,
+  PhaseOutput,
+  RunItemType,
+} from "./workflow_editor/types/w_types";
 
 export const generateWorkflowLogo = () => {
   const IconName = getRandomElement(lucideIconNames);

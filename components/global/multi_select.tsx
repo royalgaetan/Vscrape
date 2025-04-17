@@ -28,6 +28,7 @@ const MultiSelect = ({
   popoverSide,
   popoverClassName,
   selectionMode = "multi",
+  isTriggerDisabled,
 }: {
   data: SettingItemSelectDataType;
   selectionMode?: "single" | "multi";
@@ -35,6 +36,7 @@ const MultiSelect = ({
   selectedValues?: string[];
   label: string;
   triggerClassName?: string;
+  isTriggerDisabled?: boolean;
   popoverClassName?: string;
   popoverAlignment?: "end" | "center" | "start";
   popoverSide?: "top" | "right" | "bottom" | "left";
@@ -43,8 +45,9 @@ const MultiSelect = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger>
+      <PopoverTrigger disabled={isTriggerDisabled}>
         <Button
+          disabled={isTriggerDisabled}
           variant="outline"
           role="button"
           aria-expanded={open}
@@ -60,7 +63,7 @@ const MultiSelect = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn("w-64 truncate p-0", popoverClassName)}
+        className={cn("w-64 truncate p-0 shadow-lg", popoverClassName)}
         side={popoverSide}
         align={popoverAlignment}
       >
@@ -85,7 +88,7 @@ const MultiSelect = ({
                             setOpen(false);
                           }
                         }}
-                        className="flex items-center justify-between"
+                        className="flex items-center justify-between cursor-pointer data-[selected=true]:bg-accent/50"
                       >
                         {Icon && (
                           <Icon
@@ -96,7 +99,7 @@ const MultiSelect = ({
                             fill={option.iconColorHex}
                           />
                         )}
-                        <span className="truncate w-56 flex-1 justify-start">
+                        <span className="text-xs truncate w-56 flex-1 justify-start">
                           {option.label}
                         </span>
                         {selectedValues.includes(option.value) && (

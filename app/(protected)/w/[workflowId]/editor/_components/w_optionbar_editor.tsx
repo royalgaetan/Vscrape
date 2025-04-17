@@ -2,8 +2,8 @@ import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import { cn } from "@/lib/utils";
-import { LockKeyholeOpen, X } from "lucide-react";
-import React from "react";
+import { Coins, LockKeyholeOpen, Star, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
@@ -12,12 +12,28 @@ import { Toggle } from "@/components/ui/toggle";
 import SettingItemSelect from "@/app/(protected)/_settings/_components/settings_item_select";
 import { appLanguages } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
+import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
+import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
+import {
+  vsAnyPrimitives,
+  vsAnyRawTypes,
+} from "@/lib/workflow_editor/types/data_types";
+import ParamInput from "@/components/workflow_editor/param_inputs";
 
 const OptionbarEditor = () => {
+  const [selectedOperation, setSelectedOperation] = useState<string>();
   const { optionbarItem, isOptionbarOpen, toggleOptionbar } =
     useWorkflowEditor();
 
   const Icon = optionbarItem?.icon;
+
+  useEffect(() => {
+    setSelectedOperation(undefined);
+  }, [optionbarItem]);
+
+  const selectedOperationParams = workflowOperations.find(
+    (op) => op.operationName === selectedOperation ?? ""
+  )?.params;
 
   return !isOptionbarOpen ? (
     <></>
@@ -25,9 +41,9 @@ const OptionbarEditor = () => {
     <div className="min-w-[18rem] max-w-[18rem] h-full  bg-white border-l flex flex-col items-start justify-start relative">
       <div className="flex flex-1 w-full max-h-full overflow-x-clip overflow-y-scroll scrollbar-hide">
         <div className="h-px w-full relative">
-          <div className="min-w-[18rem] max-w-[18rem] px-4 bg-white border-r flex flex-col items-start justify-start relative">
+          <div className="min-w-[18rem] max-w-[18rem] bg-white border-r flex flex-col items-start justify-start relative">
             {/* Close Button */}
-            <div className="flex w-full justify-end items-center bg-transparent z-10 translate-y-4 -mb-1 sticky top-0">
+            <div className="flex w-full justify-end  px-4 items-center bg-transparent z-10 translate-y-4 -mb-1 sticky top-0">
               <SimpleTooltip
                 side="bottom"
                 align="end"
@@ -50,9 +66,9 @@ const OptionbarEditor = () => {
                 Select a tool.
               </div>
             ) : (
-              <div className="flex flex-col w-full max-h-full overflow-y-scroll scrollbar-hide">
+              <div className="flex flex-col w-full max-h-full overflow-x-clip overflow-y-scroll scrollbar-hide">
                 {/* Header */}
-                <div className="flex flex-col w-full">
+                <div className="flex flex-col w-full px-4">
                   <div className="flex flex-1 gap-2 items-center">
                     <div className="size-5">
                       {Icon && (
@@ -86,66 +102,106 @@ const OptionbarEditor = () => {
                 </div>
 
                 {/* Content */}
-                <div className="mt-6 pb-6 pr-1 space-y-4">
+                <div className="mt-4 pb-6 space-y-4">
                   {/* Operations list */}
-                  <div className="flex flex-col justify-start items-start">
+                  <div className="flex flex-col justify-start items-start px-4 pr-4">
                     <FieldLabel label={"Select an operation"} />
                     <MultiSelect
+                      isTriggerDisabled={optionbarItem.operations.length === 0}
                       triggerClassName="h-9 w-[15.7rem] flex flex-1 mb-1"
                       popoverAlignment="center"
                       selectionMode="single"
-                      popoverClassName="h-60 w-[17rem]"
-                      label={"Pick an operation"}
+                      popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
+                      label={selectedOperation ?? "Pick an operation"}
                       data={{
-                        "Data Manipulation": [],
+                        "": optionbarItem.operations.map((op) => ({
+                          label: op.operationName,
+                          value: op.operationName,
+                          icon: optionbarItem.icon ?? Star,
+                          iconClassName: "stroke-neutral-400 fill-transparent",
+                        })),
                       }}
-                      selectedValues={[]}
-                      handleSelect={(operationSelected) => {}}
+                      selectedValues={
+                        selectedOperation ? [selectedOperation] : []
+                      }
+                      handleSelect={(opSelected) => {
+                        if (opSelected === selectedOperation) {
+                          setSelectedOperation(undefined);
+                        } else {
+                          setSelectedOperation(opSelected);
+                        }
+                      }}
                     />
                   </div>
                   <Separator className="my-2" />
+
+                  {/* Input Available List: previousOperationData | previousNodeData | Variables */}
+                  <div></div>
 
                   {/* Parameters */}
                   <div className="flex flex-col justify-start items-start">
-                    <FieldLabel label={"Parameters"} />
-                    <ParameterItemLine
-                      label={"Cropping Width"}
-                      input={
-                        <Input
-                          placeholder="0"
-                          type="number"
-                          className="text-end !text-xs max-w-[4rem] !h-[1.6rem] placeholder:font-semibold placeholder:text-muted-foreground/70"
-                          onChange={(e) => {}}
-                        />
-                      }
-                    />
-                    <ParameterItemLine
-                      label={"Cropping Height"}
-                      input={
-                        <Input
-                          placeholder="0"
-                          type="number"
-                          className="text-end !text-xs max-w-[4rem] !h-[1.6rem] placeholder:font-semibold placeholder:text-muted-foreground/70"
-                          onChange={(e) => {}}
-                        />
-                      }
-                    />
-                    <ParameterItemLine
-                      label={"Lock W-H"}
-                      input={
-                        <Toggle
-                          aria-label="Lock Width and Height"
-                          className="size-7"
-                        >
-                          <LockKeyholeOpen className="" />
-                        </Toggle>
-                      }
-                    />
+                    {!selectedOperationParams ||
+                    selectedOperationParams.length === 0 ? (
+                      <div className="h-[40vh]"></div>
+                    ) : (
+                      <div className="flex flex-col w-full gap-4">
+                        {selectedOperationParams.map((params) => {
+                          // If Params is an Array: meaning it contains "nested" params
+                          // => Display all of them in the same line
+                          if (Array.isArray(params)) {
+                            return (
+                              <div className="flex flex-1 gap-2 px-4 pr-4 divide-x-2 mt-3">
+                                {params.map((param) => (
+                                  <div
+                                    className="flex flex-1"
+                                    style={{
+                                      maxWidth: `${90 / params.length}%`,
+                                    }}
+                                  >
+                                    <ParameterItemLine
+                                      operationName={selectedOperation}
+                                      label={param.paramName}
+                                      placeHolder={param.paramInputPlaceholder}
+                                      valuesToPickFrom={param.valuesToPickFrom}
+                                      inputType={param.type}
+                                      labelClassName={
+                                        param.type
+                                          .toLocaleLowerCase()
+                                          .includes("switch")
+                                          ? "text-center"
+                                          : undefined
+                                      }
+                                      className=""
+                                      inputClassName="justify-center"
+                                      onValueChange={(value) => {}}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          }
+
+                          // Else Params is a Param: Display it in the 1 line
+                          return (
+                            <div className="flex flex-1 w-full px-4 pr-4">
+                              <ParameterItemLine
+                                operationName={selectedOperation}
+                                label={params.paramName}
+                                inputType={params.type}
+                                valuesToPickFrom={params.valuesToPickFrom}
+                                placeHolder={params.paramInputPlaceholder}
+                                onValueChange={(value) => {}}
+                              />
+                            </div>
+                          );
+                        })}
+                        <Separator className="my-2" />
+                      </div>
+                    )}
                   </div>
-                  <Separator className="my-2" />
 
                   {/* More Option */}
-                  <div className="flex flex-col justify-start items-start">
+                  {/* <div className="flex flex-col justify-start items-start px-4 pr-4">
                     <FieldLabel label={"More Options"} />
 
                     <ParameterItemLine
@@ -202,7 +258,7 @@ const OptionbarEditor = () => {
                         />
                       }
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}
@@ -225,18 +281,55 @@ const FieldLabel = ({ label }: { label: string }) => {
 
 const ParameterItemLine = ({
   label,
-  input,
+  inputType,
+  onValueChange,
+  placeHolder,
+  valuesToPickFrom,
+  className,
+  inputClassName,
+  labelClassName,
+  operationName,
 }: {
   label: string;
-  input: React.ReactNode;
+  placeHolder?: string;
+  operationName?: string;
+  className?: string;
+  inputClassName?: string;
+  labelClassName?: string;
+  inputType: vsAnyPrimitives["type"] | vsAnyRawTypes["type"];
+  onValueChange: (value: any) => void;
+  valuesToPickFrom?: number[] | string[] | boolean[];
 }) => {
   return (
-    <div className="flex flex-1 w-full gap-2 justify-between items-start">
-      <div className="w-[7rem] h-7 pt-2 min-h-fit align-middle truncate mb-2">
-        <div className="text-xs font-semibold text-neutral-500">{label}</div>
+    <div
+      className={cn(
+        "flex flex-col w-full gap-1 justify-between items-start",
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "px-1 w-full text-start text-xs line-clamp-1 font-semibold text-neutral-500",
+          labelClassName
+        )}
+      >
+        {label}
       </div>
-      <div className="flex flex-1 justify-end items-center text-xs text-neutral-700">
-        {input}
+
+      <div
+        className={cn(
+          "flex flex-1 w-full justify-start items-center text-xs text-neutral-700",
+          inputClassName
+        )}
+      >
+        <ParamInput
+          paramName={label}
+          inputType={inputType}
+          onChange={onValueChange}
+          placeHolder={placeHolder}
+          valuesToPickFrom={valuesToPickFrom}
+          operationName={operationName}
+        />
       </div>
     </div>
   );

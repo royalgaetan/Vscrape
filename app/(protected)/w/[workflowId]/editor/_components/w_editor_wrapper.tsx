@@ -21,7 +21,7 @@ import {
 import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import WorkflowEditor from "./w_editor";
-import { DroppedToolItem } from "@/lib/workflow_editor/w_types";
+import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
 
 const WorflowEditorWrapper = ({
   workflowId,

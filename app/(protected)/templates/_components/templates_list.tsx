@@ -98,7 +98,7 @@ const WorkflowTemplatesList = ({
   return (
     <div className="relative mt-0 pt-0">
       {/* Header */}
-      <div className="sticky top-[8vh] z-40 bg-white w-full flex flex-col mt-4">
+      <div className="sticky top-[7.8vh] z-40 bg-white w-full flex flex-col mt-4">
         <div className="flex flex-1 gap-4 justify-center items-center pb-0">
           {/* Header Text */}
           <div className="w-[50vw] flex flex-1 relative group/scrollable-header ">

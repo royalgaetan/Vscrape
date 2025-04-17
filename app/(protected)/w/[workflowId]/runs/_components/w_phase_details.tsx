@@ -13,7 +13,7 @@ import {
   PhaseLog,
   PhaseOutput,
   RunResultsType,
-} from "@/lib/workflow_editor/w_types";
+} from "@/lib/workflow_editor/types/w_types";
 import {
   Check,
   CircleDashedIcon,

@@ -118,7 +118,7 @@ const WHeader = () => {
           <Loader2 className="animate-spin text-neutral-500" />
         ) : (
           <TabsList className="w-[30%] flex justify-center items-center bg-transparent">
-            <div className="w-fit space-x-1 bg-white px-2 rounded-full ">
+            <div className="w-fit space-x-1 bg-white px-2 rounded-full">
               {wTabs.map((mode) => {
                 return (
                   <TabsTrigger

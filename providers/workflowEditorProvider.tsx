@@ -1,4 +1,4 @@
-import { WorkflowEditorToolItem } from "@/lib/types";
+import { WorkflowEditorToolItem } from "@/lib/workflow_editor/types/w_types";
 import { createContext, useState } from "react";
 
 export type WorkflowEditorToolItemExtended = WorkflowEditorToolItem & {

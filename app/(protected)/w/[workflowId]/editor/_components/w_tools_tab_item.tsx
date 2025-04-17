@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
-import { WorkflowEditorToolItem } from "@/lib/workflow_editor/w_types";
+import { WorkflowEditorToolItem } from "@/lib/workflow_editor/types/w_types";
 
 const ToolItemLine = ({
   item,

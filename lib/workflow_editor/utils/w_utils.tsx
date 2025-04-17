@@ -1,6 +1,8 @@
-import { string } from "zod";
-import { workflowEditorSections, workflowEditorToolItems } from "../constants";
-import { WorkflowEditorToolItem } from "./w_types";
+import {
+  workflowEditorSections,
+  workflowEditorToolItems,
+} from "../constants/w_constants";
+import { WorkflowEditorToolItem } from "../types/w_types";
 
 export const getWorkflowToolItemFromLabel = (
   label: string

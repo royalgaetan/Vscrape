@@ -6,14 +6,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+import { isSearchTermFound } from "@/lib/string_utils";
+import React, { useState } from "react";
+import ToolItemLine from "./w_tools_tab_item";
 import {
   workflowEditorSections,
   workflowEditorToolItems,
-} from "@/lib/constants";
-import { isSearchTermFound } from "@/lib/string_utils";
-import { WorkflowEditorToolItem } from "@/lib/types";
-import React, { useState } from "react";
-import ToolItemLine from "./w_tools_tab_item";
+} from "@/lib/workflow_editor/constants/w_constants";
 
 const WToolsTab = () => {
   const [searchContent, setSearchContent] = useState("");

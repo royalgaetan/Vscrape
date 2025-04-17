@@ -26,7 +26,7 @@ export const WORKFLOW_COLORS = {
   teal: "#36a69a", // turquoise teal
   blue: "#5b8ee6", // calm blue
   indigo: "#7c70d8", // mid indigo
-  purple: "#a278d2", // soft violet
+  purple: "#6460aa", // soft violet (app primary)
   fuchsia: "#d762c5", // gentle fuchsia
   pink: "#e4728c", // balanced pink
   yellow: "#e2a84b", // sunny yellow

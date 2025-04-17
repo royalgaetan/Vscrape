@@ -1,12 +1,5 @@
 import { generateHexRandomString } from "@/lib/numbers_utils";
-import {
-  RunResultsType,
-  WorkflowEditorToolItem,
-} from "@/lib/workflow_editor/w_types";
-import {
-  getWorkflowSectionFromName,
-  getWorkflowToolItemFromLabel,
-} from "@/lib/workflow_editor/w_utils";
+import { WorkflowEditorToolItem } from "@/lib/workflow_editor/types/w_types";
 import React, { useRef } from "react";
 import { ClassicScheme, RenderEmit } from "rete-react-plugin";
 import Image from "next/image";
@@ -24,10 +17,12 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { SidebarIcon } from "../global/app_sidebar";
 import { Badge } from "../ui/badge";
 import { formatLargeNumber } from "@/lib/date_time_utils";
-import { getPhaseStatusInfo } from "@/app/(protected)/w/[workflowId]/runs/_components/w_phase_details";
+import {
+  getWorkflowSectionFromName,
+  getWorkflowToolItemFromLabel,
+} from "@/lib/workflow_editor/utils/w_utils";
 
 type NodeTest = "failed" | "success" | "running";
 export const getNodeTestIcon = (
@@ -67,7 +62,7 @@ type Props<S extends ClassicScheme> = {
 };
 
 const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
-  const arrayLength = useRef<number>(Math.round(Math.random() * 10));
+  const arrayLength = useRef<number>(Math.round(Math.random() * 87));
   const creditCost = useRef<number>(Math.round(Math.random() * 120));
   const randomId = useRef<string>(generateHexRandomString(7));
 
@@ -87,13 +82,13 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
   );
   const Icon = toolItem.current?.icon as LucideIcon;
   const sectionInfo = useRef(
-    getWorkflowSectionFromName(toolItem.current?.sectionName ?? "")
+    getWorkflowSectionFromName(toolItem.current?.sectionName.toString() ?? "")
   );
 
   return (
-    <div className="flex group w-72 gap-4 bg-white border border-border p-3 select-none rounded-xl">
+    <div className="flex group w-72 gap-3 bg-white border border-border p-3 pb-2 select-none rounded-xl">
       {/* Icon & Logo */}
-      <div className="justify-center items-center size-11">
+      <div className="justify-center items-center size-11 flex ">
         {Icon && (
           <div
             className={cn("flex size-9 rounded-sm justify-center items-center")}
@@ -118,16 +113,18 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
       <div className="flex flex-1 overflow-clip">
         <div className="flex flex-col w-full">
           {/* Header */}
-          <div className="flex flex-1 w-full gap-1 items-center">
+          <div className="flex flex-1 w-full gap-2 items-center">
             {/* Section Name */}
-            <div>
-              <h6 className="w-full line-clamp-1 font-bold text-neutral-900 text-base">
-                {toolItem.current?.label} Lorem ipsum dolor sit amet,
-                consectetur adipisicing elit. Culpa magnam fuga unde. Doloribus
-                ipsa saepe eius molestiae non delectus pariatur recusandae
-                inventore, aut et fugit incidunt quos itaque, laboriosam
-                deserunt!
-              </h6>
+            <div className="flex flex-1">
+              <div className="flex flex-col gap-0">
+                <h6 className="w-full line-clamp-1 font-bold text-neutral-900 text-base">
+                  {toolItem.current?.label}
+                </h6>
+                <p className="w-full line-clamp-1 font-normal text-neutral-500 text-xs">
+                  {arrayLength.current} Operations
+                </p>
+              </div>
+              {/* Buttons: Add Operation, Notification, Test Unit */}
             </div>
 
             {/* CTA Buttons */}
@@ -159,28 +156,12 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
             </div>
           </div>
 
-          {/* Operations List */}
-          <div className="flex flex-col w-full gap-1">
-            {[
-              "Video/Audio Upload",
-              "Create Video Transcript",
-              "Save Transcript",
-              "Summarize Transcript",
-              "Get lastest informations about the scripts",
-            ].map((item) => (
-              <p className="w-full line-clamp-1 text-xs" key={item}>
-                {item}
-              </p>
-            ))}
-          </div>
-
-          {/* Buttons: Add Operation, Notification, Test Unit */}
-          <div className="flex max-w-52 h-5 mt-2 gap-0 items-center justify-start overflow-clip">
+          <div className="flex items-center justify-start overflow-clip mt-2">
             {/* Operation button */}
             <Button
               variant={"ghost"}
               className={cn(
-                "scale-[0.8] hidden group-hover:flex w-fit bg-orange-300 px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-0 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                "scale-[0.8] -translate-x-[6px] flex w-fit bg-orange-300 px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-0 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
               )}
               onPointerDown={(e) => {
                 e.preventDefault();
@@ -196,7 +177,7 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
             <Button
               variant={"ghost"}
               className={cn(
-                "scale-[0.8] -translate-x-[6px] hidden group-hover:flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                "scale-[0.8] -translate-x-[6px] flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
               )}
               onPointerDown={(e) => {
                 e.preventDefault();
@@ -219,7 +200,7 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
             <Button
               variant={"ghost"}
               className={cn(
-                "scale-[0.8] translate-x-[-10px] hidden group-hover:flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                "scale-[0.8] translate-x-[-10px] flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
               )}
               onPointerDown={(e) => {
                 e.preventDefault();
@@ -236,6 +217,21 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
               <span>{unitTestInfo.label}</span>
             </Button>
           </div>
+
+          {/* Operations List */}
+          {/* <div className="flex flex-col w-full gap-1">
+            {[
+              "Video/Audio Upload",
+              "Create Video Transcript",
+              "Save Transcript",
+              "Summarize Transcript",
+              "Get lastest informations about the scripts",
+            ].map((item) => (
+              <p className="w-full line-clamp-1 text-xs" key={item}>
+                {item}
+              </p>
+            ))}
+          </div> */}
         </div>
       </div>
     </div>

@@ -8,10 +8,9 @@ import {
   ConnectionPlugin,
   Presets as ConnectionPresets,
 } from "rete-connection-plugin";
-import { DroppedToolItem } from "@/lib/workflow_editor/w_types";
-import { convertDropPositionToEditorCoords } from "@/lib/workflow_editor/convert_position_to_editor_coords";
+import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
 import CustomNode from "@/components/workflow_editor/custom_node";
-import { AddCustomBackground } from "@/lib/workflow_editor/add_custom_background";
+import { convertDropPositionToEditorCoords } from "@/lib/workflow_editor/utils/convert_position_to_editor_coords";
 
 export type Schemes = GetSchemes<
   ClassicPreset.Node,
@@ -77,6 +76,7 @@ const WorkflowEditor = ({
       // },
     });
     AreaExtensions.simpleNodesOrder(area);
+    AreaExtensions.zoomAt(area, editor.getNodes());
 
     // Add Selection Abilities
     AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
@@ -116,7 +116,7 @@ const WorkflowEditor = ({
     const editor = editorInstanceRef.current;
     const area = areaInstanceRef.current;
 
-    if (!editor || !area) return;
+    if (!editor || !area || droppedItem.label.length < 1) return;
 
     const newNode = new ClassicPreset.Node(droppedItem.label);
     newNode.addControl(
