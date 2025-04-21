@@ -268,7 +268,7 @@ const SearchModal = () => {
           {filteredSearchableItems.length === 0 &&
           searchFilter === "Default" ? (
             // Display "Not found" if no matches are found in "Default" mode
-            <div className=" text-muted-foreground text-xs font-semibold flex justify-center items-center h-36">
+            <div className="text-muted-foreground text-xs font-semibold flex justify-center items-center h-36">
               No item found.
             </div>
           ) : (

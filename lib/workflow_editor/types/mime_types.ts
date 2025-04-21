@@ -1,3 +1,37 @@
+export const isImageMimeType = (
+  value: unknown
+): value is (typeof ImageMIMETypes)[keyof typeof ImageMIMETypes] => {
+  return (
+    typeof value === "string" &&
+    Object.values(ImageMIMETypes).includes(value as any)
+  );
+};
+
+export const isAudioMimeType = (
+  value: unknown
+): value is (typeof AudioMIMETypes)[keyof typeof AudioMIMETypes] => {
+  return (
+    typeof value === "string" &&
+    Object.values(AudioMIMETypes).includes(value as any)
+  );
+};
+export const isVideoMimeType = (
+  value: unknown
+): value is (typeof VideoMIMETypes)[keyof typeof VideoMIMETypes] => {
+  return (
+    typeof value === "string" &&
+    Object.values(VideoMIMETypes).includes(value as any)
+  );
+};
+export const isDocumentMimeType = (
+  value: unknown
+): value is (typeof DocumentMIMETypes)[keyof typeof DocumentMIMETypes] => {
+  return (
+    typeof value === "string" &&
+    Object.values(DocumentMIMETypes).includes(value as any)
+  );
+};
+
 export const vsPrimitiveMIMETypes = {
   text: "primitive/text",
   array: "primitive/array",

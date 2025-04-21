@@ -1,5 +1,20 @@
 import { OperationItem } from "../types/w_types";
 
+export const deepFreeze = <T>(obj: T): T => {
+  Object.freeze(obj);
+  Object.getOwnPropertyNames(obj).forEach((prop) => {
+    const value = (obj as any)[prop];
+    if (
+      value !== null &&
+      !Object.isFrozen(value) &&
+      (typeof value === "function" || typeof value === "object")
+    ) {
+      deepFreeze(value);
+    }
+  });
+  return obj;
+};
+
 export const workflowOperations: OperationItem[] = [
   // Webhook Operations
   //
@@ -30,7 +45,7 @@ export const workflowOperations: OperationItem[] = [
   {
     operationName: "Scrape a Web Page",
     toolItemName: "Web Scraper",
-    removeDuplicate: true,
+    skipDuplicate: true,
     params: [
       {
         paramName: "URL to scrape",
@@ -45,7 +60,7 @@ export const workflowOperations: OperationItem[] = [
         valuesToPickFrom: ["GET", "POST"],
         paramDescription:
           "Some pages need to be scraped via POST requests (e.g. submitting filters or forms).",
-        value: "POST",
+        value: "GET",
       },
       {
         paramName: "Headers",
@@ -67,6 +82,17 @@ export const workflowOperations: OperationItem[] = [
         paramInputPlaceholder: "Add your selector here...",
         value: "",
       },
+      {
+        paramName: "Body",
+        type: "primitive/record",
+        paramDescription: "Add a body to your POST requests",
+        value: [
+          {
+            key: "",
+            value: "",
+          },
+        ],
+      },
 
       [
         {
@@ -74,9 +100,8 @@ export const workflowOperations: OperationItem[] = [
           type: "primitive/switch",
           paramDescription:
             "Enables JS rendering for pages where content loads dynamically.",
-          value: true,
+          value: false,
         },
-
         {
           paramName: "Metadata",
           type: "primitive/switch",
@@ -95,17 +120,17 @@ export const workflowOperations: OperationItem[] = [
     ],
     inputs: {},
     inputFilters: [],
-    outputs: [],
+    outputs: {},
   },
 
   {
     operationName: "Auto-Paginate and Scrape",
     toolItemName: "Web Scraper",
-    removeDuplicate: true,
+    skipDuplicate: true,
     params: [],
     inputs: {},
     inputFilters: [],
-    outputs: [],
+    outputs: {},
   },
   //
   //
@@ -281,4 +306,4 @@ export const workflowOperations: OperationItem[] = [
   //
   //
   //
-];
+] as const;

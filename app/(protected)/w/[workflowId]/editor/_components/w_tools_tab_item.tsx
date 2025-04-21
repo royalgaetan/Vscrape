@@ -26,11 +26,11 @@ const ToolItemLine = ({
       <div
         draggable
         role="button"
+        tabIndex={2}
         onDragStart={(e: React.DragEvent) => {
           e.dataTransfer.setData("application/workflowEditor", item.label);
           e.dataTransfer.effectAllowed = "move";
         }}
-        tabIndex={2}
         className="cursor-grabbing rounded-md select-none col-span-1 px-3 h-8 flex gap-2 justify-start items-center bg-neutral-100 hover:bg-neutral-200/80 transition-all duration-100"
       >
         {/* Icon */}

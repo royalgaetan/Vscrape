@@ -2,15 +2,19 @@ import {
   vsAnyPrimitives,
   vsAnyRawTypes,
 } from "@/lib/workflow_editor/types/data_types";
-import React, { useEffect, useState } from "react";
-import { Input } from "../ui/input";
-import { Switch } from "../ui/switch";
-import { cn } from "@/lib/utils";
-import RecordParam from "./params/record_param";
-import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
-import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
-
-type RecordArray = { key: string; value: any }[];
+import React, { useState } from "react";
+import RecordInput from "./inputs/record_input";
+import {
+  deepFreeze,
+  workflowOperations,
+} from "@/lib/workflow_editor/constants/workflows_operations_definition";
+import CustomSwitchInput from "./inputs/custom_switch_input";
+import {
+  OperationValuesToPickFromType,
+  RecordArray,
+} from "@/lib/workflow_editor/types/w_types";
+import SimpleSwitchInput from "./inputs/simple_switch_input";
+import DnDTextInput from "./inputs/dnd_text_input";
 
 const getInitialParamValue = ({
   paramName,
@@ -19,7 +23,8 @@ const getInitialParamValue = ({
   paramName: string;
   operationName?: string;
 }): any => {
-  const param: any = workflowOperations
+  const frozenWorkflowOperations = deepFreeze([...workflowOperations] as const);
+  const param: any = frozenWorkflowOperations
     .find((op) => op.operationName === operationName)
     ?.params?.flatMap((param) => {
       if (Array.isArray(param)) {
@@ -29,7 +34,6 @@ const getInitialParamValue = ({
       }
     })
     .find((param) => param.paramName === paramName);
-  console.log("@DEBUG", "Param found", param);
   return param.value;
 };
 
@@ -46,21 +50,19 @@ const ParamInput = ({
   operationName?: string;
   paramName: string;
   onChange: (value: any) => void;
-  initialValue?: number | string | boolean | RecordArray;
-  valuesToPickFrom?: number[] | string[] | boolean[];
+  valuesToPickFrom?: OperationValuesToPickFromType;
 }) => {
-  const [selectedValue, setSelectedValue] = useState<any>(
+  const [selectedValue, setSelectedValue] = useState(
     getInitialParamValue({ paramName, operationName })
   );
 
   switch (inputType) {
     case "primitive/text":
       return (
-        <Input
-          placeholder={placeHolder ?? "Type here..."}
-          type="text"
-          className="!text-xs flex-1 w-full !h-[2rem] rounded-sm placeholder:font-semibold placeholder:text-muted-foreground/70"
-          onChange={(e) => onChange(e)}
+        <DnDTextInput
+          onTextChange={(text) => setSelectedValue(text)}
+          placeholder={placeHolder}
+          className="min-w-[15.7rem] max-w-[15.7rem]"
         />
       );
 
@@ -70,29 +72,32 @@ const ParamInput = ({
           {(selectedValue as RecordArray).map((item, idx) => {
             const isLast = (selectedValue as RecordArray).length === idx + 1;
             return (
-              <RecordParam
+              <RecordInput
                 key={`${operationName}_${paramName}_record_${idx}_`}
                 initialValue={{ key: item.key, value: item.value }}
                 isLast={isLast}
                 onKeyChange={(newKeyVal) => {
-                  (selectedValue as RecordArray)[idx].key = newKeyVal;
-                  console.log("@DEBUG", "keyChanged", selectedValue);
-                  setSelectedValue(selectedValue);
+                  const updated: RecordArray = structuredClone(
+                    selectedValue as RecordArray
+                  );
+                  updated[idx].key = newKeyVal;
+                  setSelectedValue(updated);
                 }}
                 onValueChange={(val) => {
-                  (selectedValue as RecordArray)[idx].value = val;
-                  setSelectedValue(selectedValue);
-                  console.log("@DEBUG", "valChanged", selectedValue);
+                  const updated: RecordArray = structuredClone(
+                    selectedValue as RecordArray
+                  );
+                  updated[idx].value = val;
+                  setSelectedValue(updated);
                 }}
                 onAdd={() => {
                   setSelectedValue([...selectedValue, { key: "", value: "" }]);
                 }}
                 onDelete={() => {
-                  const updated = [...selectedValue];
-                  updated.splice(idx, 1); // remove 1 item at index `idx`
-                  // setSelectedValue(prev =>  (prev as RecordArray).);
-                  console.log("@DEBUG", `Deleted at ${idx}`, updated);
-                  console.log("@DEBUG", `Deleted at ${idx}`, selectedValue);
+                  const deletedArr = (selectedValue as RecordArray).filter(
+                    (_, id) => id !== idx
+                  );
+                  setSelectedValue(deletedArr);
                 }}
               />
             );
@@ -101,33 +106,19 @@ const ParamInput = ({
       );
     case "primitive/customSwitch":
       return (
-        <div className="rounded-lg flex w-[60%] items-center px-1 py-1 gap-2 h-[2rem] bg-transparent border border-neutral-200 transition-all duration-300">
-          {valuesToPickFrom?.map((value) => (
-            <button
-              onClick={() => setSelectedValue(value)}
-              className={cn(
-                "h-full rounded-sm text-xs font-semibold bg-transparent text-neutral-500 cursor-pointer flex flex-1 justify-center items-center",
-                selectedValue === value && "bg-neutral-200"
-              )}
-            >
-              {value}
-            </button>
-          ))}
-        </div>
+        <CustomSwitchInput
+          valuesToPickFrom={valuesToPickFrom}
+          onValueChange={(newVal) => setSelectedValue(newVal)}
+          selectedValue={selectedValue}
+        />
       );
 
     case "primitive/switch":
       return (
-        <div>
-          <Switch
-            checked={!!selectedValue}
-            onCheckedChange={(isChecked) => {
-              setSelectedValue(isChecked);
-            }}
-            id={`${paramName}_switch`}
-            className="data-[state=unchecked]:bg-neutral-300 data-[state=checked]:bg-neutral-500 mb-2 mt-1"
-          />
-        </div>
+        <SimpleSwitchInput
+          isChecked={!!selectedValue}
+          onCheckedChange={(isChecked) => setSelectedValue(isChecked)}
+        />
       );
 
     default:

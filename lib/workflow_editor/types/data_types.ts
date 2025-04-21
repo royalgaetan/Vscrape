@@ -40,8 +40,7 @@ export type vsTel = {
   type: (typeof vsPrimitiveMIMETypes)["tel"];
 };
 export type vsRange = {
-  from: number;
-  to: number;
+  value: [number, number];
   type: (typeof vsPrimitiveMIMETypes)["range"];
 };
 export type vsDateTime = {
@@ -86,7 +85,7 @@ export type vsImage = {
   type: (typeof ImageMIMETypes)[keyof typeof ImageMIMETypes];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsVideo = {
@@ -94,7 +93,7 @@ export type vsVideo = {
   type: (typeof VideoMIMETypes)[keyof typeof VideoMIMETypes];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsAudio = {
@@ -102,7 +101,7 @@ export type vsAudio = {
   type: (typeof AudioMIMETypes)[keyof typeof AudioMIMETypes];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsPDF = {
@@ -110,7 +109,7 @@ export type vsPDF = {
   type: (typeof DocumentMIMETypes)[".pdf"];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsJSON = {
@@ -118,7 +117,7 @@ export type vsJSON = {
   type: (typeof DocumentMIMETypes)[".json"];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsHTMLDocument = {
@@ -128,7 +127,7 @@ export type vsHTMLDocument = {
     | (typeof DocumentMIMETypes)[".htm"];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsXML = {
@@ -136,7 +135,7 @@ export type vsXML = {
   type: (typeof DocumentMIMETypes)[".xml"];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsWordDocument = {
@@ -146,7 +145,7 @@ export type vsWordDocument = {
     | (typeof DocumentMIMETypes)[".docx"];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsSheet = {
@@ -157,7 +156,7 @@ export type vsSheet = {
     | (typeof DocumentMIMETypes)[".csv"];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsPlainText = {
@@ -165,7 +164,7 @@ export type vsPlainText = {
   type: (typeof DocumentMIMETypes)[".txt"];
   sizeInBytes: number;
   url?: string;
-  blob: Blob;
+  blob?: Blob;
 };
 
 export type vsAnyRawTypes =

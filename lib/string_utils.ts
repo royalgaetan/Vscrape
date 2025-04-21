@@ -1,4 +1,19 @@
 export const formatNumber = (n: number) => Intl.NumberFormat("en-US").format(n);
+
+export const isTrulyEmpty = (text: string) => {
+  return text.replace(/\u200B/g, "").trim().length === 0;
+};
+
+export const toStringSafe = (value: any): string => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  try {
+    return String(value);
+  } catch {
+    return "";
+  }
+};
+
 export const removeDiacritics = (str: string): string => {
   return str
     .normalize("NFD") // Normalize the string to decomposed form (NFD).

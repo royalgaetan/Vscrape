@@ -1,5 +1,14 @@
 import { format, formatDistanceToNow, subDays } from "date-fns";
 
+export const isValidISODateString = (
+  testDate: string | undefined | null
+): boolean => {
+  if (!testDate) return false;
+
+  const parsed = new Date(testDate);
+  return !isNaN(parsed.getTime());
+};
+
 export const formatDurationFromMs = (ms: number): string => {
   if (ms < 1000) return `${ms} ms`;
 

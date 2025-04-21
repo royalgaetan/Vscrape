@@ -1,6 +1,15 @@
 import { LucideIcon } from "lucide-react";
 import React from "react";
 
+// General Type
+
+// Makes all properties in T nullable
+export type Nullable<T> = {
+  [P in keyof T]: T[P] | null;
+};
+
+// -------------------------------------------------------------------------
+
 export type sidebarPathType = {
   name: string;
   path: string;

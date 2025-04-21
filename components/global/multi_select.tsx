@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from "react";
+import React, { useState } from "react";
 import { CheckIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,12 +67,16 @@ const MultiSelect = ({
         side={popoverSide}
         align={popoverAlignment}
       >
-        <Command>
+        <Command defaultValue={selectedValues[0]}>
           <CommandInput className="px-2" />
           <Separator />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            {Object.entries(data).map(([groupName, options], idx) => {
+            <CommandEmpty>
+              <div className="text-muted-foreground text-xs font-semibold">
+                No results found.
+              </div>
+            </CommandEmpty>
+            {Object.entries(data).map(([groupName, options]) => {
               return (
                 <CommandGroup key={groupName} heading={groupName}>
                   {options.map((option) => {

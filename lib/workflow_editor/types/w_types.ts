@@ -5,8 +5,7 @@ import {
   workflowEditorSections,
   workflowEditorToolItems,
 } from "../constants/w_constants";
-
-[{}, [{}, {}], {}];
+import { Nullable } from "@/lib/types";
 
 export type OperationItem = {
   operationName: string;
@@ -18,21 +17,15 @@ export type OperationItem = {
     previousNodeData?: OperationThroughput;
     variables?: OperationThroughput;
   };
-  inputFilters?: ({ inputName?: string } & vsCriteria<
-    vsAnyPrimitives | vsAnyRawTypes
-  >)[]; // Many filters can be applied to many (incoming) inputs
+  inputFilters?: OperationFilterType<
+    (vsAnyPrimitives | vsAnyRawTypes)["type"]
+  >[]; // Many filters can be applied to many (incoming) inputs
   outputs?: OperationThroughput; // An Output here can be: of any type
-  removeDuplicate?: boolean;
-  loopThrough?: "All items" | number | undefined;
+  skipDuplicate?: boolean;
+  loopThrough?: "All items" | number;
 };
 
-export type OperationThroughput =
-  | vsAnyPrimitives
-  | vsAnyPrimitives[]
-  | vsAnyRawTypes
-  | vsAnyRawTypes[]
-  | vsStructuredData
-  | vsStructuredData[];
+export type OperationThroughput = vsStructuredData;
 
 export type OperationParamItem = {
   paramName: string;
@@ -60,6 +53,24 @@ export type DroppedToolItem = {
 };
 
 // --------------------------------------------------------
+export type OperationFilterType<
+  T extends (vsAnyPrimitives | vsAnyRawTypes)["type"]
+> = {
+  inputID: any;
+  keyId: string;
+} & Nullable<vsCriteria<T>>;
+export type RecordArray = { key: string; value: any }[];
+export type OperationValuesToPickFromType = number[] | string[] | boolean[];
+export type OperationMoreOptionType =
+  | "filters"
+  | "loopThrough"
+  | "skipDuplicate";
+
+export type PreviousInputDataType = {
+  label: string;
+  tooltip: string;
+  dataTransfer: string;
+};
 
 export type RunResultsType = "failed" | "success" | "paused" | "running";
 

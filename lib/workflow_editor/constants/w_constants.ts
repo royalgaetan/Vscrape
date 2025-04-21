@@ -39,9 +39,33 @@ import {
   Tag,
   FileText,
 } from "lucide-react";
-import { WorkflowEditorToolItem } from "../types/w_types";
+import {
+  PreviousInputDataType,
+  WorkflowEditorToolItem,
+} from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
 import { workflowOperations } from "./workflows_operations_definition";
+
+export const previousInputData: PreviousInputDataType[] = [
+  {
+    label: "Variables",
+    dataTransfer: "{{ Variables }}",
+    tooltip: "All Variables",
+  },
+  {
+    label: "Prev Node",
+    dataTransfer: "{{ Prev Node }}",
+    tooltip: "Previous Node Data",
+  },
+  {
+    label: "Last Operation",
+    dataTransfer: "{{ Last Operation }}",
+    tooltip: "Previous Operation Data",
+  },
+];
+
+export const inputErrorClassName =
+  "border-destructive/70 ring-2 ring-destructive/60";
 
 export const workflowEditorSections = {
   "Entry Point": {
