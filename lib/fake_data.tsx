@@ -290,41 +290,7 @@ export const generateWorkflowLogo = () => {
 };
 
 export const fakeInputs: OperationThroughput = {
-  previousOperationData: {
-    Files: {
-      downloadedPDF: {
-        name: "Monthly Report",
-        type: "application/pdf",
-        sizeInBytes: 1_423_400,
-      },
-      rawCSV: {
-        type: "text/csv",
-        name: "User Data Export",
-        sizeInBytes: 745_900,
-      },
-    },
-  },
-  previousNodeData: {
-    Metadata: {
-      runId: {
-        value: "RUN_2025_04_13_001",
-        type: "primitive/text",
-      },
-      executionTime: {
-        value: 3.412,
-        type: "primitive/number",
-      },
-      timestamp: {
-        value: new Date().toISOString(),
-        type: "primitive/dateTime",
-      },
-      completed: {
-        value: true,
-        type: "primitive/boolean",
-      },
-    },
-  },
-  variables: {
+  Variables: {
     text: {
       value: "TEXT_UPPERCASED",
       type: "primitive/text",
@@ -335,14 +301,14 @@ export const fakeInputs: OperationThroughput = {
     },
     img: {
       type: "image/png",
-      blob: undefined,
+      value: null,
       name: "Sample Screenshot",
       sizeInBytes: 1_783_290,
     },
     json: {
       name: "JSON data",
       sizeInBytes: 200344,
-      blob: new Blob(
+      value: new Blob(
         [
           JSON.stringify({
             enabled: true,
@@ -385,6 +351,45 @@ export const fakeInputs: OperationThroughput = {
     range: {
       value: [49.99, 199.99],
       type: "primitive/range",
+    },
+  },
+  LastNode: {
+    Metric: {
+      timestamp: {
+        value: new Date().toISOString(),
+        type: "primitive/dateTime",
+      },
+    },
+    Metadata: {
+      runId: {
+        value: "RUN_2025_04_13_001",
+        type: "primitive/text",
+      },
+      executionTime: {
+        value: 3.412,
+        type: "primitive/number",
+      },
+
+      completed: {
+        value: true,
+        type: "primitive/boolean",
+      },
+    },
+  },
+  LastOperation: {
+    Files: {
+      downloadedPDF: {
+        name: "Monthly Report",
+        type: "application/pdf",
+        sizeInBytes: 1_423_400,
+        value: null,
+      },
+      rawCSV: {
+        type: "text/csv",
+        name: "User Data Export",
+        sizeInBytes: 745_900,
+        value: null,
+      },
     },
   },
 };

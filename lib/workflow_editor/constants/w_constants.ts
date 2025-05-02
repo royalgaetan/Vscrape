@@ -38,6 +38,7 @@ import {
   FileInput,
   Tag,
   FileText,
+  Variable,
 } from "lucide-react";
 import {
   PreviousInputDataType,
@@ -53,8 +54,8 @@ export const previousInputData: PreviousInputDataType[] = [
     tooltip: "All Variables",
   },
   {
-    label: "Prev Node",
-    dataTransfer: "{{ Prev Node }}",
+    label: "Last Node",
+    dataTransfer: "{{ Last Node }}",
     tooltip: "Previous Node Data",
   },
   {
@@ -174,6 +175,14 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
     sectionName: "Core",
     operations: [],
   },
+  {
+    label: "Set Variables",
+    icon: Variable,
+    tooltip: "Add/Remove Global Variables",
+    sectionName: "Core",
+    operations: [],
+  },
+
   {
     label: "If/else Condition",
     icon: Split,

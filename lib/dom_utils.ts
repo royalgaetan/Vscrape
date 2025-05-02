@@ -65,6 +65,7 @@ export const waitForElement = (
     }, timeout);
   });
 };
+
 export const isAccordionElementOpen = (id: string) => {
   const element = document.getElementById(id);
   if (element) {

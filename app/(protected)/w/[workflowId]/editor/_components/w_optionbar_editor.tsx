@@ -10,7 +10,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
@@ -21,23 +21,15 @@ import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
 import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
 
 const OptionbarEditor = () => {
-  const [selectedOperation, setSelectedOperation] = useState<string>();
   const { optionbarItem, isOptionbarOpen, toggleOptionbar } =
     useWorkflowEditor();
-
   const Icon = optionbarItem?.icon;
 
+  const { currentOperation, setCurrentOperation } = useWorkflowEditor();
+
   useEffect(() => {
-    setSelectedOperation(undefined);
+    setCurrentOperation(undefined);
   }, [optionbarItem]);
-
-  const selectedOperationParams = workflowOperations.find(
-    (op) => op.operationName === selectedOperation
-  )?.params;
-
-  const operationInfo = workflowOperations.find(
-    (op) => op.operationName === selectedOperation
-  );
 
   return !isOptionbarOpen ? (
     <></>
@@ -47,7 +39,7 @@ const OptionbarEditor = () => {
         <div className="h-px w-full relative">
           <div className="min-w-[18rem] max-w-[18rem] bg-white border-r flex flex-col items-start justify-start relative">
             {/* Close Button */}
-            <div className="flex w-[var(--optionbarwidth)] justify-end px-4 items-center bg-transparent z-10 translate-y-4 -mb-1 sticky top-0">
+            <div className="pointer-events-none flex w-[var(--optionbarwidth)] justify-end px-4 items-center bg-transparent z-10 translate-y-4 -mb-1 sticky top-0">
               <SimpleTooltip
                 side="bottom"
                 align="end"
@@ -57,7 +49,7 @@ const OptionbarEditor = () => {
                   variant={"ghost"}
                   onClick={() => toggleOptionbar(false)}
                   className={cn(
-                    "bg-gray-100 hover:bg-gray-200 inset-0 p-3 duration-0 rounded-full size-4 flex justify-center items-center"
+                    "pointer-events-auto bg-gray-100 hover:bg-gray-200 inset-0 p-3 duration-0 rounded-full size-4 flex justify-center items-center"
                   )}
                 >
                   <X className="size-3" />
@@ -119,7 +111,9 @@ const OptionbarEditor = () => {
                         popoverAlignment="center"
                         selectionMode="single"
                         popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
-                        label={selectedOperation ?? "Pick an operation"}
+                        label={
+                          currentOperation?.operationName ?? "Pick an operation"
+                        }
                         data={{
                           "": optionbarItem.operations.map((op) => ({
                             label: op.operationName,
@@ -130,30 +124,33 @@ const OptionbarEditor = () => {
                           })),
                         }}
                         selectedValues={
-                          selectedOperation ? [selectedOperation] : []
+                          currentOperation?.operationName
+                            ? [currentOperation.operationName]
+                            : []
                         }
                         handleSelect={(opSelected) => {
-                          if (opSelected === selectedOperation) {
-                            setSelectedOperation(undefined);
+                          if (opSelected === currentOperation?.operationName) {
+                            setCurrentOperation(undefined);
                           } else {
-                            setSelectedOperation(opSelected);
+                            const operation = workflowOperations.find(
+                              (op) => op.operationName === opSelected
+                            );
+                            setCurrentOperation(structuredClone(operation));
                           }
                         }}
                       />
                     </div>
                     <Separator className="my-2" />
 
-                    {/* Input Available List: previousOperationData | previousNodeData | Variables */}
-                    <div></div>
-
                     {/* Parameters List */}
                     <div className="flex flex-col justify-start items-start">
-                      {!selectedOperationParams ||
-                      selectedOperationParams.length === 0 ? (
+                      {!currentOperation ||
+                      !currentOperation.params ||
+                      currentOperation.params.length === 0 ? (
                         <div className="h-[0vh]"></div>
                       ) : (
                         <div className="flex flex-col w-full gap-4">
-                          {selectedOperationParams.map((params, id) => {
+                          {currentOperation?.params?.map((params, id) => {
                             // If Params is an Array: meaning it contains "nested" params
                             // => Display all of them in the same line
                             // Else Params is a Param: Display it in the 1 line
@@ -176,15 +173,7 @@ const OptionbarEditor = () => {
                                         }}
                                       >
                                         <ParameterItemLine
-                                          operationName={selectedOperation}
-                                          label={param.paramName}
-                                          placeHolder={
-                                            param.paramInputPlaceholder
-                                          }
-                                          valuesToPickFrom={
-                                            param.valuesToPickFrom
-                                          }
-                                          inputType={param.type}
+                                          paramData={param}
                                           labelClassName={
                                             param.type
                                               .toLocaleLowerCase()
@@ -192,23 +181,14 @@ const OptionbarEditor = () => {
                                               ? "text-center"
                                               : undefined
                                           }
-                                          className=""
                                           inputClassName="justify-center"
-                                          onValueChange={(value) => {}}
                                         />
                                       </div>
                                     ))}
                                   </div>
                                 ) : (
                                   <div className="flex flex-1 w-full px-4 pr-4">
-                                    <ParameterItemLine
-                                      operationName={selectedOperation}
-                                      label={params.paramName}
-                                      inputType={params.type}
-                                      valuesToPickFrom={params.valuesToPickFrom}
-                                      placeHolder={params.paramInputPlaceholder}
-                                      onValueChange={(value) => {}}
-                                    />
+                                    <ParameterItemLine paramData={params} />
                                   </div>
                                 )}
                               </div>
@@ -221,7 +201,7 @@ const OptionbarEditor = () => {
                     </div>
 
                     {/* More Options List: Detect Duplicate, Enable Loop */}
-                    {selectedOperation && (
+                    {currentOperation && (
                       <div>
                         <div className="flex flex-col justify-start items-start  px-4 pr-4">
                           <FieldLabel
@@ -230,19 +210,13 @@ const OptionbarEditor = () => {
                           />
 
                           {/* Loop Through */}
-                          {operationInfo && (
-                            <MoreOptionInput
-                              operationName={selectedOperation}
-                              optionType="loopThrough"
-                            />
+                          {currentOperation.loopThrough !== undefined && (
+                            <MoreOptionInput optionType="loopThrough" />
                           )}
 
                           {/* Skip Duplicates */}
-                          {operationInfo && (
-                            <MoreOptionInput
-                              operationName={selectedOperation}
-                              optionType="skipDuplicate"
-                            />
+                          {currentOperation.skipDuplicate && (
+                            <MoreOptionInput optionType="skipDuplicate" />
                           )}
 
                           {/* Separator */}
@@ -252,12 +226,9 @@ const OptionbarEditor = () => {
                     )}
 
                     {/* Filters */}
-                    {selectedOperation && (
+                    {currentOperation && (
                       <div className="mt-1 flex flex-col justify-start items-start">
-                        <MoreOptionInput
-                          optionType="filters"
-                          operationName={selectedOperation}
-                        />
+                        <MoreOptionInput optionType="filters" />
                       </div>
                     )}
 
@@ -269,7 +240,7 @@ const OptionbarEditor = () => {
             )}
 
             {/* Fixed Bottom Bar */}
-            {selectedOperation && optionbarItem && (
+            {currentOperation && optionbarItem && (
               <div className="flex flex-col w-[var(--optionbarwidth)] bg-white z-10 fixed bottom-[7vh]">
                 <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
                   {previousInputData.map((inputData) => (

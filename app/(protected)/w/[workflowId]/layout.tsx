@@ -3,6 +3,7 @@ import React from "react";
 import WFooter from "./_components/w_footer";
 import WHeader from "./_components/w_header";
 import { WorkflowEditorProvider } from "@/providers/workflowEditorProvider";
+import SelectInputDataDialog from "@/components/workflow_editor/dialogs/select_input_data_dialog";
 
 const WLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -16,6 +17,9 @@ const WLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Footer */}
         <WFooter />
+
+        {/* Dialogs */}
+        <SelectInputDataDialog />
       </div>
     </WorkflowEditorProvider>
   );

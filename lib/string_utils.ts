@@ -4,6 +4,72 @@ export const isTrulyEmpty = (text: string) => {
   return text.replace(/\u200B/g, "").trim().length === 0;
 };
 
+export const extractSingleTokenType = (
+  content: string
+): string | null | undefined => {
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = content
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const tokenChips = tempDiv.querySelectorAll(".token-chip");
+  if (tokenChips.length === 1) {
+    const el = tokenChips[0];
+    const type = el.getAttribute("data-type");
+    if (type) {
+      if (isPureVariableOnly(tempDiv.innerHTML)) return type;
+      else return null;
+    } else {
+      if (isPureVariableOnly(tempDiv.innerHTML)) return undefined;
+      else return null;
+    }
+  }
+
+  return null;
+};
+
+export const isPureVariableOnly = (html: string): boolean => {
+  const container = document.createElement("div");
+  container.innerHTML = html;
+
+  const cleanedText = (container.textContent || "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim(); // replace &nbsp;
+
+  const matches = cleanedText.match(/{{\s*[^{}]*?\s*}}/g) || [];
+
+  return matches.length === 1 && cleanedText === matches[0].trim();
+};
+
+export const extractTextFromHTML = (html: string) => {
+  // Create a temporary dom element
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = html;
+
+  //  Get text content only (strips tags and decodes entities like &nbsp;)
+  const rawText = tempDiv.textContent || "";
+
+  // Normalize whitespace: replace multiple spaces/non-breaking spaces with a single space
+  return rawText
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+export const humanizeKey = (key: string) => {
+  return key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase());
+};
+
+export const humanize = (text: string): string => {
+  return text
+    .replace(/([a-z])([A-Z])/g, "$1 $2") // camelCase → space-separated
+    .replace(/^./, (s) => s.toUpperCase()); // capitalize first letter
+};
+
 export const toStringSafe = (value: any): string => {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;

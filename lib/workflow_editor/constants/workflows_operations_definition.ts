@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { OperationItem } from "../types/w_types";
 
 export const deepFreeze = <T>(obj: T): T => {
@@ -46,6 +47,7 @@ export const workflowOperations: OperationItem[] = [
     operationName: "Scrape a Web Page",
     toolItemName: "Web Scraper",
     skipDuplicate: true,
+    loopThrough: false,
     params: [
       {
         paramName: "URL to scrape",

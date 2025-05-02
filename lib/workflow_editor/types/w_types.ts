@@ -22,7 +22,7 @@ export type OperationItem = {
   >[]; // Many filters can be applied to many (incoming) inputs
   outputs?: OperationThroughput; // An Output here can be: of any type
   skipDuplicate?: boolean;
-  loopThrough?: "All items" | number;
+  loopThrough?: "All items" | number | boolean;
 };
 
 export type OperationThroughput = vsStructuredData;
@@ -53,6 +53,15 @@ export type DroppedToolItem = {
 };
 
 // --------------------------------------------------------
+export type InputDataSelectedItem = {
+  fullPath: string;
+  type: (vsAnyPrimitives | vsAnyRawTypes)["type"];
+};
+
+export type ExtendedOperationFilterType = OperationFilterType<
+  (vsAnyPrimitives | vsAnyRawTypes)["type"]
+>;
+
 export type OperationFilterType<
   T extends (vsAnyPrimitives | vsAnyRawTypes)["type"]
 > = {

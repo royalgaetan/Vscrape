@@ -1,43 +1,29 @@
 import { cn } from "@/lib/utils";
 import {
-  OperationFilterType,
+  OperationItem,
   OperationMoreOptionType,
 } from "@/lib/workflow_editor/types/w_types";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SimpleSwitchInput from "./inputs/simple_switch_input";
-import { Button } from "../ui/button";
+import { LucideIcon } from "lucide-react";
+import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import FilterInput from "./inputs/filter_input";
-import { ListFilterPlusIcon, LucideIcon } from "lucide-react";
-import { FieldLabel } from "@/app/(protected)/w/[workflowId]/editor/_components/w_optionbar_editor";
-import {
-  deepFreeze,
-  workflowOperations,
-} from "@/lib/workflow_editor/constants/workflows_operations_definition";
-import {
-  vsAnyPrimitives,
-  vsAnyRawTypes,
-} from "@/lib/workflow_editor/types/data_types";
-
-type FilterArr = OperationFilterType<
-  (vsAnyPrimitives | vsAnyRawTypes)["type"]
->[];
 
 const getInitialOptionValues = ({
   optionType,
-  operationName,
-}: Pick<Props, "operationName" | "optionType">): any => {
-  const frozenWorkflowOperations = deepFreeze([...workflowOperations] as const);
+  currentOperation,
+}: {
+  optionType: OperationMoreOptionType;
+  currentOperation?: OperationItem;
+}): any => {
+  if (!currentOperation) return;
   switch (optionType) {
     case "skipDuplicate":
-      return frozenWorkflowOperations.find(
-        (op) => op.operationName === operationName
-      )?.skipDuplicate;
+      return currentOperation.skipDuplicate;
     case "loopThrough":
-      return frozenWorkflowOperations.find(
-        (op) => op.operationName === operationName
-      )?.loopThrough;
+      return currentOperation.loopThrough;
     case "filters":
-      return deepFreeze([] as const) as FilterArr;
+      return currentOperation.inputFilters;
     default:
       break;
   }
@@ -45,25 +31,37 @@ const getInitialOptionValues = ({
 
 type Props = {
   optionType: OperationMoreOptionType;
-  operationName: string;
 };
 
-const MoreOptionInput = ({ optionType, operationName }: Props) => {
-  const [internalOptionValue, setInternalOptionValue] = useState(
-    getInitialOptionValues({ optionType, operationName })
+const MoreOptionInput = ({ optionType }: Props) => {
+  const { currentOperation, setCurrentOperation } = useWorkflowEditor();
+  const [internalValue, setInternalValue] = useState<any>(
+    getInitialOptionValues({
+      optionType: optionType,
+      currentOperation: currentOperation,
+    })
   );
 
-  useEffect(() => {
-    setInternalOptionValue([]);
-  }, [operationName]);
+  const updateValue = (newValue: any) => {
+    setInternalValue(newValue);
+    if (!currentOperation) return;
+    switch (optionType) {
+      case "skipDuplicate":
+        currentOperation.skipDuplicate = newValue;
+        setCurrentOperation(currentOperation);
 
-  const generateEmpyFilter = (): OperationFilterType<"primitive/text"> => ({
-    keyId: crypto.randomUUID(),
-    filterCriteria: null,
-    filterValue: null,
-    filterType: null,
-    inputID: "",
-  });
+      case "loopThrough":
+        currentOperation.loopThrough = newValue;
+        setCurrentOperation(currentOperation);
+
+      case "filters":
+        currentOperation.inputFilters = newValue;
+        setCurrentOperation(currentOperation);
+
+      default:
+        break;
+    }
+  };
 
   switch (optionType) {
     case "skipDuplicate":
@@ -72,8 +70,8 @@ const MoreOptionInput = ({ optionType, operationName }: Props) => {
           <MoreOptionLabel label={"Skip Duplicate"} />
 
           <SimpleSwitchInput
-            isChecked={!!internalOptionValue}
-            onCheckedChange={(isChecked) => setInternalOptionValue(isChecked)}
+            isChecked={!!internalValue}
+            onCheckedChange={(isChecked) => updateValue(isChecked)}
           />
         </div>
       );
@@ -84,64 +82,18 @@ const MoreOptionInput = ({ optionType, operationName }: Props) => {
           <MoreOptionLabel label={"Loop Through"} />
 
           <SimpleSwitchInput
-            isChecked={!!internalOptionValue}
-            onCheckedChange={(isChecked) => setInternalOptionValue(isChecked)}
+            isChecked={!!internalValue}
+            onCheckedChange={(isChecked) => updateValue(isChecked)}
           />
         </div>
       );
 
     case "filters":
       return (
-        <div className="flex flex-col w-full">
-          {/* Label + Add Filter Button */}
-
-          <div className="flex flex-1 items-center px-4">
-            <FieldLabel label={"Filters"} Icon={ListFilterPlusIcon} />
-            <Button
-              type="button"
-              variant={"outline"}
-              size={"sm"}
-              className="w-fit text-xs text-neutral-500 py-1 px-2 h-6 rounded-sm"
-              onClick={() => {
-                setInternalOptionValue((prev: FilterArr) => [
-                  ...prev,
-                  generateEmpyFilter(),
-                ]);
-              }}
-            >
-              + Add
-            </Button>
-          </div>
-
-          {/* All Filters: list */}
-          <div className="flex flex-col w-full mt-0">
-            {!internalOptionValue ||
-            (internalOptionValue as FilterArr)?.length === 0 ? (
-              <div className=" text-muted-foreground text-xs font-semibold flex flex-1 justify-center items-center min-h-20">
-                No filter yet.
-              </div>
-            ) : (
-              (internalOptionValue as FilterArr)?.map((filter, idx) => {
-                return (
-                  <FilterInput
-                    key={filter.keyId}
-                    index={idx + 1}
-                    onSave={(filterObj) => {
-                      internalOptionValue[idx] = filterObj;
-                    }}
-                    onDelete={() => {
-                      const deletedArr = (
-                        internalOptionValue as FilterArr
-                      ).filter((_, id) => id !== idx);
-                      setInternalOptionValue(deletedArr);
-                    }}
-                    initialFilter={filter}
-                  />
-                );
-              })
-            )}
-          </div>
-        </div>
+        <FilterInput
+          initialFilters={internalValue}
+          onBlur={(newFilters) => updateValue(newFilters)}
+        />
       );
 
     default:

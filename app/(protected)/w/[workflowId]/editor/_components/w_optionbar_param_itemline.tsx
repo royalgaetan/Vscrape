@@ -1,31 +1,60 @@
 import ParamInput from "@/components/workflow_editor/param_inputs";
+import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import { cn } from "@/lib/utils";
-import {
-  vsAnyPrimitives,
-  vsAnyRawTypes,
-} from "@/lib/workflow_editor/types/data_types";
+import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
+import { useState } from "react";
 
 const ParameterItemLine = ({
-  label,
-  inputType,
-  onValueChange,
-  placeHolder,
-  valuesToPickFrom,
+  paramData,
   className,
   inputClassName,
   labelClassName,
-  operationName,
 }: {
-  label: string;
-  placeHolder?: string;
-  operationName?: string;
+  paramData: OperationParamItem;
   className?: string;
   inputClassName?: string;
   labelClassName?: string;
-  inputType: vsAnyPrimitives["type"] | vsAnyRawTypes["type"];
-  onValueChange: (value: any) => void;
-  valuesToPickFrom?: number[] | string[] | boolean[];
 }) => {
+  const { currentOperation, setCurrentOperation } = useWorkflowEditor();
+  const getParam = (): OperationParamItem | undefined => {
+    return currentOperation?.params
+      ?.flatMap((p) => p)
+      .find((p) => p.paramName === paramData.paramName);
+  };
+
+  const [internalValue, setInternalValue] = useState<any>(getParam()?.value);
+
+  const updateParamValue = (param: OperationParamItem, newValue: any) => {
+    param.value = newValue;
+    return param;
+  };
+
+  const onValueChange = (newValue: any) => {
+    setInternalValue(newValue);
+
+    if (!currentOperation || !currentOperation.params) return;
+
+    const updatedOperationParams = currentOperation.params.map((param) => {
+      if (Array.isArray(param)) {
+        return param.map((subParam) => {
+          if (subParam.paramName === paramData.paramName) {
+            return updateParamValue(subParam, newValue);
+          }
+          return subParam;
+        });
+      } else {
+        if (param.paramName === paramData.paramName) {
+          return updateParamValue(param, newValue);
+        }
+        return param;
+      }
+    });
+    currentOperation.params = updatedOperationParams;
+    setCurrentOperation(currentOperation);
+    // console.log("@debug", "Internal Value", internalValue);
+    // console.log("@debug", "(provider) currentOperation", currentOperation);
+  };
+
   return (
     <div
       className={cn(
@@ -39,7 +68,7 @@ const ParameterItemLine = ({
           labelClassName
         )}
       >
-        {label}
+        {paramData.paramName}
       </div>
 
       <div
@@ -49,12 +78,11 @@ const ParameterItemLine = ({
         )}
       >
         <ParamInput
-          paramName={label}
-          inputType={inputType}
+          initialValue={internalValue}
+          inputType={paramData.type}
           onChange={onValueChange}
-          placeHolder={placeHolder}
-          valuesToPickFrom={valuesToPickFrom}
-          operationName={operationName}
+          placeHolder={paramData.paramName}
+          valuesToPickFrom={paramData.valuesToPickFrom}
         />
       </div>
     </div>

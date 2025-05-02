@@ -9,6 +9,57 @@ export const isValidISODateString = (
   return !isNaN(parsed.getTime());
 };
 
+export const isValidDateString = (input: string): boolean => {
+  if (!input || typeof input !== "string") return false;
+
+  const normalized = input.trim();
+
+  // Match common formats: YYYY-MM-DD, YYYY/MM/DD, DD/MM/YYYY, MM/DD/YYYY
+  const datePatterns = [
+    {
+      regex: /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/,
+      format: "YYYY-MM-DD",
+    },
+    {
+      regex: /^(\d{4})\/(\d{2})\/(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/,
+      format: "YYYY/MM/DD",
+    },
+    {
+      regex: /^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/,
+      format: "DD/MM/YYYY or MM/DD/YYYY",
+    },
+  ];
+
+  for (const { regex } of datePatterns) {
+    const match = normalized.match(regex);
+    if (match) {
+      let [_, y, m, d] = match;
+
+      // Try to detect which field is year/month/day based on format
+      if (y.length === 4) {
+        // YYYY-MM-DD format
+        const year = parseInt(y, 10);
+        const month = parseInt(m, 10);
+        const day = parseInt(d, 10);
+        if (month < 1 || month > 12) return false;
+        if (day < 1 || day > 31) return false;
+        return true;
+      } else {
+        // Possibly DD/MM/YYYY or MM/DD/YYYY
+        const day = parseInt(y, 10); // y = dd
+        const month = parseInt(m, 10);
+        const year = parseInt(d, 10); // d = yyyy
+
+        if (month < 1 || month > 12) return false;
+        if (day < 1 || day > 31) return false;
+        return true; // could enhance with more logic to distinguish DD/MM vs MM/DD
+      }
+    }
+  }
+
+  return false;
+};
+
 export const formatDurationFromMs = (ms: number): string => {
   if (ms < 1000) return `${ms} ms`;
 

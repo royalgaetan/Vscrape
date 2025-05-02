@@ -1,3 +1,28 @@
+import { humanize } from "@/lib/string_utils";
+
+export const describeMIME = (mime: string): string => {
+  if (Object.values(ImageMIMETypes).join(" ").includes(mime)) return "Image";
+  if (Object.values(VideoMIMETypes).join(" ").includes(mime)) return "Video";
+  if (Object.values(AudioMIMETypes).join(" ").includes(mime)) return "Audio";
+
+  const docEntry = Object.entries(DocumentMIMETypes).find(
+    ([, val]) => val === mime
+  );
+  if (docEntry) {
+    const ext = docEntry[0].replace(".", "").toUpperCase();
+    return ext === "TXT" ? "Text File" : ext;
+  }
+
+  const primitiveEntry = Object.entries(vsPrimitiveMIMETypes).find(
+    ([, val]) => val === mime
+  );
+  if (primitiveEntry) {
+    return humanize(primitiveEntry[0]);
+  }
+
+  return "Unknown";
+};
+
 export const isImageMimeType = (
   value: unknown
 ): value is (typeof ImageMIMETypes)[keyof typeof ImageMIMETypes] => {
