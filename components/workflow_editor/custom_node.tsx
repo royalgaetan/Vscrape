@@ -1,60 +1,22 @@
-import { generateHexRandomString } from "@/lib/numbers_utils";
 import { WorkflowEditorToolItem } from "@/lib/workflow_editor/types/w_types";
 import React, { useRef } from "react";
 import { ClassicScheme, RenderEmit } from "rete-react-plugin";
 import Image from "next/image";
 import {
-  Bell,
-  BellRingIcon,
-  CircleCheck,
-  CircleDashedIcon,
-  CircleX,
-  Coins,
+  Circle,
+  Copy,
+  CopyCheck,
   GripVertical,
-  Loader2,
   LucideIcon,
-  Plus,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { Badge } from "../ui/badge";
-import { formatLargeNumber } from "@/lib/date_time_utils";
 import {
   getWorkflowSectionFromName,
   getWorkflowToolItemFromLabel,
 } from "@/lib/workflow_editor/utils/w_utils";
-
-type NodeTest = "failed" | "success" | "running";
-export const getNodeTestIcon = (
-  status: NodeTest
-): { icon: LucideIcon; label: string; iconClassname?: string } => {
-  switch (status) {
-    case "failed":
-      return {
-        icon: CircleX,
-        label: "Failed",
-        iconClassname: "stroke-red-400",
-      };
-    case "success":
-      return {
-        icon: CircleCheck,
-        label: "Completed",
-        iconClassname: "stroke-green-600",
-      };
-    case "running":
-      return {
-        icon: Loader2,
-        label: "Running",
-        iconClassname: "animate-spin text-neutral-500",
-      };
-
-    default:
-      return {
-        icon: CircleDashedIcon,
-        label: "—",
-      };
-  }
-};
+import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
+import SimpleTooltip from "../global/simple_tooltip";
 
 type Props<S extends ClassicScheme> = {
   data: S["Node"];
@@ -62,20 +24,10 @@ type Props<S extends ClassicScheme> = {
 };
 
 const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
-  const arrayLength = useRef<number>(Math.round(Math.random() * 87));
-  const creditCost = useRef<number>(Math.round(Math.random() * 120));
-  const randomId = useRef<string>(generateHexRandomString(7));
+  // const { toggleOptionbar, isOptionbarOpen, optionbarItem } =
+  //   useWorkflowEditor();
 
-  const NotificationIcon = useRef<LucideIcon>(
-    Math.random() < 0.7 ? Bell : BellRingIcon
-  );
-  const NotificationIconB = NotificationIcon.current;
-  const unitTestArr = ["failed", "success", "running"] as const;
-  const unitTestResult = useRef<NodeTest>(
-    unitTestArr[Math.round(Math.random() * unitTestArr.length)]
-  );
-  const UnitTestIcon = getNodeTestIcon(unitTestResult.current).icon;
-  const unitTestInfo = getNodeTestIcon(unitTestResult.current);
+  const arrayLength = useRef<number>(Math.round(Math.random() * 87));
 
   const toolItem = useRef<WorkflowEditorToolItem | null>(
     getWorkflowToolItemFromLabel(props?.data.label ?? "")
@@ -86,19 +38,48 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
   );
 
   return (
-    <div className="flex group w-72 gap-3 bg-white border border-border p-3 pb-2 select-none rounded-xl">
+    <button
+      onClick={() => {
+        // Open Option Bar for this Node:
+        // if (toolItem.current === null || !toolItem.current) return;
+        // toggleOptionbar(true, {
+        //   iconColor: "",
+        //   ...toolItem.current,
+        // });
+      }}
+      className="relative flex flex-col justify-center cursor-pointer items-center group w-48 gap-3 border-none select-none hover:opacity-95 transition-all duration-300"
+    >
+      {/* Buttons: Grab (Move Node) */}
+      <Button
+        variant={"ghost"}
+        className={cn(
+          "group-hover:flex hidden absolute -top-0 right-2 cursor-grab !px-0 transition-all duration-300 justify-center items-center hover:bg-transparent bg-transparent"
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+      >
+        {/* Icon */}
+        <GripVertical
+          className="stroke-neutral-400 !size-7 !fill-neutral-400
+          "
+        />
+      </Button>
+
       {/* Icon & Logo */}
-      <div className="justify-center items-center size-11 flex ">
+      <div className="justify-center items-center flex">
         {Icon && (
           <div
-            className={cn("flex size-9 rounded-sm justify-center items-center")}
+            className={cn(
+              "flex size-28 rounded-full justify-center items-center"
+            )}
             style={{ backgroundColor: sectionInfo.current?.[1].iconColor }}
           >
-            <Icon className={"size-5"} stroke={"white"} />
+            <Icon className={"size-16 stroke-[1.3px] stroke-white"} />
           </div>
         )}
         {toolItem.current?.logoPath && (
-          <div className="relative h-8 w-8 mb-0">
+          <div className="relative h-24 w-24 mb-0">
             <Image
               src={toolItem.current?.logoPath}
               alt={`${toolItem.current?.label} logo`}
@@ -109,132 +90,76 @@ const CustomNode = <S extends ClassicScheme>(props?: Props<S>): JSX.Element => {
         )}
       </div>
 
-      {/* Content: SectionName */}
-      <div className="flex flex-1 overflow-clip">
-        <div className="flex flex-col w-full">
-          {/* Header */}
-          <div className="flex flex-1 w-full gap-2 items-center">
-            {/* Section Name */}
-            <div className="flex flex-1">
-              <div className="flex flex-col gap-0">
-                <h6 className="w-full line-clamp-1 font-bold text-neutral-900 text-base">
-                  {toolItem.current?.label}
-                </h6>
-                <p className="w-full line-clamp-1 font-normal text-neutral-500 text-xs">
-                  {arrayLength.current} Operations
-                </p>
-              </div>
-              {/* Buttons: Add Operation, Notification, Test Unit */}
-            </div>
+      {/* Content: Node Name, Handles, Operation Number, etc. */}
+      <div className="flex flex-col justify-center items-center gap-0">
+        {/* Node Name + Handles */}
+        <div className="relative flex flex-1 items-center justify-center gap-1">
+          <NodeHandle
+            iconColor={sectionInfo.current?.[1].iconColor}
+            containerClassName="absolute left-0 group-hover:flex w-1/2 h-16 items-center justify-start hidden group/leftHandle"
+            iconClassName="origin-center group-hover/leftHandle:scale-[2.25]"
+          />
+          <h6 className="w-full text-center line-clamp-1 font-bold text-neutral-900 text-base px-5">
+            {toolItem.current?.label}
+          </h6>
+          <NodeHandle
+            iconColor={sectionInfo.current?.[1].iconColor}
+            containerClassName="absolute right-0 group-hover:flex w-1/2 h-16 items-center justify-end hidden group/rightHandle"
+            iconClassName="origin-center group-hover/rightHandle:scale-[2.25]"
+          />
+        </div>
 
-            {/* CTA Buttons */}
-            <div className="flex h-full justify-center items-start">
-              {/* CreditCost */}
-              <Badge
-                variant={"outline"}
-                className="-mr-2 hidden group-hover:flex gap-1 text-xs font-medium border-none h-8 text-neutral-400 rounded-sm cursor-pointer hover:bg-transparent bg-transparent"
-              >
-                <Coins className="size-4 stroke-neutral-400" />
-                <span className="scale-90">
-                  {formatLargeNumber(creditCost.current)}
-                </span>
-              </Badge>
-
-              {/* Grab Button */}
-              <Button
-                variant={"ghost"}
-                className={cn(
-                  "flex w-8 transition-all duration-300 h-8 justify-center items-center gap-2 hover:bg-transparent bg-transparent text-neutral-500 cursor-grab mb-[0.9px] px-3 rounded-sm"
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                }}
-              >
-                {/* Icon */}
-                <GripVertical className="stroke-neutral-400" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-start overflow-clip mt-2">
-            {/* Operation button */}
+        {/* Rests... */}
+        <div className="flex flex-1 items-center justify-center gap-1">
+          <p className="w-full text-center line-clamp-1 font-normal text-neutral-500 text-sm">
+            {arrayLength.current} Operations
+          </p>
+          {/* Button: Duplicate */}
+          <SimpleTooltip tooltipText="Duplicate" side="bottom">
             <Button
               variant={"ghost"}
               className={cn(
-                "scale-[0.8] -translate-x-[6px] flex w-fit bg-orange-300 px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-0 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                "flex cursor-pointer hover:opacity-70 translate-y-[0.16rem] active:scale-[0.96] h-fit !px-0 !py-0 transition-all duration-300 justify-center items-center hover:bg-transparent bg-transparent"
               )}
-              onPointerDown={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
-                console.log("Add an Operation");
               }}
             >
               {/* Icon */}
-              <Plus className="stroke-neutral-500 !size-3" />
-              <span>Add</span>
+              <Copy className="stroke-neutral-400" />
             </Button>
-
-            {/* Notification */}
-            <Button
-              variant={"ghost"}
-              className={cn(
-                "scale-[0.8] -translate-x-[6px] flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
-              )}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                console.log("Toggle Notification");
-              }}
-            >
-              {/* Icon */}
-              <NotificationIconB
-                className={cn(
-                  "!size-3 stroke-[2.5px] translate-y-[1px]",
-                  NotificationIcon.current === Bell
-                    ? "stroke-neutral-500"
-                    : "stroke-yellow-500"
-                )}
-              />
-              <span>{NotificationIcon.current === Bell ? "Off" : "On"}</span>
-            </Button>
-
-            {/* Test Unit */}
-            <Button
-              variant={"ghost"}
-              className={cn(
-                "scale-[0.8] translate-x-[-10px] flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
-              )}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                console.log("Launch a unit test");
-              }}
-            >
-              {/* Icon */}
-              <UnitTestIcon
-                className={cn(
-                  "stroke-neutral-500 !size-3",
-                  unitTestInfo.iconClassname
-                )}
-              />
-              <span>{unitTestInfo.label}</span>
-            </Button>
-          </div>
-
-          {/* Operations List */}
-          {/* <div className="flex flex-col w-full gap-1">
-            {[
-              "Video/Audio Upload",
-              "Create Video Transcript",
-              "Save Transcript",
-              "Summarize Transcript",
-              "Get lastest informations about the scripts",
-            ].map((item) => (
-              <p className="w-full line-clamp-1 text-xs" key={item}>
-                {item}
-              </p>
-            ))}
-          </div> */}
+          </SimpleTooltip>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 export default CustomNode;
+
+export const NodeHandle = ({
+  iconClassName,
+  containerClassName,
+  iconColor,
+}: {
+  iconClassName?: string;
+  containerClassName?: string;
+  iconColor?: string;
+}) => {
+  return (
+    <span
+      className={cn(
+        "transition-all duration-100 ease-in-out",
+        containerClassName
+      )}
+    >
+      <Circle
+        className={cn(
+          "size-2 inline-block transition-transform duration-100 ease-in-out",
+          iconClassName
+        )}
+        stroke={iconColor ?? "#6460aa"}
+        fill={iconColor ?? "#6460aa"}
+      />
+    </span>
+  );
+};

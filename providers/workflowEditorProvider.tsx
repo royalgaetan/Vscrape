@@ -25,6 +25,8 @@ export type WorkflowEditorContext = {
     item?: WorkflowEditorToolItemExtended
   ) => void;
 
+  // Workflow Editor
+
   // Current Operation
   currentOperation: OperationItem | undefined;
   setCurrentOperation: Dispatch<SetStateAction<OperationItem | undefined>>;

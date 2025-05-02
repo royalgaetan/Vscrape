@@ -1,40 +1,60 @@
+import React, { useRef, useState } from "react";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import { cn } from "@/lib/utils";
 import {
-  CircleEllipsisIcon,
-  Hammer,
+  ArrowDown,
+  ArrowLeft,
+  Bell,
+  BellRingIcon,
+  ChevronsDownIcon,
+  Coins,
   LucideIcon,
-  Star,
-  Trash2,
+  MoveDown,
+  Plus,
   X,
 } from "lucide-react";
-import React, { useEffect } from "react";
 import Image from "next/image";
-import MultiSelect from "@/components/global/multi_select";
-import { Separator } from "@/components/ui/separator";
-import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
-import { generateHexRandomString } from "@/lib/numbers_utils";
-import ParameterItemLine from "./w_optionbar_param_itemline";
-import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
-import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
-
+import { WorkflowEditorToolItemExtended } from "@/providers/workflowEditorProvider";
+import { formatLargeNumber } from "@/lib/date_time_utils";
+import { NodeTest } from "@/lib/workflow_editor/types/w_types";
+import { getNodeTestIcon } from "@/lib/workflow_editor/utils/w_utils";
+import OptionbarOperation from "./w_optionbar_single_operation";
 const OptionbarEditor = () => {
-  const { optionbarItem, isOptionbarOpen, toggleOptionbar } =
-    useWorkflowEditor();
-  const Icon = optionbarItem?.icon;
+  const {
+    optionbarItem,
+    isOptionbarOpen,
+    setCurrentOperation,
+    toggleOptionbar,
+  } = useWorkflowEditor();
 
-  const { currentOperation, setCurrentOperation } = useWorkflowEditor();
+  const [displaySingleOperation, setDisplaySingleOperation] = useState(false);
+  const [
+    canDisplayBackBtnOnSingleOperation,
+    setCanDisplayBackBtnOnSingleOperation,
+  ] = useState(false);
 
-  useEffect(() => {
-    setCurrentOperation(undefined);
-  }, [optionbarItem]);
+  const NotificationIcon = useRef<LucideIcon>(
+    Math.random() < 0.7 ? Bell : BellRingIcon
+  );
+  const unitTestArr = ["failed", "success", "running"] as const;
+  const unitTestResult = useRef<NodeTest>(
+    unitTestArr[Math.round(Math.random() * unitTestArr.length)]
+  );
+  const creditCost = useRef<number>(Math.round(Math.random() * 120));
+  const NotificationIconB = NotificationIcon.current;
+  const UnitTestIcon = getNodeTestIcon(unitTestResult.current).icon;
+  const unitTestInfo = getNodeTestIcon(unitTestResult.current);
 
   return !isOptionbarOpen ? (
     <></>
   ) : (
-    <div className="[--optionbarwidth:18rem] min-w-[var(--optionbarwidth)] max-w-[var(--optionbarwidth)] h-full  bg-white border-l flex flex-col items-start justify-start relative">
+    <div
+      onMouseEnter={() => setCanDisplayBackBtnOnSingleOperation(true)}
+      onMouseLeave={() => setCanDisplayBackBtnOnSingleOperation(false)}
+      className="group/optionBar [--optionbarwidth:18rem] min-w-[var(--optionbarwidth)] max-w-[var(--optionbarwidth)] h-full bg-white border-l flex flex-col items-start justify-start relative"
+    >
       <div className="flex flex-1 w-full max-h-full overflow-x-clip overflow-y-scroll scrollbar-hide">
         <div className="h-px w-full relative">
           <div className="min-w-[18rem] max-w-[18rem] bg-white border-r flex flex-col items-start justify-start relative">
@@ -47,7 +67,11 @@ const OptionbarEditor = () => {
               >
                 <Button
                   variant={"ghost"}
-                  onClick={() => toggleOptionbar(false)}
+                  onClick={() => {
+                    setCurrentOperation(undefined);
+                    setDisplaySingleOperation(false);
+                    toggleOptionbar(false, undefined);
+                  }}
                   className={cn(
                     "pointer-events-auto bg-gray-100 hover:bg-gray-200 inset-0 p-3 duration-0 rounded-full size-4 flex justify-center items-center"
                   )}
@@ -57,239 +81,154 @@ const OptionbarEditor = () => {
               </SimpleTooltip>
             </div>
 
+            {/* Content */}
             {!optionbarItem ? (
               <div className=" text-muted-foreground w-full text-xs font-semibold flex flex-1 justify-center items-center min-h-[80vh]">
                 Select a tool.
               </div>
+            ) : displaySingleOperation ? (
+              // Single Operation Arena
+              <OptionbarOperation
+                optionbarItem={optionbarItem}
+                displayBackButton={canDisplayBackBtnOnSingleOperation}
+                onBack={() => {
+                  setDisplaySingleOperation(false);
+                }}
+              />
             ) : (
-              <div className="flex flex-col w-full max-h-full relative">
-                <div className="flex flex-col w-full max-h-full overflow-x-clip overflow-y-scroll scrollbar-hide">
-                  {/* Header */}
-                  <div className="flex flex-col w-full px-4">
-                    <div className="flex flex-1 gap-2 items-center">
-                      <div className="size-5">
-                        {Icon && (
-                          <Icon
-                            className={"size-5"}
-                            stroke={optionbarItem.iconColor}
-                          />
-                        )}
-                        {optionbarItem.logoPath && (
-                          <div className="relative h-5 w-5 mb-2">
-                            <Image
-                              src={optionbarItem.logoPath}
-                              alt={`${optionbarItem.label} logo`}
-                              className="select-none object-contain"
-                              fill
-                            />
-                          </div>
-                        )}
-                      </div>
+              // All Node's Operations
+              <div className="px-4 w-full">
+                {/* Header */}
+                <OptionbarHeader optionbarItem={optionbarItem} />
 
-                      <h2 className="text-xl font-semibold text-[#333] line-clamp-1">
-                        {optionbarItem.label}
-                      </h2>
-                    </div>
-
-                    {optionbarItem.tooltip && (
-                      <p className="mt-1 text-xs font-normal text-neutral-500 line-clamp-2">
-                        {optionbarItem.tooltip}
-                      </p>
+                {/* Buttons : Credit Cost, Notification, Unit test */}
+                <div className="flex flex-1 w-full mt-2 mb-8 gap-2">
+                  {/* Credit Cost */}
+                  <Button
+                    variant={"ghost"}
+                    className={cn(
+                      "flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
                     )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="mt-4 pb-6 space-y-4">
-                    {/* Operation Selector */}
-                    <div className="flex flex-col justify-start items-start px-4 pr-4">
-                      <FieldLabel label={"Select an operation"} Icon={Hammer} />
-                      <MultiSelect
-                        isTriggerDisabled={
-                          optionbarItem.operations.length === 0
-                        }
-                        triggerClassName="h-9 w-[15.7rem] flex flex-1 mb-1"
-                        popoverAlignment="center"
-                        selectionMode="single"
-                        popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
-                        label={
-                          currentOperation?.operationName ?? "Pick an operation"
-                        }
-                        data={{
-                          "": optionbarItem.operations.map((op) => ({
-                            label: op.operationName,
-                            value: op.operationName,
-                            icon: optionbarItem.icon ?? Star,
-                            iconClassName:
-                              "stroke-neutral-400 fill-transparent",
-                          })),
-                        }}
-                        selectedValues={
-                          currentOperation?.operationName
-                            ? [currentOperation.operationName]
-                            : []
-                        }
-                        handleSelect={(opSelected) => {
-                          if (opSelected === currentOperation?.operationName) {
-                            setCurrentOperation(undefined);
-                          } else {
-                            const operation = workflowOperations.find(
-                              (op) => op.operationName === opSelected
-                            );
-                            setCurrentOperation(structuredClone(operation));
-                          }
-                        }}
-                      />
-                    </div>
-                    <Separator className="my-2" />
-
-                    {/* Parameters List */}
-                    <div className="flex flex-col justify-start items-start">
-                      {!currentOperation ||
-                      !currentOperation.params ||
-                      currentOperation.params.length === 0 ? (
-                        <div className="h-[0vh]"></div>
-                      ) : (
-                        <div className="flex flex-col w-full gap-4">
-                          {currentOperation?.params?.map((params, id) => {
-                            // If Params is an Array: meaning it contains "nested" params
-                            // => Display all of them in the same line
-                            // Else Params is a Param: Display it in the 1 line
-                            return (
-                              <div
-                                key={`${generateHexRandomString(
-                                  20
-                                )}_param_${id}`}
-                              >
-                                {Array.isArray(params) ? (
-                                  <div className="flex flex-1 gap-2 px-4 pr-4 divide-x-2 mt-3">
-                                    {params.map((param, idx) => (
-                                      <div
-                                        key={`${generateHexRandomString(
-                                          20
-                                        )}_param_inline_${idx}`}
-                                        className="flex flex-1"
-                                        style={{
-                                          maxWidth: `${90 / params.length}%`,
-                                        }}
-                                      >
-                                        <ParameterItemLine
-                                          paramData={param}
-                                          labelClassName={
-                                            param.type
-                                              .toLocaleLowerCase()
-                                              .includes("switch")
-                                              ? "text-center"
-                                              : undefined
-                                          }
-                                          inputClassName="justify-center"
-                                        />
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-1 w-full px-4 pr-4">
-                                    <ParameterItemLine paramData={params} />
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-
-                          <Separator className="my-2" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* More Options List: Detect Duplicate, Enable Loop */}
-                    {currentOperation && (
-                      <div>
-                        <div className="flex flex-col justify-start items-start  px-4 pr-4">
-                          <FieldLabel
-                            label={"More Options"}
-                            Icon={CircleEllipsisIcon}
-                          />
-
-                          {/* Loop Through */}
-                          {currentOperation.loopThrough !== undefined && (
-                            <MoreOptionInput optionType="loopThrough" />
-                          )}
-
-                          {/* Skip Duplicates */}
-                          {currentOperation.skipDuplicate && (
-                            <MoreOptionInput optionType="skipDuplicate" />
-                          )}
-
-                          {/* Separator */}
-                        </div>
-                        <Separator className="my-2" />
-                      </div>
-                    )}
-
-                    {/* Filters */}
-                    {currentOperation && (
-                      <div className="mt-1 flex flex-col justify-start items-start">
-                        <MoreOptionInput optionType="filters" />
-                      </div>
-                    )}
-
-                    {/* Spacer */}
-                    <div className="h-[10vh]"></div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Fixed Bottom Bar */}
-            {currentOperation && optionbarItem && (
-              <div className="flex flex-col w-[var(--optionbarwidth)] bg-white z-10 fixed bottom-[7vh]">
-                <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
-                  {previousInputData.map((inputData) => (
-                    <SimpleTooltip
-                      key={inputData.label}
-                      tooltipText={inputData.tooltip}
-                    >
-                      <div
-                        role="button"
-                        tabIndex={2}
-                        draggable
-                        onDragStart={(e: React.DragEvent) => {
-                          e.dataTransfer.setData(
-                            "application/workflowEditor_inputdata",
-                            inputData.dataTransfer
-                          );
-                          e.dataTransfer.effectAllowed = "move";
-                        }}
-                        className="w-1/3 h-5 px-1 py-0 line-clamp-1 text-center content-center border-none rounded-sm bg-primary/20 text-primary/80 cursor-grab text-xs font-medium"
-                      >
-                        {inputData.label}
-                      </div>
-                    </SimpleTooltip>
-                  ))}
-                </div>
-                {/* Action Buttons: Delete | Save Operation */}
-                <div className="flex flex-1 justify-between items-center py-1 px-3 border-t">
-                  <SimpleTooltip tooltipText={"Delete Operation"}>
-                    <Button
-                      type="button"
-                      variant={"ghost"}
-                      size={"sm"}
-                      className="w-fit"
-                      onClick={() => {}}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </SimpleTooltip>
+                  >
+                    <Coins className="size-4 stroke-neutral-400" />
+                    <span className="scale-90">
+                      {formatLargeNumber(creditCost.current)}
+                    </span>
+                  </Button>
 
                   <Button
-                    type="submit"
-                    variant={"default"}
-                    size={"sm"}
-                    // disabled={!onboardingForm.formState.isValid}
-                    className="w-fit"
+                    variant={"ghost"}
+                    className={cn(
+                      "flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                    )}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      console.log("Toggle Notification");
+                    }}
                   >
-                    Save changes
+                    {/* Icon */}
+                    <NotificationIconB
+                      className={cn(
+                        "!size-3 stroke-[2.5px] translate-y-[1px]",
+                        NotificationIcon.current === Bell
+                          ? "stroke-neutral-500"
+                          : "stroke-yellow-500"
+                      )}
+                    />
+                    <span>
+                      {NotificationIcon.current === Bell ? "Off" : "On"}
+                    </span>
+                  </Button>
+
+                  {/* Test Unit */}
+                  <Button
+                    variant={"ghost"}
+                    className={cn(
+                      "flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                    )}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      console.log("Launch a unit test");
+                    }}
+                  >
+                    {/* Icon */}
+                    <UnitTestIcon
+                      className={cn(
+                        "stroke-neutral-500 !size-3",
+                        unitTestInfo.iconClassname
+                      )}
+                    />
+                    <span>{unitTestInfo.label}</span>
                   </Button>
                 </div>
+
+                {/* Node: Operations List (All) */}
+                <h5 className="text-base font-semibold text-[#333] line-clamp-1 mb-4">
+                  {optionbarItem.operations.length} Operation
+                  {optionbarItem.operations.length > 1 && "s"}
+                </h5>
+
+                {optionbarItem.operations.length === 0 ? (
+                  <div className="flex flex-col w-full">
+                    <AddAndOperationButton
+                      onClick={() => {
+                        setCurrentOperation(undefined);
+                        setDisplaySingleOperation(true);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col w-full group/operationsList">
+                    {optionbarItem.operations.map((operation, idx) => {
+                      const isLast =
+                        optionbarItem.operations.length === idx + 1;
+                      return (
+                        <div className="flex flex-col w-full items-center">
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "group/operationItemButton relative flex flex-1 h-4 !py-[0.3rem] !w-full px-2 border border-border/50 transition-all duration-300 justify-center items-center gap-1 hover:bg-white bg-white cursor-pointer rounded-sm"
+                            )}
+                            onClick={() => {
+                              setCurrentOperation(operation);
+                              setDisplaySingleOperation(true);
+                            }}
+                          >
+                            <div className="w-full line-clamp-1 group-hover/operationItemButton:text-neutral-500/80 text-neutral-500">
+                              {operation.operationName}
+                            </div>
+                            <div className="group-hover/operationItemButton:flex hidden text-neutral-500 absolute gap-1 justify-center items-center top-0 right-0 bg-white h-[97%] rounded-r-sm pl-1 pr-3">
+                              <Coins className="size-3 stroke-neutral-400" />
+                              <span className="scale-90 text-xs">
+                                {formatLargeNumber(29)}
+                              </span>
+                            </div>
+                          </Button>
+                          {!isLast && (
+                            <div className="flex my-2">
+                              {/* Arrow Flow Indicator */}
+                              <ChevronsDownIcon className="stroke-neutral-400 size-5 stroke-[1.8px]" />
+                            </div>
+                          )}
+                          {isLast && (
+                            <div className="group-hover/optionBar:flex hidden flex-col w-full my-2 items-center gap-2">
+                              {/* Arrow Flow Indicator */}
+                              <ChevronsDownIcon className="stroke-neutral-400 size-5 stroke-[1.8px]" />
+
+                              {/* Add another Operation */}
+                              <AddAndOperationButton
+                                onClick={() => {
+                                  setCurrentOperation(undefined);
+                                  setDisplaySingleOperation(true);
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -317,5 +256,73 @@ export const FieldLabel = ({
         {label}
       </span>
     </div>
+  );
+};
+
+export const OptionbarHeader = ({
+  optionbarItem,
+  displayBackButton,
+  onBack,
+}: {
+  optionbarItem: WorkflowEditorToolItemExtended;
+  displayBackButton?: boolean;
+  onBack?: () => void;
+}) => {
+  const Icon = optionbarItem?.icon;
+
+  return (
+    <div className="flex flex-col w-full">
+      <div className="flex flex-1 gap-2 items-center">
+        {displayBackButton ? (
+          <button
+            onClick={() => onBack && onBack()}
+            className="inset-0 hover:opacity-90 transition-all duration-300 active:scale-[0.97]"
+          >
+            <ArrowLeft className={"size-5"} stroke={optionbarItem.iconColor} />
+          </button>
+        ) : (
+          <div className="size-5">
+            {Icon && (
+              <Icon className={"size-5"} stroke={optionbarItem.iconColor} />
+            )}
+            {optionbarItem.logoPath && (
+              <div className="relative h-5 w-5 mb-2">
+                <Image
+                  src={optionbarItem.logoPath}
+                  alt={`${optionbarItem.label} logo`}
+                  className="select-none object-contain"
+                  fill
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        <h2 className="text-xl font-semibold text-[#333] line-clamp-1">
+          {optionbarItem.label}
+        </h2>
+      </div>
+
+      {optionbarItem.tooltip && (
+        <p className="mt-1 text-xs font-normal text-neutral-500 line-clamp-2">
+          {optionbarItem.tooltip}
+        </p>
+      )}
+    </div>
+  );
+};
+
+const AddAndOperationButton = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <Button
+      variant={"ghost"}
+      className={cn(
+        "group/operationItemButton relative flex flex-1 h-4 !py-[0.3rem] !w-full px-2 transition-all duration-300 justify-center items-center gap-1 hover:bg-white bg-white cursor-pointer rounded-sm hover:text-neutral-500/60 text-neutral-500 active:scale-[0.97]"
+      )}
+      onClick={(e) => onClick()}
+    >
+      <Plus className="stroke-neutral-400 size-4 stroke-[1.8px]" /> Add an
+      operation
+    </Button>
   );
 };

@@ -120,3 +120,5 @@ export type PhaseLog = {
   level: PhaseLogLevel;
   message: string;
 };
+
+export type NodeTest = "failed" | "success" | "running";
