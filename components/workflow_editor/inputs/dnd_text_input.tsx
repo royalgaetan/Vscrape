@@ -3,7 +3,7 @@ import {
   isTrulyEmpty,
   toStringSafe,
 } from "@/lib/string_utils";
-import { cn } from "@/lib/utils";
+import { cn, debounce } from "@/lib/utils";
 import React, {
   HTMLInputTypeAttribute,
   useEffect,
@@ -11,10 +11,9 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
-import { waitForElement } from "@/lib/dom_utils";
-
-type HtmlPossibleType = string | number | readonly string[] | undefined | null;
+import { restoreCaret, waitForElement } from "@/lib/dom_utils";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import { TokenInputType } from "@/lib/workflow_editor/types/w_types";
 
 const DnDTextInput = ({
   placeholder,
@@ -42,32 +41,34 @@ const DnDTextInput = ({
   onElementDropped?: (text: string | null) => void;
   onBlur?: (text?: string) => void;
 }) => {
-  const keyId = useId();
   const DnDInputRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [html, setHtml] = useState<string | null | undefined>("");
-  const {
-    toggleDataInputDialog,
-    dataInputSelected,
-    inputTokenID,
-    setInputTokenID,
-    inputTokenValue,
-    setInputTokenValue,
-    setDataInputSelected,
-  } = useWorkflowEditor();
-
-  const openDialog = (inputTokenID?: string, inputTokenValue?: string) => {
-    const editor = DnDInputRef.current;
-    if (!editor) return;
-    onTextChange && onTextChange(editor.innerHTML.trim());
-
-    toggleDataInputDialog(true, inputTokenID, inputTokenValue);
-  };
+  // Store
+  const toggleSharedOutputsDialog = useWorkflowEditorStore(
+    (s) => s.toggleSharedOutputsDialog
+  );
+  const inputToken = useWorkflowEditorStore((s) => s.inputToken);
+  const sharedOutputSelected = useWorkflowEditorStore(
+    (s) => s.sharedOutputSelected
+  );
+  const setSharedOutputSelected = useWorkflowEditorStore(
+    (s) => s.setSharedOutputSelected
+  );
+  // End Store
 
   const isInputEmpty = () =>
     html === undefined ||
     html === null ||
-    (typeof html === "string" && isTrulyEmpty(html));
+    (typeof html === "string" &&
+      isTrulyEmpty(extractTextFromHTML(toStringSafe(html))));
+
+  const cleanHTML = (html: any) => {
+    return toStringSafe(html)
+      .replace(/<br\s*\/?>/g, "")
+      .replace(/\u200B/g, "")
+      .trim();
+  };
 
   const parseEditorText = (text: string) => {
     const container = document.createElement("div");
@@ -115,75 +116,6 @@ const DnDTextInput = ({
 
     return container.innerHTML.replace(/<br\s*\/?>/g, "");
   };
-
-  const getCleanHtml = (e: React.FormEvent<HTMLDivElement>): string => {
-    const html = e.currentTarget.innerHTML;
-    const plain = e.currentTarget.innerText.trim();
-
-    if (plain === "") {
-      setHtml("");
-      return "";
-    } else {
-      // Optional: clean up <br> if that's the only leftover
-      const cleaned = html
-        .replace(/<br\s*\/?>/g, "")
-        .replace(/\u200B/g, "")
-        .trim();
-      setHtml(cleaned);
-
-      // Return Plain text cleaned
-      return html
-        .replace(/<br\s*\/?>/g, "")
-        .replace(/\u200B/g, "")
-        .trim();
-    }
-  };
-
-  const handleSpace = (e: KeyboardEvent) => {
-    if (e.key !== " ") return;
-
-    const editor = DnDInputRef.current;
-    if (!editor) return;
-
-    const rawText = editor.innerHTML;
-    const html = parseEditorText(rawText);
-
-    editor.innerHTML = html;
-
-    // Move caret to end
-    const range = document.createRange();
-    const sel = window.getSelection();
-    range.selectNodeContents(editor);
-    range.collapse(false);
-    sel?.removeAllRanges();
-    sel?.addRange(range);
-  };
-
-  const initEditor = () => {
-    const editor = DnDInputRef.current;
-    if (editor) {
-      editor.addEventListener("keydown", handleSpace);
-      DnDInputRef.current.innerHTML = toStringSafe(inputValue)
-        .replace(/<br\s*\/?>/g, "")
-        .replace(/\u200B/g, "")
-        .trim();
-      setHtml(toStringSafe(inputValue));
-    }
-
-    return () => {
-      editor?.removeEventListener("keydown", handleSpace);
-    };
-  };
-
-  useEffect(() => {
-    initEditor();
-  }, []);
-
-  useEffect(() => {
-    if (reRenderOnInputValueChange) {
-      initEditor();
-    }
-  }, [inputValue]);
 
   const handleDrop = (e: React.DragEvent) => {
     if (isDisabled) return;
@@ -245,12 +177,79 @@ const DnDTextInput = ({
     const editorContentCleaned = editor.innerHTML
       .replace(/<br\s*\/?>/g, "")
       .replace(/\u200B/g, "");
-    // .trim();
 
     setHtml(editorContentCleaned);
     onTextChange && onTextChange(editorContentCleaned);
     onElementDropped && onElementDropped(editorContentCleaned);
     editor.focus();
+  };
+
+  const handleSpace = (e?: KeyboardEvent) => {
+    // if (e.key !== " ") return;
+
+    const editor = DnDInputRef.current;
+    if (!editor) return;
+
+    sanitizeEditor(editor);
+  };
+
+  const sanitizeEditor = debounce((editor: HTMLElement) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(editor);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
+    const caretPosition = preCaretRange.toString().length;
+
+    const rawText = editor.innerText;
+    const html = parseEditorText(rawText);
+
+    if (editor.innerHTML !== html) {
+      editor.innerHTML = html;
+      restoreCaret(editor, caretPosition);
+
+      // Update state
+      const editorContentCleaned = cleanHTML(html);
+
+      setHtml(editorContentCleaned);
+      onTextChange && onTextChange(editorContentCleaned);
+      onElementDropped && onElementDropped(editorContentCleaned);
+      editor.focus();
+    }
+  }, 100);
+
+  const initEditor = () => {
+    console.log("🥥 Re-render", { inputValue, isDragging });
+    const editor = DnDInputRef.current;
+    if (editor) {
+      // editor.addEventListener("keydown", handleSpace);
+      DnDInputRef.current.innerHTML = cleanHTML(inputValue);
+      setHtml(toStringSafe(inputValue));
+    }
+
+    return () => {
+      // editor?.removeEventListener("keydown", handleSpace);
+    };
+  };
+
+  useEffect(() => {
+    initEditor();
+  }, []);
+
+  useEffect(() => {
+    if (reRenderOnInputValueChange) {
+      initEditor();
+    }
+  }, [inputValue]);
+
+  const openSharedOutputsDialog = (inputToken?: TokenInputType) => {
+    const editor = DnDInputRef.current;
+    if (!editor) return;
+    onTextChange && onTextChange(editor.innerHTML.trim());
+
+    toggleSharedOutputsDialog(true, inputToken);
   };
 
   useEffect(() => {
@@ -261,7 +260,10 @@ const DnDTextInput = ({
       const tokenId = el.id;
 
       // console.log("inputValue", inputValue, "tokenId", tokenId);
-      openDialog(tokenId, extractTextFromHTML(el.innerHTML));
+      openSharedOutputsDialog({
+        inputTokenID: tokenId,
+        inputTokenValue: extractTextFromHTML(el.innerHTML),
+      });
     };
 
     elements.forEach((el) => el.addEventListener("click", handleClick));
@@ -272,34 +274,29 @@ const DnDTextInput = ({
   }, [html, inputValue]);
 
   useEffect(() => {
-    if (inputTokenID && dataInputSelected) {
-      waitForElement("id", inputTokenID).then((el) => {
+    if (inputToken?.inputTokenID && sharedOutputSelected) {
+      waitForElement("id", inputToken?.inputTokenID).then((el) => {
         setTimeout(() => {
-          setDataInputSelected(undefined);
-          setInputTokenID(undefined);
+          setSharedOutputSelected(undefined);
+          toggleSharedOutputsDialog(false, undefined);
 
-          el.textContent = `{{ ${dataInputSelected.fullPath} }}`;
-          el.setAttribute("data-type", dataInputSelected.type);
+          el.textContent = `{{ ${sharedOutputSelected.fullPath} }}`;
+          el.setAttribute("data-type", sharedOutputSelected.type);
 
           const editor = DnDInputRef.current;
           if (!editor) return;
 
-          const editorContentCleaned = editor.innerHTML
-            .replace(/<br\s*\/?>/g, "")
-            .replace(/\u200B/g, "")
-            .trim();
+          const editorContentCleaned = cleanHTML(editor.innerHTML);
           onElementDropped && onElementDropped(editorContentCleaned);
         }, 0);
       });
     }
-  }, [dataInputSelected]);
+  }, [sharedOutputSelected]);
 
   return (
     <div
       role="button"
       tabIndex={1}
-      onKeyDown={(e) => {}}
-      key={keyId}
       onClick={() => {
         if (!DnDInputRef.current || isDisabled) return;
         DnDInputRef.current.focus();
@@ -326,18 +323,18 @@ const DnDTextInput = ({
         ref={DnDInputRef}
         contentEditable={!isDisabled && !readOnly}
         onInput={(e: React.FormEvent<HTMLDivElement>) => {
-          onTextChange && onTextChange(getCleanHtml(e));
-        }}
-        onDragLeave={() => {
-          setIsDragging(false);
+          handleSpace();
         }}
         onDragOver={(e: React.DragEvent) => {
           e.preventDefault();
-          setIsDragging(true);
-          e.dataTransfer.dropEffect = "move";
+          if (!isDragging) setIsDragging(true);
+          // e.dataTransfer.dropEffect = "move";
+        }}
+        onDragLeave={() => {
+          if (isDragging) setIsDragging(false);
         }}
         onBlur={(e) => {
-          onBlur && onBlur(getCleanHtml(e));
+          onBlur && onBlur(cleanHTML(html));
         }}
         onDrop={(e) => {
           e.preventDefault();
@@ -349,8 +346,8 @@ const DnDTextInput = ({
             e.preventDefault();
           }
         }}
+        tabIndex={0}
         role="textbox"
-        tabIndex={1}
         suppressContentEditableWarning
         className={cn(
           "flex flex-1 gap-1 line-clamp-1 place-content-center p-0 min-h-[1.4rem] max-h-[1.4rem] outline-none border-none ring-0 focus:outline-none focus:ring-0 w-full overflow-x-scroll scrollbar-hide"

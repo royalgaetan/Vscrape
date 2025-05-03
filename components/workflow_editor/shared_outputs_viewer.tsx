@@ -1,19 +1,16 @@
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import { generateHexRandomString } from "@/lib/numbers_utils";
 import { humanize, toStringSafe } from "@/lib/string_utils";
 import { cn, isRecord } from "@/lib/utils";
 import { describeMIME } from "@/lib/workflow_editor/types/mime_types";
-import { InputDataSelectedItem } from "@/lib/workflow_editor/types/w_types";
+import { SharedOutputSelectedItem } from "@/lib/workflow_editor/types/w_types";
 import React from "react";
 
-const DataInputViewer = ({
+const SharedOutputsViewer = ({
   object,
   onObjectSelected,
-  onKeyToggled,
 }: {
   object: Record<string, any>;
-  onObjectSelected: (elementSelected: InputDataSelectedItem) => void;
-  onKeyToggled: (keyFullPath: string) => void;
+  onObjectSelected: (elementSelected: SharedOutputSelectedItem) => void;
 }) => {
   return (
     <div className="flex flex-col w-full h-[65vh] p-4 bg-neutral-100 border border-border rounded-sm overflow-y-auto scrollbar-hide">
@@ -25,14 +22,13 @@ const DataInputViewer = ({
           onObjectSelected={(elementSelected) => {
             onObjectSelected(elementSelected);
           }}
-          // onKeyToggled={onKeyToggled}
         />
       </div>
     </div>
   );
 };
 
-export default DataInputViewer;
+export default SharedOutputsViewer;
 
 const ObjectChildren = ({
   obj,
@@ -43,12 +39,9 @@ const ObjectChildren = ({
   level: number;
   path: string;
   obj: Record<string, any>;
-  onObjectSelected: (elementSelected: InputDataSelectedItem) => void;
-  // onKeyToggled: (keyFullPath: string) => void;
+  onObjectSelected: (elementSelected: SharedOutputSelectedItem) => void;
 }) => {
-  const { expandedInputDataKeys } = useWorkflowEditor();
   const marginLeftValue = "10px";
-
   if (!isRecord(obj)) return;
 
   return (

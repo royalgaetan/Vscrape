@@ -9,20 +9,26 @@ import { generateHexRandomString } from "@/lib/numbers_utils";
 import ParameterItemLine from "./w_optionbar_param_itemline";
 import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
 import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import { FieldLabel, OptionbarHeader } from "./w_optionbar_editor";
-import { WorkflowEditorToolItemExtended } from "@/providers/workflowEditorProvider";
+import { WorkflowEditorNode } from "@/lib/workflow_editor/types/w_types";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import { shallow } from "zustand/shallow";
 
 const OptionbarOperation = ({
-  optionbarItem,
+  nodeOrigin,
   onBack,
   displayBackButton,
 }: {
-  optionbarItem: WorkflowEditorToolItemExtended;
+  nodeOrigin: WorkflowEditorNode;
   onBack?: () => void;
   displayBackButton?: boolean;
 }) => {
-  const { currentOperation, setCurrentOperation } = useWorkflowEditor();
+  // Store
+  const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
+  const setCurrentOperation = useWorkflowEditorStore(
+    (s) => s.setCurrentOperation
+  );
+  // End Store
 
   return (
     <div>
@@ -31,7 +37,7 @@ const OptionbarOperation = ({
           {/* Header */}
           <div className="px-4 w-full">
             <OptionbarHeader
-              optionbarItem={optionbarItem}
+              nodeOrigin={nodeOrigin}
               displayBackButton={
                 displayBackButton && currentOperation === undefined
               }
@@ -45,17 +51,17 @@ const OptionbarOperation = ({
             <div className="flex flex-col justify-start items-start px-4 pr-4">
               <FieldLabel label={"Select an operation"} Icon={Hammer} />
               <MultiSelect
-                isTriggerDisabled={optionbarItem.operations.length === 0}
+                isTriggerDisabled={nodeOrigin.operations.length === 0}
                 triggerClassName="h-9 w-[15.7rem] flex flex-1 mb-1"
                 popoverAlignment="center"
                 selectionMode="single"
                 popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
                 label={currentOperation?.operationName ?? "Pick an operation"}
                 data={{
-                  "": optionbarItem.operations.map((op) => ({
+                  "": nodeOrigin.operations.map((op) => ({
                     label: op.operationName,
                     value: op.operationName,
-                    icon: optionbarItem.icon ?? Star,
+                    icon: nodeOrigin.icon ?? Star,
                     iconClassName: "stroke-neutral-400 fill-transparent",
                   })),
                 }}

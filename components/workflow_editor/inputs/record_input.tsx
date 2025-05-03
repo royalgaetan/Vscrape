@@ -97,10 +97,10 @@ const SingleRecordRow = ({
         onElementDropped={(text) => {
           if (!text || text === recordkey) return;
           setRecordkey(text);
-          onBlur && onBlur({ key: text, value: recordValue });
+          // onBlur && onBlur({ key: text, value: recordValue });
         }}
         onTextChange={(text) => {
-          if (!text) return;
+          if (!text || text === recordkey) return;
           setRecordkey(text);
         }}
       />
@@ -117,10 +117,10 @@ const SingleRecordRow = ({
         onElementDropped={(text) => {
           if (!text || text === recordValue) return;
           setRecordValue(text);
-          onBlur && onBlur({ key: recordkey, value: text });
+          // onBlur && onBlur({ key: recordkey, value: text });
         }}
         onTextChange={(text) => {
-          if (!text) return;
+          if (!text || text === recordValue) return;
           setRecordValue(text);
         }}
       />

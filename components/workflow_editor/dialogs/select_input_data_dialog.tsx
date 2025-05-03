@@ -1,3 +1,4 @@
+"use client";
 import {
   Dialog,
   DialogContent,
@@ -9,23 +10,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fakeInputs } from "@/lib/fake_data";
 import { humanizeKey } from "@/lib/string_utils";
 import React, { useEffect, useState } from "react";
-import DataInputViewer from "../data_input_viewer";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import SharedOutputsViewer from "../shared_outputs_viewer";
 
 const SelectInputDataDialog = () => {
   const [currentKeyTab, setCurrentKeyTab] = useState("");
-  const {
-    expandedInputDataKeys,
-    setExpandedInputDataKeys,
-    isDataInputDialogOpen,
-    setIsDataInputDialogOpen,
-    setDataInputSelected,
-    inputTokenID,
-    inputTokenValue,
-    toggleDataInputDialog,
-  } = useWorkflowEditor();
+
+  // Store
+  const isSharedOutputsDialogOpen = useWorkflowEditorStore(
+    (s) => s.isSharedOutputsDialogOpen
+  );
+  const toggleSharedOutputsDialog = useWorkflowEditorStore(
+    (s) => s.toggleSharedOutputsDialog
+  );
+  const inputToken = useWorkflowEditorStore((s) => s.inputToken);
+  const setSharedOutputSelected = useWorkflowEditorStore(
+    (s) => s.setSharedOutputSelected
+  );
+  // End Store
 
   useEffect(() => {
+    const inputTokenValue = inputToken?.inputTokenValue;
     if (
       typeof inputTokenValue === "string" &&
       (inputTokenValue.toLocaleLowerCase().includes("lastnode") ||
@@ -41,15 +46,15 @@ const SelectInputDataDialog = () => {
     } else {
       setCurrentKeyTab("Variables");
     }
-  }, [inputTokenValue]);
+  }, [inputToken?.inputTokenValue]);
 
   return (
     <Dialog
-      open={isDataInputDialogOpen}
-      onOpenChange={(open) => setIsDataInputDialogOpen(open)}
+      open={isSharedOutputsDialogOpen}
+      onOpenChange={(open) => toggleSharedOutputsDialog(open)}
     >
       <DialogContent
-        onInteractOutside={(e) => setIsDataInputDialogOpen(false)}
+        onInteractOutside={() => toggleSharedOutputsDialog(false)}
         className="h-[90vh] w-[50vw] flex flex-col max-w-none overflow-clip"
       >
         <Tabs
@@ -88,24 +93,12 @@ const SelectInputDataDialog = () => {
             {Object.entries(fakeInputs).map(([key, values]) => {
               return (
                 <TabsContent key={key} value={key} className="h-full mt-2 px-6">
-                  <DataInputViewer
+                  <SharedOutputsViewer
                     key={key}
                     object={{ [key]: values }}
-                    onKeyToggled={(keyFullPath) => {
-                      if (expandedInputDataKeys.includes(keyFullPath)) {
-                        setExpandedInputDataKeys((prev) =>
-                          prev.filter((p) => p != keyFullPath)
-                        );
-                      } else {
-                        setExpandedInputDataKeys((prev) => [
-                          ...prev,
-                          keyFullPath,
-                        ]);
-                      }
-                    }}
                     onObjectSelected={(obj) => {
-                      setDataInputSelected(obj);
-                      toggleDataInputDialog(false, inputTokenID);
+                      setSharedOutputSelected(obj);
+                      toggleSharedOutputsDialog(false, inputToken);
                     }}
                   />
                 </TabsContent>

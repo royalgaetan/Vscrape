@@ -1,7 +1,7 @@
 import ParamInput from "@/components/workflow_editor/param_inputs";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import { cn } from "@/lib/utils";
 import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { useState } from "react";
 
 const ParameterItemLine = ({
@@ -15,7 +15,13 @@ const ParameterItemLine = ({
   inputClassName?: string;
   labelClassName?: string;
 }) => {
-  const { currentOperation, setCurrentOperation } = useWorkflowEditor();
+  // Store
+  const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
+  const setCurrentOperation = useWorkflowEditorStore(
+    (s) => s.setCurrentOperation
+  );
+  // End Store
+
   const getParam = (): OperationParamItem | undefined => {
     return currentOperation?.params
       ?.flatMap((p) => p)

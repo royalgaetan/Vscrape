@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import WChatTab from "./w_chat_tab";
 import WToolsTab from "./w_tools_tab";
 import { LucideIcon } from "lucide-react";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 
 export type WSidebarType = {
   label: string;
@@ -12,19 +12,23 @@ export type WSidebarType = {
 };
 
 const WEditorSidebar = () => {
-  const { isWChatOpen } = useWorkflowEditor();
+  // Store
+  const isWorkflowChatOpen = useWorkflowEditorStore(
+    (s) => s.isWorkflowChatOpen
+  );
+  // End Store
 
   const chatHistoryContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Scroll to the bottom of Chat History
-    if (chatHistoryContainer.current && isWChatOpen) {
+    if (chatHistoryContainer.current && isWorkflowChatOpen) {
       chatHistoryContainer.current.scrollTo({
         behavior: "instant",
         top: chatHistoryContainer.current.scrollHeight,
       });
     }
-  }, [isWChatOpen]);
+  }, [isWorkflowChatOpen]);
   return (
     <div className="min-w-[18rem] max-w-[18rem] h-full bg-white border-r flex flex-col items-start justify-start relative">
       {/* Tools list | Or chat assistant */}
@@ -32,7 +36,7 @@ const WEditorSidebar = () => {
         ref={chatHistoryContainer}
         className="flex flex-1 w-full max-h-full overflow-y-scroll scrollbar-hide"
       >
-        {isWChatOpen ? <WChatTab /> : <WToolsTab />}
+        {isWorkflowChatOpen ? <WChatTab /> : <WToolsTab />}
       </div>
     </div>
   );

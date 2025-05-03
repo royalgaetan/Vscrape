@@ -61,24 +61,25 @@ const FilterInput = ({
           </div>
         ) : (
           <div>
-            {localFilters.map((filter, idx) => {
-              return (
-                <SingleFilterRow
-                  initialFilter={filter}
-                  onSave={(newFilterValue) => {
-                    localFilters[idx] = newFilterValue;
-                    setLocalFilters(localFilters);
-                  }}
-                  index={idx}
-                  key={filter.keyId}
-                  onDelete={() => {
-                    setLocalFilters((prev) =>
-                      prev.filter((_, id) => id !== idx)
-                    );
-                  }}
-                />
-              );
-            })}
+            {Array.isArray(localFilters) &&
+              localFilters.map((filter, idx) => {
+                return (
+                  <SingleFilterRow
+                    initialFilter={filter}
+                    onSave={(newFilterValue) => {
+                      localFilters[idx] = newFilterValue;
+                      setLocalFilters(localFilters);
+                    }}
+                    index={idx}
+                    key={filter.keyId}
+                    onDelete={() => {
+                      setLocalFilters((prev) =>
+                        prev.filter((_, id) => id !== idx)
+                      );
+                    }}
+                  />
+                );
+              })}
           </div>
         )}
       </div>

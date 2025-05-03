@@ -102,3 +102,37 @@ export const scrollToEl = ({
     );
   }
 };
+
+export const restoreCaret = (container: HTMLElement, pos: number) => {
+  const range = document.createRange();
+  const selection = window.getSelection();
+  let currentNode: Node | null = null;
+  let currentOffset = 0;
+
+  function findNodeAtOffset(node: Node): boolean {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const textLength = node.textContent?.length ?? 0;
+      if (pos <= textLength) {
+        currentNode = node;
+        currentOffset = pos;
+        return true;
+      } else {
+        pos -= textLength;
+      }
+    } else {
+      for (let child of node.childNodes) {
+        if (findNodeAtOffset(child)) return true;
+      }
+    }
+    return false;
+  }
+
+  findNodeAtOffset(container);
+
+  if (currentNode) {
+    range.setStart(currentNode, currentOffset);
+    range.collapse(true);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+};

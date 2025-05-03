@@ -34,8 +34,9 @@ export type OperationParamItem = {
   valuesToPickFrom?: number[] | string[] | boolean[];
 } & (vsAnyRawTypes | vsAnyPrimitives);
 
-export type WorkflowEditorToolItem = {
+export type WorkflowEditorNode = {
   label: string;
+  iconColor?: string;
   icon?: LucideIcon;
   logoPath?: string;
   tooltip?: string;
@@ -53,9 +54,14 @@ export type DroppedToolItem = {
 };
 
 // --------------------------------------------------------
-export type InputDataSelectedItem = {
+export type SharedOutputSelectedItem = {
   fullPath: string;
   type: (vsAnyPrimitives | vsAnyRawTypes)["type"];
+};
+
+export type TokenInputType = {
+  inputTokenID?: string;
+  inputTokenValue?: string;
 };
 
 export type ExtendedOperationFilterType = OperationFilterType<

@@ -18,10 +18,10 @@ import {
   Undo2,
   UndoDotIcon,
 } from "lucide-react";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import WorkflowEditor from "./w_editor";
 import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 
 const WorflowEditorWrapper = ({
   workflowId,
@@ -30,7 +30,15 @@ const WorflowEditorWrapper = ({
   workflowId: string;
   isHistory?: boolean;
 }) => {
-  const { isWChatOpen, setWChatOpen } = useWorkflowEditor();
+  // Store
+  const toggleWorkflowChat = useWorkflowEditorStore(
+    (s) => s.toggleWorkflowChat
+  );
+  const isWorkflowChatOpen = useWorkflowEditorStore(
+    (s) => s.isWorkflowChatOpen
+  );
+  // End Store
+
   const [droppedElement, setDroppedElement] = useState<DroppedToolItem>();
 
   return (
@@ -93,21 +101,21 @@ const WorflowEditorWrapper = ({
 
           {isHistory === undefined && (
             <SimpleTooltip
-              tooltipText={isWChatOpen ? "Close Chat" : "Open Chat"}
+              tooltipText={isWorkflowChatOpen ? "Close Chat" : "Open Chat"}
             >
               <Button
-                onClick={() => setWChatOpen(!isWChatOpen)}
+                onClick={() => toggleWorkflowChat(!isWorkflowChatOpen)}
                 variant={"secondary"}
                 className={cn(
                   "duration-0 rounded-2xl h-7 text-xs gap-1 px-3",
-                  isWChatOpen &&
+                  isWorkflowChatOpen &&
                     "bg-primary text-primary-foreground hover:bg-primary/90"
                 )}
               >
                 <MessageCircleMoreIcon
                   className={cn(
                     "stroke-neutral-800",
-                    isWChatOpen && "stroke-white"
+                    isWorkflowChatOpen && "stroke-white"
                   )}
                 />
               </Button>
@@ -137,7 +145,10 @@ const WorflowEditorWrapper = ({
         </div>
 
         {/* View Buttons */}
-        <div className="flex flex-1 justify-end pointer-events-auto items-center">
+        <div
+          className="flex flex-1 justify-end pointer-eve
+        $ùnts-auto items-center"
+        >
           <ViewButtons />
         </div>
       </div>

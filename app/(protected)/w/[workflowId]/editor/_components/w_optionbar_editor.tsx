@@ -1,39 +1,39 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import { cn } from "@/lib/utils";
 import {
-  ArrowDown,
   ArrowLeft,
   Bell,
   BellRingIcon,
   ChevronsDownIcon,
   Coins,
   LucideIcon,
-  MoveDown,
   Plus,
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { WorkflowEditorToolItemExtended } from "@/providers/workflowEditorProvider";
 import { formatLargeNumber } from "@/lib/date_time_utils";
-import { NodeTest } from "@/lib/workflow_editor/types/w_types";
+import {
+  NodeTest,
+  WorkflowEditorNode,
+} from "@/lib/workflow_editor/types/w_types";
 import { getNodeTestIcon } from "@/lib/workflow_editor/utils/w_utils";
 import OptionbarOperation from "./w_optionbar_single_operation";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 const OptionbarEditor = () => {
-  const {
-    optionbarItem,
-    isOptionbarOpen,
-    setCurrentOperation,
-    toggleOptionbar,
-  } = useWorkflowEditor();
+  // Store:
+  const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const setCurrentOperation = useWorkflowEditorStore(
+    (s) => s.setCurrentOperation
+  );
+  const toggleOptionbar = useWorkflowEditorStore((s) => s.toggleOptionbar);
+  const isWorkflowOptionbarOpen = useWorkflowEditorStore(
+    (s) => s.isWorkflowOptionbarOpen
+  );
+  // End Store
 
   const [displaySingleOperation, setDisplaySingleOperation] = useState(false);
-  const [
-    canDisplayBackBtnOnSingleOperation,
-    setCanDisplayBackBtnOnSingleOperation,
-  ] = useState(false);
 
   const NotificationIcon = useRef<LucideIcon>(
     Math.random() < 0.7 ? Bell : BellRingIcon
@@ -47,14 +47,10 @@ const OptionbarEditor = () => {
   const UnitTestIcon = getNodeTestIcon(unitTestResult.current).icon;
   const unitTestInfo = getNodeTestIcon(unitTestResult.current);
 
-  return !isOptionbarOpen ? (
+  return !isWorkflowOptionbarOpen ? (
     <></>
   ) : (
-    <div
-      onMouseEnter={() => setCanDisplayBackBtnOnSingleOperation(true)}
-      onMouseLeave={() => setCanDisplayBackBtnOnSingleOperation(false)}
-      className="group/optionBar [--optionbarwidth:18rem] min-w-[var(--optionbarwidth)] max-w-[var(--optionbarwidth)] h-full bg-white border-l flex flex-col items-start justify-start relative"
-    >
+    <div className="group/optionBar [--optionbarwidth:18rem] min-w-[var(--optionbarwidth)] max-w-[var(--optionbarwidth)] h-full bg-white border-l flex flex-col items-start justify-start relative">
       <div className="flex flex-1 w-full max-h-full overflow-x-clip overflow-y-scroll scrollbar-hide">
         <div className="h-px w-full relative">
           <div className="min-w-[18rem] max-w-[18rem] bg-white border-r flex flex-col items-start justify-start relative">
@@ -82,15 +78,15 @@ const OptionbarEditor = () => {
             </div>
 
             {/* Content */}
-            {!optionbarItem ? (
+            {!currentNode ? (
               <div className=" text-muted-foreground w-full text-xs font-semibold flex flex-1 justify-center items-center min-h-[80vh]">
                 Select a tool.
               </div>
             ) : displaySingleOperation ? (
               // Single Operation Arena
               <OptionbarOperation
-                optionbarItem={optionbarItem}
-                displayBackButton={canDisplayBackBtnOnSingleOperation}
+                nodeOrigin={currentNode}
+                displayBackButton={displaySingleOperation}
                 onBack={() => {
                   setDisplaySingleOperation(false);
                 }}
@@ -99,7 +95,7 @@ const OptionbarEditor = () => {
               // All Node's Operations
               <div className="px-4 w-full">
                 {/* Header */}
-                <OptionbarHeader optionbarItem={optionbarItem} />
+                <OptionbarHeader nodeOrigin={currentNode} />
 
                 {/* Buttons : Credit Cost, Notification, Unit test */}
                 <div className="flex flex-1 w-full mt-2 mb-8 gap-2">
@@ -164,11 +160,11 @@ const OptionbarEditor = () => {
 
                 {/* Node: Operations List (All) */}
                 <h5 className="text-base font-semibold text-[#333] line-clamp-1 mb-4">
-                  {optionbarItem.operations.length} Operation
-                  {optionbarItem.operations.length > 1 && "s"}
+                  {currentNode.operations.length} Operation
+                  {currentNode.operations.length > 1 && "s"}
                 </h5>
 
-                {optionbarItem.operations.length === 0 ? (
+                {currentNode.operations.length === 0 ? (
                   <div className="flex flex-col w-full">
                     <AddAndOperationButton
                       onClick={() => {
@@ -179,11 +175,13 @@ const OptionbarEditor = () => {
                   </div>
                 ) : (
                   <div className="flex flex-col w-full group/operationsList">
-                    {optionbarItem.operations.map((operation, idx) => {
-                      const isLast =
-                        optionbarItem.operations.length === idx + 1;
+                    {currentNode.operations.map((operation, idx) => {
+                      const isLast = currentNode.operations.length === idx + 1;
                       return (
-                        <div className="flex flex-col w-full items-center">
+                        <div
+                          key={`${currentNode.sectionName}_${operation.operationName}_${idx}`}
+                          className="flex flex-col w-full items-center"
+                        >
                           <Button
                             variant={"outline"}
                             className={cn(
@@ -211,9 +209,9 @@ const OptionbarEditor = () => {
                             </div>
                           )}
                           {isLast && (
-                            <div className="group-hover/optionBar:flex hidden flex-col w-full my-2 items-center gap-2">
+                            <div className="group-hover/optionBar:flex hidden flex-col w-full my-2 mt-5 items-center gap-2">
                               {/* Arrow Flow Indicator */}
-                              <ChevronsDownIcon className="stroke-neutral-400 size-5 stroke-[1.8px]" />
+                              {/* <ChevronsDownIcon className="stroke-neutral-400 size-5 stroke-[1.8px]" /> */}
 
                               {/* Add another Operation */}
                               <AddAndOperationButton
@@ -260,15 +258,15 @@ export const FieldLabel = ({
 };
 
 export const OptionbarHeader = ({
-  optionbarItem,
+  nodeOrigin,
   displayBackButton,
   onBack,
 }: {
-  optionbarItem: WorkflowEditorToolItemExtended;
+  nodeOrigin: WorkflowEditorNode;
   displayBackButton?: boolean;
   onBack?: () => void;
 }) => {
-  const Icon = optionbarItem?.icon;
+  const Icon = nodeOrigin?.icon;
 
   return (
     <div className="flex flex-col w-full">
@@ -278,18 +276,18 @@ export const OptionbarHeader = ({
             onClick={() => onBack && onBack()}
             className="inset-0 hover:opacity-90 transition-all duration-300 active:scale-[0.97]"
           >
-            <ArrowLeft className={"size-5"} stroke={optionbarItem.iconColor} />
+            <ArrowLeft className={"size-5"} stroke={nodeOrigin.iconColor} />
           </button>
         ) : (
           <div className="size-5">
             {Icon && (
-              <Icon className={"size-5"} stroke={optionbarItem.iconColor} />
+              <Icon className={"size-5"} stroke={nodeOrigin.iconColor} />
             )}
-            {optionbarItem.logoPath && (
+            {nodeOrigin.logoPath && (
               <div className="relative h-5 w-5 mb-2">
                 <Image
-                  src={optionbarItem.logoPath}
-                  alt={`${optionbarItem.label} logo`}
+                  src={nodeOrigin.logoPath}
+                  alt={`${nodeOrigin.label} logo`}
                   className="select-none object-contain"
                   fill
                 />
@@ -299,13 +297,13 @@ export const OptionbarHeader = ({
         )}
 
         <h2 className="text-xl font-semibold text-[#333] line-clamp-1">
-          {optionbarItem.label}
+          {nodeOrigin.label}
         </h2>
       </div>
 
-      {optionbarItem.tooltip && (
+      {nodeOrigin.tooltip && (
         <p className="mt-1 text-xs font-normal text-neutral-500 line-clamp-2">
-          {optionbarItem.tooltip}
+          {nodeOrigin.tooltip}
         </p>
       )}
     </div>

@@ -114,7 +114,7 @@ const SingleFilterRow = ({
 
     // Check Filter values: if incorrect display error in corresponding input field
     valueInputsSchema.forEach((inputSchemaAt, id) => {
-      const inputValue = Array.isArray(filterObj.filterValue)
+      let inputValue = Array.isArray(filterObj.filterValue)
         ? filterObj.filterValue[id]
         : null;
       console.log(
@@ -149,42 +149,40 @@ const SingleFilterRow = ({
           errorIndexes.push(id);
         }
       } else if (!isPure) {
-        {
-          if (
-            inputSchemaAt === "date" &&
-            (inputValue === null ||
-              !isValidISODateString(inputValue?.toString()))
-          ) {
-            console.log("=> Is date error");
-            errorIndexes.push(id);
-          }
-          if (
-            inputSchemaAt === "text" &&
-            (inputValue === null ||
-              typeof inputValue !== "string" ||
-              inputValue.length === 0)
-          ) {
-            console.log("=> Is text error");
-            errorIndexes.push(id);
-          }
+        if (
+          inputSchemaAt === "undefined" &&
+          (inputValue === null || typeof inputValue !== "undefined")
+        ) {
+          console.log("=> Is undefined error");
+          errorIndexes.push(id);
+        }
 
-          if (
-            inputSchemaAt === "number" &&
-            (toStringSafe(inputValue).trim() === "" ||
-              inputValue === null ||
-              isNaN(Number(inputValue)))
-          ) {
-            console.log("=> Is number error");
-            errorIndexes.push(id);
-          }
+        inputValue = extractTextFromHTML(toStringSafe(inputValue));
+        if (
+          inputSchemaAt === "date" &&
+          (inputValue === null || !isValidISODateString(inputValue))
+        ) {
+          console.log("=> Is date error");
+          errorIndexes.push(id);
+        }
+        if (
+          inputSchemaAt === "text" &&
+          (inputValue === null ||
+            typeof inputValue !== "string" ||
+            inputValue.length === 0)
+        ) {
+          console.log("=> Is text error");
+          errorIndexes.push(id);
+        }
 
-          if (
-            inputSchemaAt === "undefined" &&
-            (inputValue === null || typeof inputValue !== "undefined")
-          ) {
-            console.log("=> Is undefined error");
-            errorIndexes.push(id);
-          }
+        if (
+          inputSchemaAt === "number" &&
+          (toStringSafe(inputValue).trim() === "" ||
+            inputValue === null ||
+            isNaN(Number(inputValue)))
+        ) {
+          console.log("=> Is number error");
+          errorIndexes.push(id);
         }
       }
     });

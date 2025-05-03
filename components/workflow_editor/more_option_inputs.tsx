@@ -6,8 +6,8 @@ import {
 import React, { useState } from "react";
 import SimpleSwitchInput from "./inputs/simple_switch_input";
 import { LucideIcon } from "lucide-react";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
 import FilterInput from "./inputs/filter_input";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 
 const getInitialOptionValues = ({
   optionType,
@@ -34,7 +34,13 @@ type Props = {
 };
 
 const MoreOptionInput = ({ optionType }: Props) => {
-  const { currentOperation, setCurrentOperation } = useWorkflowEditor();
+  // Store
+  const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
+  const setCurrentOperation = useWorkflowEditorStore(
+    (s) => s.setCurrentOperation
+  );
+  // End Store
+
   const [internalValue, setInternalValue] = useState<any>(
     getInitialOptionValues({
       optionType: optionType,

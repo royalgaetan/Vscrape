@@ -18,6 +18,10 @@ export type Schemes = GetSchemes<
 >;
 export type AreaExtra = ReactArea2D<Schemes>;
 
+export const NodeTest = () => {
+  return <div>Node Text here 🥥</div>;
+};
+
 const WorkflowEditor = ({
   elementDropped,
 }: {
