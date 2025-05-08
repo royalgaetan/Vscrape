@@ -1,5 +1,5 @@
-import { LucideIcon } from "lucide-react";
 import {
+  LucideIcon,
   BarChart3,
   Bell,
   Cloudy,

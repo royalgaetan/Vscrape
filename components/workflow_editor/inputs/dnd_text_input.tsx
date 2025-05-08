@@ -221,7 +221,6 @@ const DnDTextInput = ({
   }, 100);
 
   const initEditor = () => {
-    console.log("🥥 Re-render", { inputValue, isDragging });
     const editor = DnDInputRef.current;
     if (editor) {
       // editor.addEventListener("keydown", handleSpace);
@@ -319,6 +318,7 @@ const DnDTextInput = ({
           {placeholder ?? "Type something..."}
         </div>
       )}
+
       <div
         ref={DnDInputRef}
         contentEditable={!isDisabled && !readOnly}

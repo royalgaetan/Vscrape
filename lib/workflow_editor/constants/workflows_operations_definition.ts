@@ -1,21 +1,6 @@
 import { OperationItem } from "../types/w_types";
 
-export const deepFreeze = <T>(obj: T): T => {
-  Object.freeze(obj);
-  Object.getOwnPropertyNames(obj).forEach((prop) => {
-    const value = (obj as any)[prop];
-    if (
-      value !== null &&
-      !Object.isFrozen(value) &&
-      (typeof value === "function" || typeof value === "object")
-    ) {
-      deepFreeze(value);
-    }
-  });
-  return obj;
-};
-
-export const workflowOperations: OperationItem[] = [
+export const workflowOperations: Omit<OperationItem, "operationId">[] = [
   // Webhook Operations
   //
   //
@@ -44,7 +29,7 @@ export const workflowOperations: OperationItem[] = [
   // Web Scraper Operations
   {
     operationName: "Scrape a Web Page",
-    toolItemName: "Web Scraper",
+    nodeName: "Web Scraper",
     skipDuplicate: true,
     loopThrough: false,
     params: [
@@ -126,7 +111,7 @@ export const workflowOperations: OperationItem[] = [
 
   {
     operationName: "Auto-Paginate and Scrape",
-    toolItemName: "Web Scraper",
+    nodeName: "Web Scraper",
     skipDuplicate: true,
     params: [],
     inputs: {},

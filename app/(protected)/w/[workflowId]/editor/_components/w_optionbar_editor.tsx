@@ -10,20 +10,20 @@ import {
   Coins,
   LucideIcon,
   Plus,
+  Trash2,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import { formatLargeNumber } from "@/lib/date_time_utils";
-import {
-  NodeTest,
-  WorkflowEditorNode,
-} from "@/lib/workflow_editor/types/w_types";
+import { NodeTest, OperationItem } from "@/lib/workflow_editor/types/w_types";
 import { getNodeTestIcon } from "@/lib/workflow_editor/utils/w_utils";
 import OptionbarOperation from "./w_optionbar_single_operation";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import { VsNode } from "@/lib/workflow_editor/node";
 const OptionbarEditor = () => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const updateCurrentNode = useWorkflowEditorStore((s) => s.updateCurrentNode);
   const setCurrentOperation = useWorkflowEditorStore(
     (s) => s.setCurrentOperation
   );
@@ -31,9 +31,26 @@ const OptionbarEditor = () => {
   const isWorkflowOptionbarOpen = useWorkflowEditorStore(
     (s) => s.isWorkflowOptionbarOpen
   );
+  const setNodeIdToDelete = useWorkflowEditorStore((s) => s.setNodeIdToDelete);
   // End Store
 
+  const [operationOrigin, setOperationOrigin] = useState<
+    OperationItem | undefined
+  >();
   const [displaySingleOperation, setDisplaySingleOperation] = useState(false);
+
+  useEffect(() => {
+    // When the Optionbar changes: Display Single Operation return to false
+    const unsub = useWorkflowEditorStore.subscribe((state, prev) => {
+      if (
+        prev.currentNode?.id !== state.currentNode?.id ||
+        isWorkflowOptionbarOpen
+      ) {
+        setDisplaySingleOperation(false);
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const NotificationIcon = useRef<LucideIcon>(
     Math.random() < 0.7 ? Bell : BellRingIcon
@@ -78,84 +95,128 @@ const OptionbarEditor = () => {
             </div>
 
             {/* Content */}
-            {!currentNode ? (
+
+            {/* Empty Display */}
+            {!currentNode && (
               <div className=" text-muted-foreground w-full text-xs font-semibold flex flex-1 justify-center items-center min-h-[80vh]">
                 Select a tool.
               </div>
-            ) : displaySingleOperation ? (
-              // Single Operation Arena
+            )}
+
+            {/* Single Operation Arena */}
+            {currentNode && displaySingleOperation && (
               <OptionbarOperation
                 nodeOrigin={currentNode}
+                operationOrigin={operationOrigin}
                 displayBackButton={displaySingleOperation}
+                onDelete={(operationId) => {
+                  setDisplaySingleOperation(false);
+                  const updatedNode = currentNode.removeOperation(operationId);
+                  updateCurrentNode(updatedNode);
+                }}
+                onSave={(operation) => {
+                  setDisplaySingleOperation(false);
+                  const updatedNode =
+                    currentNode.addOrUpdateOperation(operation);
+                  updateCurrentNode(updatedNode);
+                }}
                 onBack={() => {
                   setDisplaySingleOperation(false);
                 }}
               />
-            ) : (
-              // All Node's Operations
+            )}
+
+            {/* All Node's Operations */}
+            {currentNode && !displaySingleOperation && (
               <div className="px-4 w-full">
                 {/* Header */}
                 <OptionbarHeader nodeOrigin={currentNode} />
 
-                {/* Buttons : Credit Cost, Notification, Unit test */}
+                {/* Buttons : Credit Cost, Notification, Unit test, Delete Node */}
                 <div className="flex flex-1 w-full mt-2 mb-8 gap-2">
                   {/* Credit Cost */}
-                  <Button
-                    variant={"ghost"}
-                    className={cn(
-                      "flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
-                    )}
-                  >
-                    <Coins className="size-4 stroke-neutral-400" />
-                    <span className="scale-90">
-                      {formatLargeNumber(creditCost.current)}
-                    </span>
-                  </Button>
-
-                  <Button
-                    variant={"ghost"}
-                    className={cn(
-                      "flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
-                    )}
-                    onPointerDown={(e) => {
-                      e.preventDefault();
-                      console.log("Toggle Notification");
-                    }}
-                  >
-                    {/* Icon */}
-                    <NotificationIconB
+                  <SimpleTooltip tooltipText="Node Total Cost" side="bottom">
+                    <Button
+                      variant={"ghost"}
                       className={cn(
-                        "!size-3 stroke-[2.5px] translate-y-[1px]",
-                        NotificationIcon.current === Bell
-                          ? "stroke-neutral-500"
-                          : "stroke-yellow-500"
+                        "flex truncate px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
                       )}
-                    />
-                    <span>
-                      {NotificationIcon.current === Bell ? "Off" : "On"}
-                    </span>
-                  </Button>
+                    >
+                      <Coins className="size-4 stroke-neutral-400 inline" />
+                      <span className="scale-90 line-clamp-1">
+                        {formatLargeNumber(creditCost.current)}
+                      </span>
+                    </Button>
+                  </SimpleTooltip>
 
-                  {/* Test Unit */}
-                  <Button
-                    variant={"ghost"}
-                    className={cn(
-                      "flex w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-center items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
-                    )}
-                    onPointerDown={(e) => {
-                      e.preventDefault();
-                      console.log("Launch a unit test");
-                    }}
+                  {/* Notification */}
+                  <SimpleTooltip
+                    tooltipText={`${
+                      NotificationIcon.current === Bell ? "Enable" : "Disable"
+                    } Node's Notifications`}
+                    side="bottom"
                   >
-                    {/* Icon */}
-                    <UnitTestIcon
+                    <Button
+                      variant={"ghost"}
                       className={cn(
-                        "stroke-neutral-500 !size-3",
-                        unitTestInfo.iconClassname
+                        "flex truncate px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
                       )}
-                    />
-                    <span>{unitTestInfo.label}</span>
-                  </Button>
+                      onClick={(e) => {
+                        console.log("Toggle Notification");
+                      }}
+                    >
+                      {/* Icon */}
+                      <NotificationIconB
+                        className={cn(
+                          "!size-3 stroke-[2.5px] translate-y-[1px]",
+                          NotificationIcon.current === Bell
+                            ? "stroke-neutral-500"
+                            : "stroke-yellow-500"
+                        )}
+                      />
+                      <span>
+                        {NotificationIcon.current === Bell ? "Off" : "On"}
+                      </span>
+                    </Button>
+                  </SimpleTooltip>
+                  {/* Test Node */}
+                  <SimpleTooltip tooltipText="Test Node" side="bottom">
+                    <Button
+                      variant={"ghost"}
+                      className={cn(
+                        "flex truncate text-left px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                      )}
+                      onClick={(e) => {
+                        console.log("Launch a unit test");
+                      }}
+                    >
+                      {/* Icon */}
+                      <UnitTestIcon
+                        className={cn(
+                          "stroke-neutral-500 !size-3",
+                          unitTestInfo.iconClassname
+                        )}
+                      />
+                      <span>{unitTestInfo.label}</span>
+                    </Button>
+                  </SimpleTooltip>
+
+                  {/* Delete Node */}
+                  <SimpleTooltip tooltipText="Delete Node" side="bottom">
+                    <Button
+                      variant={"ghost"}
+                      className={cn(
+                        "group/deleleNodeBtn flex w-fit px-2 border border-border/20 text-neutral-500 h-6 duration-0 justify-center items-center gap-1 hover:bg-destructive/80 bg-transparent cursor-pointer rounded-sm"
+                      )}
+                      onClick={(e) => {
+                        // Handle Node Deletion
+                        setNodeIdToDelete(currentNode.id);
+                      }}
+                    >
+                      {/* Icon */}
+                      <Trash2 className="group-hover/deleleNodeBtn:stroke-destructive-foreground !size-3 stroke-[2.5px] translate-y-[1px] stroke-neutral-500" />
+                    </Button>
+                  </SimpleTooltip>
                 </div>
 
                 {/* Node: Operations List (All) */}
@@ -168,6 +229,7 @@ const OptionbarEditor = () => {
                   <div className="flex flex-col w-full">
                     <AddAndOperationButton
                       onClick={() => {
+                        setOperationOrigin(undefined);
                         setCurrentOperation(undefined);
                         setDisplaySingleOperation(true);
                       }}
@@ -188,6 +250,7 @@ const OptionbarEditor = () => {
                               "group/operationItemButton relative flex flex-1 h-4 !py-[0.3rem] !w-full px-2 border border-border/50 transition-all duration-300 justify-center items-center gap-1 hover:bg-white bg-white cursor-pointer rounded-sm"
                             )}
                             onClick={() => {
+                              setOperationOrigin(operation);
                               setCurrentOperation(operation);
                               setDisplaySingleOperation(true);
                             }}
@@ -216,6 +279,7 @@ const OptionbarEditor = () => {
                               {/* Add another Operation */}
                               <AddAndOperationButton
                                 onClick={() => {
+                                  setOperationOrigin(undefined);
                                   setCurrentOperation(undefined);
                                   setDisplaySingleOperation(true);
                                 }}
@@ -262,7 +326,7 @@ export const OptionbarHeader = ({
   displayBackButton,
   onBack,
 }: {
-  nodeOrigin: WorkflowEditorNode;
+  nodeOrigin: VsNode;
   displayBackButton?: boolean;
   onBack?: () => void;
 }) => {

@@ -2,14 +2,25 @@ import { LucideIcon } from "lucide-react";
 import { vsAnyPrimitives, vsAnyRawTypes, vsStructuredData } from "./data_types";
 import { vsCriteria } from "./data_types_criteria";
 import {
+  workflowEditorNodes,
   workflowEditorSections,
-  workflowEditorToolItems,
 } from "../constants/w_constants";
 import { Nullable } from "@/lib/types";
 
+export type WorkflowEditorNode = {
+  label: string;
+  iconColor: string;
+  icon?: LucideIcon;
+  logoPath?: string;
+  tooltip?: string;
+  sectionName: keyof typeof workflowEditorSections;
+  operations: OperationItem[];
+};
+
 export type OperationItem = {
+  operationId: string;
   operationName: string;
-  toolItemName: (typeof workflowEditorToolItems)[number]["label"];
+  nodeName: (typeof workflowEditorNodes)[number]["label"];
   params?: (OperationParamItem | OperationParamItem[])[];
   inputs?: {
     // An Input key here can be: previousOperationData OR previousNodeData OR variables
@@ -33,16 +44,6 @@ export type OperationParamItem = {
   paramDescription: string;
   valuesToPickFrom?: number[] | string[] | boolean[];
 } & (vsAnyRawTypes | vsAnyPrimitives);
-
-export type WorkflowEditorNode = {
-  label: string;
-  iconColor?: string;
-  icon?: LucideIcon;
-  logoPath?: string;
-  tooltip?: string;
-  sectionName: keyof typeof workflowEditorSections;
-  operations: OperationItem[];
-};
 
 // Workflow Editor Types
 export type DroppedToolItem = {

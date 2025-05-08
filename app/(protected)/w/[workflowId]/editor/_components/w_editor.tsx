@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { NodeEditor, GetSchemes, ClassicPreset } from "rete";
 import CustomLoader from "@/components/global/loader";
 import { createRoot } from "react-dom/client";
@@ -11,16 +11,16 @@ import {
 import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
 import CustomNode from "@/components/workflow_editor/custom_node";
 import { convertDropPositionToEditorCoords } from "@/lib/workflow_editor/utils/convert_position_to_editor_coords";
+import { VsNode } from "@/lib/workflow_editor/node";
+import { getVsNodeFromLabel } from "@/lib/workflow_editor/utils/w_utils";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import { VsSelector } from "@/lib/workflow_editor/selector";
 
 export type Schemes = GetSchemes<
-  ClassicPreset.Node,
+  VsNode,
   ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>
 >;
 export type AreaExtra = ReactArea2D<Schemes>;
-
-export const NodeTest = () => {
-  return <div>Node Text here 🥥</div>;
-};
 
 const WorkflowEditor = ({
   elementDropped,
@@ -36,7 +36,36 @@ const WorkflowEditor = ({
   const areaInstanceRef = useRef<AreaPlugin<Schemes, AreaExtra>>();
   const renderInstanceRef = useRef<ReactPlugin<Schemes, AreaExtra>>();
   const connectionInstanceRef = useRef<ConnectionPlugin<Schemes, AreaExtra>>();
-  const socket = new ClassicPreset.Socket("socket");
+  const socket = new ClassicPreset.Socket("any");
+  const selectorRef = useRef<VsSelector<any>>();
+
+  // Store
+  const toggleOptionbar = useWorkflowEditorStore((s) => s.toggleOptionbar);
+  const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const setNodeIdToDelete = useWorkflowEditorStore((s) => s.setNodeIdToDelete);
+  // End Store
+
+  const editorCursorPosition = useRef<{ x: number; y: number } | null>(null);
+  const currentNodeRef = useRef(currentNode);
+  const isTranslatingCurrentNode = useRef<boolean>();
+
+  const handleNodeDeletion = async (nodeId: string) => {
+    try {
+      const editor = editorInstanceRef.current;
+      if (!editor) return;
+      await editor.removeNode(nodeId);
+      if (currentNodeRef.current && currentNodeRef.current.id === nodeId) {
+        toggleOptionbar(false);
+      }
+      setNodeIdToDelete(undefined);
+    } catch (err) {
+      console.log(`Cannot delete the node: ${nodeId}`);
+    }
+  };
+
+  useEffect(() => {
+    currentNodeRef.current = currentNode;
+  }, [currentNode?.id]);
 
   async function createEditor() {
     // Check if the editor div element has been loaded and Avoid double-initialization
@@ -82,11 +111,6 @@ const WorkflowEditor = ({
     AreaExtensions.simpleNodesOrder(area);
     AreaExtensions.zoomAt(area, editor.getNodes());
 
-    // Add Selection Abilities
-    AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
-      accumulating: AreaExtensions.accumulateOnCtrl(),
-    });
-
     // Assign edior + plugins to Refs: to avoid re-rendering of their values
     editorInstanceRef.current = editor;
     areaInstanceRef.current = area;
@@ -102,13 +126,97 @@ const WorkflowEditor = ({
       destroy: () => area.destroy(),
     };
   }
+
   useEffect(() => {
     createEditor();
 
-    if (editorInstanceRef.current) {
-      // editorInstanceRef.current.vie
+    // Listen to Workflow Editor Store
+    const unsub = useWorkflowEditorStore.subscribe((state) => {
+      // Listen to OptionBar Display State
+      if (state.isWorkflowOptionbarOpen === false) {
+        selectorRef.current && selectorRef.current?.unselectAll();
+      }
+
+      // Listen to node to delete
+      if (state.nodeIdToDelete) {
+        // Handle Node Deletion
+        handleNodeDeletion(state.nodeIdToDelete);
+      }
+    });
+
+    // Listen to Editor clicks!
+    if (editorRef.current) {
+      editorRef.current.addEventListener("pointerdown", handlePointerDown);
+      editorRef.current.addEventListener("pointerup", handlePointerUp);
     }
+
+    return () => {
+      unsub();
+      editorRef.current?.removeEventListener("pointerdown", handlePointerDown);
+      editorRef.current?.removeEventListener("pointerup", handlePointerUp);
+    };
   }, []);
+
+  useEffect(() => {
+    // Add Selection Abilities: to Editor
+    const editor = editorInstanceRef.current;
+    const area = areaInstanceRef.current;
+    selectorRef.current = new VsSelector((_, $) => {});
+
+    const accumulating = AreaExtensions.accumulateOnCtrl();
+
+    if (!editor || !area || !selectorRef.current) return;
+    const selectableNodes = AreaExtensions.selectableNodes(
+      area,
+      selectorRef.current,
+      {
+        accumulating,
+      }
+    );
+
+    area.addPipe((context) => {
+      // Picked: Node "full" Clicked
+      if (context.type === "nodepicked") {
+        isTranslatingCurrentNode.current = false;
+        selectableNodes.unselect(context.data.id);
+      }
+      // Translated: Node being moved...
+      else if (context.type === "nodetranslated") {
+        onNodeTranslated();
+      }
+      // Dragged: On Drag End (PointerUp)
+      else if (context.type === "nodedragged") {
+        const nodeIdDragged = context.data.id;
+        const concernedNode = editor.getNode(nodeIdDragged);
+
+        if (isTranslatingCurrentNode.current) {
+          if (
+            currentNodeRef.current &&
+            currentNodeRef.current.id === nodeIdDragged
+          ) {
+            selectableNodes.select(nodeIdDragged, true);
+          } else {
+            selectableNodes.unselect(nodeIdDragged);
+            if (!currentNodeRef.current) return;
+            selectableNodes.select(currentNodeRef.current.id, true);
+          }
+        } else {
+          if (
+            currentNodeRef.current &&
+            currentNodeRef.current.id === nodeIdDragged
+          ) {
+            selectableNodes.unselect(nodeIdDragged);
+            toggleOptionbar(false);
+          } else {
+            selectableNodes.select(nodeIdDragged, true);
+            toggleOptionbar(true, concernedNode);
+          }
+        }
+      }
+
+      return context;
+    });
+  }, [editorInstanceRef.current]);
 
   useEffect(() => {
     if (elementDropped) {
@@ -119,24 +227,41 @@ const WorkflowEditor = ({
   const onNodeAdded = async (droppedItem: DroppedToolItem) => {
     const editor = editorInstanceRef.current;
     const area = areaInstanceRef.current;
+    const nodeToAdd = getVsNodeFromLabel(droppedItem.label);
 
-    if (!editor || !area || droppedItem.label.length < 1) return;
-
-    const newNode = new ClassicPreset.Node(droppedItem.label);
-    newNode.addControl(
-      "custom",
-      new ClassicPreset.InputControl("text", { initial: "custom" })
-    );
-    newNode.addInput("custom", new ClassicPreset.Input(socket));
-    await editor.addNode(newNode);
+    if (!editor || !area || !nodeToAdd || droppedItem.label.length < 1) return;
+    await editor.addNode(nodeToAdd);
 
     const position = convertDropPositionToEditorCoords(
       droppedItem.position ?? { x: 0, y: 0 },
       area
     );
 
-    await area.translate(newNode.id, position);
-    console.log("@DEBUG", "Node Added", newNode);
+    await area.translate(nodeToAdd.id, position);
+    console.log("@DEBUG", "Node Added", nodeToAdd.label);
+  };
+
+  const onNodeTranslated = useMemo(() => {
+    return () => {
+      isTranslatingCurrentNode.current = true;
+    };
+  }, []);
+
+  const handlePointerDown = (e: PointerEvent) => {
+    editorCursorPosition.current = { x: e.clientX, y: e.clientY };
+  };
+  const handlePointerUp = (e: PointerEvent) => {
+    if (e.target !== e.currentTarget || !editorCursorPosition.current) return;
+    const dx = Math.abs(e.clientX - editorCursorPosition.current.x);
+    const dy = Math.abs(e.clientY - editorCursorPosition.current.y);
+    const threshold = 5; // pixels
+
+    if (dx < threshold && dy < threshold) {
+      // Click
+      toggleOptionbar(false);
+    } else {
+      // Pan / Drag
+    }
   };
 
   return (
@@ -149,7 +274,7 @@ const WorkflowEditor = ({
 
       <div
         ref={editorRef}
-        className="h-full w-full editor-background-dots"
+        className="flex flex-1 w-full editor-background-dots"
       ></div>
     </div>
   );

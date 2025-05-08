@@ -10,21 +10,19 @@ import { isSearchTermFound } from "@/lib/string_utils";
 import React, { useState } from "react";
 import ToolItemLine from "./w_tools_tab_item";
 import {
+  workflowEditorNodes,
   workflowEditorSections,
-  workflowEditorToolItems,
 } from "@/lib/workflow_editor/constants/w_constants";
 
 const WToolsTab = () => {
   const [searchContent, setSearchContent] = useState("");
 
-  const filteredWorkflowEditorToolItems = workflowEditorToolItems.filter(
-    (item) => {
-      return isSearchTermFound({
-        text: item.label,
-        keySearchTerm: searchContent,
-      });
-    }
-  );
+  const filteredWorkflowEditorToolItems = workflowEditorNodes.filter((node) => {
+    return isSearchTermFound({
+      text: node.label,
+      keySearchTerm: searchContent,
+    });
+  });
 
   return (
     <div className="h-px w-full relative">

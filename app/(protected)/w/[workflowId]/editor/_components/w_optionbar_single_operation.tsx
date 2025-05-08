@@ -1,34 +1,91 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
-import { CircleEllipsisIcon, Hammer, Star, Trash2 } from "lucide-react";
+import {
+  Check,
+  CircleEllipsisIcon,
+  Hammer,
+  Loader2,
+  LucideIcon,
+  Save,
+  Star,
+  Trash2,
+  X,
+} from "lucide-react";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
 import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
-import { generateHexRandomString } from "@/lib/numbers_utils";
+import { delay, generateHexRandomString } from "@/lib/numbers_utils";
 import ParameterItemLine from "./w_optionbar_param_itemline";
 import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
 import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
 import { FieldLabel, OptionbarHeader } from "./w_optionbar_editor";
-import { WorkflowEditorNode } from "@/lib/workflow_editor/types/w_types";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
-import { shallow } from "zustand/shallow";
+import { VsNode } from "@/lib/workflow_editor/node";
+import { OperationItem } from "@/lib/workflow_editor/types/w_types";
 
 const OptionbarOperation = ({
   nodeOrigin,
+  operationOrigin,
   onBack,
+  onSave,
+  onDelete,
   displayBackButton,
 }: {
-  nodeOrigin: WorkflowEditorNode;
+  nodeOrigin: VsNode;
+  operationOrigin?: OperationItem;
   onBack?: () => void;
+  onSave: (operation: OperationItem) => void;
+  onDelete: (operationId: string) => void;
   displayBackButton?: boolean;
 }) => {
+  const operationId = useRef<string>(
+    operationOrigin?.operationId ?? crypto.randomUUID()
+  );
   // Store
+  const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+
   const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
   const setCurrentOperation = useWorkflowEditorStore(
     (s) => s.setCurrentOperation
   );
   // End Store
+
+  const availableOperations = workflowOperations.filter(
+    (operation) => operation.nodeName === nodeOrigin.label
+  );
+
+  const [isSavingOperation, setIsSavingOperation] = useState(false);
+  const [SavingOperationResultIcon, setSavingOperationResultIcon] = useState<
+    LucideIcon | undefined
+  >(undefined);
+  const saveOperation = async () => {
+    setSavingOperationResultIcon(undefined);
+    setIsSavingOperation(true);
+    await delay(400);
+
+    if (!currentNode || !currentOperation) {
+      setIsSavingOperation(false);
+      setSavingOperationResultIcon(X);
+      await delay(1000);
+      setSavingOperationResultIcon(undefined);
+      return;
+    }
+    try {
+      setIsSavingOperation(false);
+      setSavingOperationResultIcon(Check);
+      await delay(150);
+      setSavingOperationResultIcon(undefined);
+      onSave(currentOperation);
+    } catch (e) {
+      console.log("Err", e);
+      setIsSavingOperation(false);
+      setSavingOperationResultIcon(X);
+      await delay(1000);
+      setSavingOperationResultIcon(undefined);
+      return;
+    }
+  };
 
   return (
     <div>
@@ -38,9 +95,7 @@ const OptionbarOperation = ({
           <div className="px-4 w-full">
             <OptionbarHeader
               nodeOrigin={nodeOrigin}
-              displayBackButton={
-                displayBackButton && currentOperation === undefined
-              }
+              displayBackButton={displayBackButton}
               onBack={() => onBack && onBack()}
             />
           </div>
@@ -49,16 +104,24 @@ const OptionbarOperation = ({
           <div className="mt-4 pb-6 space-y-4">
             {/* Operation Selector */}
             <div className="flex flex-col justify-start items-start px-4 pr-4">
-              <FieldLabel label={"Select an operation"} Icon={Hammer} />
+              <FieldLabel
+                label={
+                  operationOrigin
+                    ? "Change operation type"
+                    : "Select an operation"
+                }
+                Icon={Hammer}
+              />
+
               <MultiSelect
-                isTriggerDisabled={nodeOrigin.operations.length === 0}
+                isTriggerDisabled={availableOperations.length === 0}
                 triggerClassName="h-9 w-[15.7rem] flex flex-1 mb-1"
                 popoverAlignment="center"
                 selectionMode="single"
                 popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
                 label={currentOperation?.operationName ?? "Pick an operation"}
                 data={{
-                  "": nodeOrigin.operations.map((op) => ({
+                  "": availableOperations.map((op) => ({
                     label: op.operationName,
                     value: op.operationName,
                     icon: nodeOrigin.icon ?? Star,
@@ -77,7 +140,13 @@ const OptionbarOperation = ({
                     const operation = workflowOperations.find(
                       (op) => op.operationName === opSelected
                     );
-                    setCurrentOperation(structuredClone(operation));
+                    if (!operation) return;
+                    setCurrentOperation(
+                      structuredClone({
+                        operationId: operationId.current,
+                        ...operation,
+                      })
+                    );
                   }
                 }}
               />
@@ -179,6 +248,7 @@ const OptionbarOperation = ({
       {/* Fixed Bottom Bar */}
       {currentOperation && (
         <div className="flex flex-col w-[var(--optionbarwidth)] bg-white z-10 fixed bottom-[7vh]">
+          {/* Shared Outputs DnD Buttons */}
           <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
             {previousInputData.map((inputData) => (
               <SimpleTooltip
@@ -203,28 +273,48 @@ const OptionbarOperation = ({
               </SimpleTooltip>
             ))}
           </div>
+
           {/* Action Buttons: Delete | Save Operation */}
-          <div className="flex flex-1 justify-between items-center py-1 px-3 border-t">
-            <SimpleTooltip tooltipText={"Delete Operation"}>
-              <Button
-                type="button"
-                variant={"ghost"}
-                size={"sm"}
-                className="w-fit"
-                onClick={() => {}}
-              >
-                <Trash2 />
-              </Button>
-            </SimpleTooltip>
+          <div className="flex flex-1 justify-end items-center py-1 px-3 border-t">
+            {/* Delete Button: only if we're in [UPDATE Mode] */}
+            {operationOrigin && (
+              <div className="flex flex-1 justify-start">
+                <SimpleTooltip tooltipText={"Delete Operation"}>
+                  <Button
+                    type="button"
+                    variant={"ghost"}
+                    size={"sm"}
+                    className="w-fit"
+                    onClick={() => {
+                      // Delete Operation
+                      onDelete(operationOrigin.operationId);
+                    }}
+                  >
+                    <Trash2 />
+                  </Button>
+                </SimpleTooltip>
+              </div>
+            )}
 
             <Button
-              type="submit"
               variant={"default"}
-              size={"sm"}
+              disabled={isSavingOperation}
+              className="rounded-2xl h-7 text-xs gap-1 px-3 duration-150"
+              onClick={() => saveOperation()}
               // disabled={!onboardingForm.formState.isValid}
-              className="w-fit"
             >
-              Save changes
+              {isSavingOperation && SavingOperationResultIcon === undefined && (
+                <Loader2 className="animate-spin stroke-white" />
+              )}
+              {SavingOperationResultIcon && !isSavingOperation && (
+                <SavingOperationResultIcon className="stroke-white" />
+              )}
+
+              {!isSavingOperation &&
+                SavingOperationResultIcon === undefined && (
+                  <Save className="stroke-white" />
+                )}
+              <span className="">Save Changes</span>
             </Button>
           </div>
         </div>

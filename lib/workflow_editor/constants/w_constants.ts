@@ -40,12 +40,9 @@ import {
   FileText,
   Variable,
 } from "lucide-react";
-import {
-  PreviousInputDataType,
-  WorkflowEditorToolItem,
-} from "../types/w_types";
+import { PreviousInputDataType, WorkflowEditorNode } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
-import { workflowOperations } from "./workflows_operations_definition";
+import { deepFreeze } from "@/lib/utils";
 
 export const previousInputData: PreviousInputDataType[] = [
   {
@@ -95,7 +92,10 @@ export const workflowEditorSections = {
   },
 } as const;
 
-export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
+export const workflowEditorNodes: Omit<
+  WorkflowEditorNode,
+  "iconColor" | "nodeId"
+>[] = deepFreeze([
   // Entry Points
   {
     label: "Webhook",
@@ -140,9 +140,7 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
     icon: Globe,
     tooltip: "",
     sectionName: "Data Reading",
-    operations: workflowOperations.filter(
-      (op) => op.toolItemName === "Web Scraper"
-    ),
+    operations: [],
   },
   {
     label: "File reader",
@@ -529,4 +527,4 @@ export const workflowEditorToolItems: WorkflowEditorToolItem[] = [
     sectionName: "Data Sync",
     operations: [],
   },
-] as const;
+] as const);

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Circle } from "lucide-react";
+import { Drag } from "rete-react-plugin";
 
 const NodeHandle = ({
   iconClassName,
@@ -17,14 +18,16 @@ const NodeHandle = ({
         containerClassName
       )}
     >
-      <Circle
-        className={cn(
-          "size-2 inline-block transition-transform duration-100 ease-in-out",
-          iconClassName
-        )}
-        stroke={iconColor ?? "#6460aa"}
-        fill={iconColor ?? "#6460aa"}
-      />
+      <Drag.NoDrag>
+        <Circle
+          className={cn(
+            "size-2 inline-block transition-transform duration-100 ease-in-out cursor-grab",
+            iconClassName
+          )}
+          stroke={iconColor ?? "#6460aa"}
+          fill={iconColor ?? "#6460aa"}
+        />
+      </Drag.NoDrag>
     </span>
   );
 };

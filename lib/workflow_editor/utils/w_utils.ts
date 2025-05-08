@@ -6,30 +6,36 @@ import {
   LucideIcon,
 } from "lucide-react";
 import {
+  workflowEditorNodes,
   workflowEditorSections,
-  workflowEditorToolItems,
 } from "../constants/w_constants";
-import { NodeTest, WorkflowEditorToolItem } from "../types/w_types";
+import { NodeTest, OperationItem, WorkflowEditorNode } from "../types/w_types";
+import { WORKFLOW_COLORS } from "@/lib/colors_utils";
+import { VsNode } from "../node";
+import { deepClone } from "@/lib/utils";
 
 export const isDynamicInputDataOnly = (content: string) => {
   // Check if the provided content is only a data input. E.g. {{ Variables }}
   return content.startsWith("{{") && content.endsWith("}}");
 };
 
-export const getWorkflowToolItemFromLabel = (
-  label: string
-): WorkflowEditorToolItem | null => {
-  const item = workflowEditorToolItems.find((item) => item.label === label);
-  if (!item) return null;
-  return item;
+export const getVsNodeFromLabel = (label: string): VsNode | null => {
+  const node = workflowEditorNodes.find((node) => node.label === label);
+  if (!node) return null;
+  const vsNode: VsNode = new VsNode({
+    iconColor: getWorkflowSectionColor(node.sectionName),
+    ...node,
+  } as WorkflowEditorNode);
+
+  return vsNode;
 };
 
-export const getWorkflowSectionFromName = (sectionName: string) => {
+export const getWorkflowSectionColor = (sectionName: string): string => {
   const section = Object.entries(workflowEditorSections).find(
     (s) => s[0] === sectionName
   );
-  if (!section) return null;
-  return section;
+  if (!section) return WORKFLOW_COLORS.slate;
+  return section[1].iconColor;
 };
 
 export const getNodeTestIcon = (
