@@ -6,6 +6,13 @@ import {
 } from "@/lib/workflow_editor/types/w_types";
 import { create } from "zustand";
 
+export type NodeToActOn =
+  | {
+      nodeId: string;
+      operation: "Delete" | "Duplicate";
+    }
+  | undefined;
+
 interface WorkflowEditorState {
   // Workflow Chat
   isWorkflowChatOpen: boolean;
@@ -14,12 +21,14 @@ interface WorkflowEditorState {
   // Workflow Option Bar (Right bar)
   isWorkflowOptionbarOpen: boolean;
   currentNode: VsNode | undefined;
-  nodeIdToDelete: string | undefined;
-  setNodeIdToDelete: (nodeId: string | undefined) => void;
   updateCurrentNode: (val: VsNode) => void;
   currentOperation: OperationItem | undefined;
   setCurrentOperation: (operation: OperationItem | undefined) => void;
   toggleOptionbar: (isOpen: boolean, node?: VsNode) => void;
+
+  // Node Operations: Duplicate, Delete
+  setNodeIdToActOn: (act: NodeToActOn) => void;
+  nodeIdToActOn: NodeToActOn;
 
   // Worfklow Shared Outputs Dialog
   isSharedOutputsDialogOpen: boolean;
@@ -45,10 +54,6 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
     isWorkflowOptionbarOpen: false,
     setIsWorkflowOptionbarOpen: (isOpen) =>
       set({ isWorkflowOptionbarOpen: isOpen }),
-
-    nodeIdToDelete: undefined,
-    setNodeIdToDelete: (nodeId) => set({ nodeIdToDelete: nodeId }),
-
     currentNode: undefined,
     updateCurrentNode: (val) => set({ currentNode: val }),
     currentOperation: undefined,
@@ -60,6 +65,11 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
         currentOperation: undefined,
       });
     },
+
+    // Node Operations: Duplicate, Delete
+    nodeIdToActOn: undefined,
+    setNodeIdToActOn: (act) => set({ nodeIdToActOn: act }),
+
     // Shared Output-related
     isSharedOutputsDialogOpen: false,
     sharedOutputSelected: undefined,

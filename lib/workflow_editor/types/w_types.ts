@@ -20,6 +20,7 @@ export type WorkflowEditorNode = {
 export type OperationItem = {
   operationId: string;
   operationName: string;
+  operationDescription: string;
   nodeName: (typeof workflowEditorNodes)[number]["label"];
   params?: (OperationParamItem | OperationParamItem[])[];
   inputs?: {

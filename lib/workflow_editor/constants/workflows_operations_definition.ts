@@ -30,6 +30,8 @@ export const workflowOperations: Omit<OperationItem, "operationId">[] = [
   {
     operationName: "Scrape a Web Page",
     nodeName: "Web Scraper",
+    operationDescription:
+      "Extracts content from a single web page, allowing retrieval of specific elements such as text, images, links, or structured data using defined selectors.",
     skipDuplicate: true,
     loopThrough: false,
     params: [
@@ -108,12 +110,48 @@ export const workflowOperations: Omit<OperationItem, "operationId">[] = [
     inputFilters: [],
     outputs: {},
   },
-
   {
     operationName: "Auto-Paginate and Scrape",
     nodeName: "Web Scraper",
+    operationDescription:
+      "Automatically navigates through multiple pages of a paginated website and extracts content from each page, enabling large-scale data collection without manual intervention.",
     skipDuplicate: true,
-    params: [],
+    loopThrough: false,
+    params: [
+      {
+        paramName: "Start URL",
+        paramInputPlaceholder: "Enter the url to begin with...",
+        paramDescription:
+          "This should be the URL of the first page you want to start scraping.",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Pagination Selector",
+        paramInputPlaceholder: "Selector to find the “next page” button/link",
+        paramDescription:
+          'A CSS selector that targets the "Next" button or link in the pagination UI.',
+        type: "primitive/text",
+        value: "",
+      },
+      [
+        {
+          paramName: "Max Pages",
+          paramDescription:
+            "An upper limit to avoid scraping infinitely. Choose a number based on how many pages you want to scrape.",
+          type: "primitive/number",
+          paramInputPlaceholder: "Enter...",
+          value: "" as any,
+        },
+        {
+          paramName: "Wait between pages",
+          paramInputPlaceholder: "0 (ms)",
+          paramDescription: "Delay (ms) between pages.",
+          type: "primitive/number",
+          value: "" as any,
+        },
+      ],
+    ],
     inputs: {},
     inputFilters: [],
     outputs: {},
@@ -123,6 +161,59 @@ export const workflowOperations: Omit<OperationItem, "operationId">[] = [
   //
   //
   // File Reader Operations
+  {
+    operationName: "Read Text File",
+    nodeName: "File reader",
+    operationDescription:
+      "Read content from .txt, .log, .md, or similar plain text files.",
+    skipDuplicate: true,
+    loopThrough: false,
+    params: [
+      {
+        paramName: "File input",
+        paramInputPlaceholder: "File or file path...",
+        paramDescription: "File or file path (dynamic or static)",
+        type: "primitive/text",
+        value: "",
+      },
+      [
+        {
+          paramName: "Encoding",
+          paramInputPlaceholder: "Select...",
+          paramDescription: "",
+          type: "primitive/text",
+          valuesToPickFrom: ["utf-8", "ascii", "latin1"],
+          value: "",
+        },
+        {
+          paramName: "Read mode",
+          paramInputPlaceholder: "Select...",
+          paramDescription: "",
+          type: "primitive/text",
+          valuesToPickFrom: ["full", "lines", "lines with limit"],
+          value: "",
+        },
+      ],
+
+      {
+        paramName: "Line limit",
+        paramDescription: "(if mode is line-based)",
+        type: "primitive/number",
+        paramInputPlaceholder: "(if mode is line-based)...",
+        value: "" as any,
+      },
+      {
+        paramName: "Trim whitespace",
+        paramInputPlaceholder: "",
+        paramDescription: "Trim whitespace",
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //

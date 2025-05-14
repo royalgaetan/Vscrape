@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Drag, Presets } from "rete-react-plugin";
+import React, { useEffect, useState } from "react";
+import { Presets } from "rete-react-plugin";
 import Image from "next/image";
 import { Copy, GripVertical, LucideIcon } from "lucide-react";
 import { Button } from "../ui/button";
@@ -9,6 +9,9 @@ import NodeHandle from "./node_handle";
 import { VsNode } from "@/lib/workflow_editor/node";
 import { Schemes } from "@/app/(protected)/w/[workflowId]/editor/_components/w_editor";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import { hexToRgba } from "@/lib/colors_utils";
+
+const { RefSocket } = Presets.classic;
 
 const CustomNode = ({
   data: node,
@@ -19,11 +22,12 @@ const CustomNode = ({
 }) => {
   const Icon = node.icon as LucideIcon;
 
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const [nodeOperationsLength, setNodeOperationsLength] = useState<number>(
     node.operations.length
   );
   // Store
-  const setNodeIdToDelete = useWorkflowEditorStore((s) => s.setNodeIdToDelete);
+  const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
   // End Store
 
   useEffect(() => {
@@ -40,10 +44,12 @@ const CustomNode = ({
 
   return (
     <button
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onKeyDown={(e) => {
         // Handle Delete Node
         if (e.key === "Delete") {
-          setNodeIdToDelete(node.id);
+          setNodeIdToActOn({ nodeId: node.id, operation: "Delete" });
         }
       }}
       className={cn(
@@ -75,19 +81,26 @@ const CustomNode = ({
           {Icon && (
             <div
               className={cn(
-                "flex size-28 rounded-full justify-center items-center"
+                "flex size-28 rounded-full justify-center items-center outline-offset-[-1px] transition-all duration-150"
               )}
-              style={{ backgroundColor: node.iconColor }}
+              style={{
+                backgroundColor: node.iconColor,
+                outline: `6px solid ${
+                  node.selected || isHovered
+                    ? hexToRgba(node.iconColor, 0.4)
+                    : "transparent"
+                }`,
+              }}
             >
               <Icon className={"size-16 stroke-[1.3px] stroke-white"} />
             </div>
           )}
           {node?.logoPath && (
-            <div className="relative h-24 w-24 mb-0">
+            <div className="relative h-24 w-24 mb-0 ">
               <Image
                 src={node.logoPath}
                 alt={`${node.label} logo`}
-                className="select-none object-contain"
+                className="select-none object-contain group-hover:opacity-80 transition-all duration-150"
                 fill
               />
             </div>
@@ -97,28 +110,39 @@ const CustomNode = ({
         {/* Content: Node Name, Handles, Operation Number, etc. */}
         <div className="flex flex-col justify-center items-center gap-0 w-full">
           {/* Node Name + Handles */}
-          <div className="relative flex flex-1 items-center justify-center gap-1 w-full">
+          <div className="relative flex flex-1 items-center justify-center gap-1 w-max">
+            {/* Handle Overlays */}
+
+            {/* Left Handle */}
             <NodeHandle
-              iconColor={node.iconColor}
-              containerClassName="absolute left-3 group-hover:flex justify-start hidden group/leftHandle"
-              iconClassName="origin-center group-hover/leftHandle:scale-[2.25]"
+              key={`${node.id}-input`}
+              emit={emit}
+              nodeId={node.id}
+              side="input"
+              throughput={node.inputs}
+              iconClassName="-translate-x-[0.75rem]"
             />
 
-            <div className="flex justify-center w-full">
-              <h6 className="text-center truncate font-bold text-neutral-900 text-base px-5">
+            {/* Node Label */}
+            <div className="flex justify-center max-w-fit min-w-[6rem]">
+              <h6 className="text-center truncate font-bold text-neutral-900 text-base px-3">
                 {node.label}
               </h6>
             </div>
 
+            {/* Right Handle */}
             <NodeHandle
-              iconColor={node.iconColor}
-              containerClassName="absolute right-3 group-hover:flex justify-end hidden group/rightHandle"
-              iconClassName="origin-center group-hover/rightHandle:scale-[2.25]"
+              key={`${node.id}-output`}
+              emit={emit}
+              nodeId={node.id}
+              side="output"
+              throughput={node.outputs}
+              iconClassName="translate-x-[0.75rem]"
             />
           </div>
 
           {/* Rests... */}
-          <div className="flex flex-1 items-center justify-center gap-1">
+          <div className="flex flex-1 items-center justify-center gap-1 pointer-events-none">
             <p className="w-full text-center line-clamp-1 font-normal text-neutral-500 text-sm">
               {nodeOperationsLength} Operation
               {nodeOperationsLength > 1 && "s"}
@@ -128,12 +152,12 @@ const CustomNode = ({
               <Button
                 variant={"ghost"}
                 className={cn(
-                  "flex cursor-pointer pointer-events-none hover:opacity-70 translate-y-[0.16rem] active:scale-[0.9] h-fit !px-0 !py-0 transition-all duration-300 justify-center items-center hover:bg-transparent bg-transparent"
+                  "flex cursor-pointer pointer-events-auto hover:opacity-70 translate-y-[0.16rem] active:scale-[0.9] h-fit !px-0 !py-0 transition-all duration-300 justify-center items-center hover:bg-transparent bg-transparent"
                 )}
                 onPointerDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log("Duplicate Btn");
+                  setNodeIdToActOn({ nodeId: node.id, operation: "Duplicate" });
                 }}
               >
                 {/* Icon */}

@@ -9,11 +9,13 @@ const ParameterItemLine = ({
   className,
   inputClassName,
   labelClassName,
+  isWithinAGroup,
 }: {
   paramData: OperationParamItem;
   className?: string;
   inputClassName?: string;
   labelClassName?: string;
+  isWithinAGroup: boolean;
 }) => {
   // Store
   const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
@@ -79,15 +81,16 @@ const ParameterItemLine = ({
 
       <div
         className={cn(
-          "flex flex-1 w-full justify-start items-center text-xs text-neutral-700",
+          "flex flex-1 w-full !justify-start items-center text-xs text-neutral-700",
           inputClassName
         )}
       >
         <ParamInput
+          isWithinAGroup={isWithinAGroup}
           initialValue={internalValue}
           inputType={paramData.type}
           onChange={onValueChange}
-          placeHolder={paramData.paramName}
+          placeHolder={paramData.paramInputPlaceholder}
           valuesToPickFrom={paramData.valuesToPickFrom}
         />
       </div>

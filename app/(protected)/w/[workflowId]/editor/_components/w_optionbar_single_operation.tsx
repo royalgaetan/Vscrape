@@ -120,12 +120,16 @@ const OptionbarOperation = ({
                 selectionMode="single"
                 popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
                 label={currentOperation?.operationName ?? "Pick an operation"}
+                itemTooltipClassname="w-52"
                 data={{
                   "": availableOperations.map((op) => ({
                     label: op.operationName,
                     value: op.operationName,
                     icon: nodeOrigin.icon ?? Star,
                     iconClassName: "stroke-neutral-400 fill-transparent",
+                    tooltipContent: op.operationDescription,
+                    tooltipAlign: "end",
+                    tooltipSide: "left",
                   })),
                 }}
                 selectedValues={
@@ -168,18 +172,19 @@ const OptionbarOperation = ({
                     return (
                       <div key={`${generateHexRandomString(20)}_param_${id}`}>
                         {Array.isArray(params) ? (
-                          <div className="flex flex-1 gap-2 px-4 pr-4 divide-x-2 mt-3">
+                          <div className="flex flex-1 !w-full justify-start gap-0 px-4 pr-4 mt-3">
                             {params.map((param, idx) => (
                               <div
                                 key={`${generateHexRandomString(
                                   20
                                 )}_param_inline_${idx}`}
-                                className="flex flex-1"
+                                className="flex flex-1 pl-2 pr-1 mr-2 first:pl-0"
                                 style={{
                                   maxWidth: `${90 / params.length}%`,
                                 }}
                               >
                                 <ParameterItemLine
+                                  isWithinAGroup={true}
                                   paramData={param}
                                   labelClassName={
                                     param.type
@@ -190,12 +195,20 @@ const OptionbarOperation = ({
                                   }
                                   inputClassName="justify-center"
                                 />
+                                {params.length === idx + 1 ? (
+                                  <></>
+                                ) : (
+                                  <div className="h-full w-[0.5px] ml-2 bg-border"></div>
+                                )}
                               </div>
                             ))}
                           </div>
                         ) : (
                           <div className="flex flex-1 w-full px-4 pr-4">
-                            <ParameterItemLine paramData={params} />
+                            <ParameterItemLine
+                              paramData={params}
+                              isWithinAGroup={false}
+                            />
                           </div>
                         )}
                       </div>

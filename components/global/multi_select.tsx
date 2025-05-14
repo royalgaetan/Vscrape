@@ -17,6 +17,7 @@ import {
 import { SettingItemSelectDataType } from "@/app/(protected)/_settings/_components/settings_item_select";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";
+import SimpleTooltip, { TooltipAlign, TooltipSide } from "./simple_tooltip";
 
 const MultiSelect = ({
   data,
@@ -29,6 +30,7 @@ const MultiSelect = ({
   popoverClassName,
   selectionMode = "multi",
   isTriggerDisabled,
+  itemTooltipClassname,
 }: {
   data: SettingItemSelectDataType;
   selectionMode?: "single" | "multi";
@@ -40,6 +42,7 @@ const MultiSelect = ({
   popoverClassName?: string;
   popoverAlignment?: "end" | "center" | "start";
   popoverSide?: "top" | "right" | "bottom" | "left";
+  itemTooltipClassname?: string;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -92,23 +95,36 @@ const MultiSelect = ({
                             setOpen(false);
                           }
                         }}
-                        className="flex items-center justify-between cursor-pointer data-[selected=true]:bg-accent/50"
+                        className="flex flex-1 w-full items-center justify-between cursor-pointer data-[selected=true]:bg-accent/50"
                       >
-                        {Icon && (
-                          <Icon
-                            className={cn(
-                              "mr-0 size-3 stroke-[1.8px]",
-                              option.iconClassName
-                            )}
-                            fill={option.iconColorHex}
-                          />
-                        )}
-                        <span className="text-xs truncate w-56 flex-1 justify-start">
-                          {option.label}
-                        </span>
-                        {selectedValues.includes(option.value) && (
-                          <CheckIcon className="h-4 w-4" />
-                        )}
+                        <TooltipWrapper
+                          tooltipClassName={itemTooltipClassname}
+                          tooltip={option.tooltipContent}
+                          tooltipAlign={option.tooltipAlign}
+                          tooltipSide={option.tooltipSide}
+                        >
+                          <div className="flex flex-1 w-full justify-between gap-2">
+                            <div>
+                              {Icon && (
+                                <Icon
+                                  className={cn(
+                                    "mr-0 size-3 stroke-[1.8px]",
+                                    option.iconClassName
+                                  )}
+                                  fill={option.iconColorHex}
+                                />
+                              )}
+                            </div>
+                            <div className="text-xs truncate justify-start text-left flex flex-1">
+                              {option.label}
+                            </div>
+                            <div className="">
+                              {selectedValues.includes(option.value) && (
+                                <CheckIcon className="h-4 w-4" />
+                              )}
+                            </div>
+                          </div>
+                        </TooltipWrapper>
                       </CommandItem>
                     );
                   })}
@@ -123,3 +139,33 @@ const MultiSelect = ({
 };
 
 export default MultiSelect;
+
+const TooltipWrapper = ({
+  children,
+  tooltip,
+  tooltipAlign,
+  tooltipSide,
+  tooltipClassName,
+}: {
+  children: React.ReactNode;
+  tooltip?: string;
+  tooltipAlign?: TooltipAlign;
+  tooltipSide?: TooltipSide;
+  tooltipClassName?: string;
+}) => {
+  if (tooltip) {
+    return (
+      <SimpleTooltip
+        className={tooltipClassName}
+        align={tooltipAlign}
+        side={tooltipSide}
+        tooltipText={tooltip}
+        enableAsChild={false}
+      >
+        {children}
+      </SimpleTooltip>
+    );
+  } else {
+    return children;
+  }
+};

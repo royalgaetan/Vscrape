@@ -3,7 +3,7 @@ import { NodeEditor, GetSchemes, ClassicPreset } from "rete";
 import CustomLoader from "@/components/global/loader";
 import { createRoot } from "react-dom/client";
 import { ReactPlugin, Presets, ReactArea2D } from "rete-react-plugin";
-import { AreaPlugin, AreaExtensions } from "rete-area-plugin";
+import { AreaPlugin, AreaExtensions, NodeView } from "rete-area-plugin";
 import {
   ConnectionPlugin,
   Presets as ConnectionPresets,
@@ -15,11 +15,11 @@ import { VsNode } from "@/lib/workflow_editor/node";
 import { getVsNodeFromLabel } from "@/lib/workflow_editor/utils/w_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { VsSelector } from "@/lib/workflow_editor/selector";
+import { VsConnection } from "@/lib/workflow_editor/connections";
+import CustomSocket from "@/components/workflow_editor/custom_socket";
+import CustomConnection from "@/components/workflow_editor/custom_connection";
 
-export type Schemes = GetSchemes<
-  VsNode,
-  ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>
->;
+export type Schemes = GetSchemes<VsNode, VsConnection<VsNode>>;
 export type AreaExtra = ReactArea2D<Schemes>;
 
 const WorkflowEditor = ({
@@ -36,13 +36,12 @@ const WorkflowEditor = ({
   const areaInstanceRef = useRef<AreaPlugin<Schemes, AreaExtra>>();
   const renderInstanceRef = useRef<ReactPlugin<Schemes, AreaExtra>>();
   const connectionInstanceRef = useRef<ConnectionPlugin<Schemes, AreaExtra>>();
-  const socket = new ClassicPreset.Socket("any");
   const selectorRef = useRef<VsSelector<any>>();
 
   // Store
   const toggleOptionbar = useWorkflowEditorStore((s) => s.toggleOptionbar);
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-  const setNodeIdToDelete = useWorkflowEditorStore((s) => s.setNodeIdToDelete);
+  const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
   // End Store
 
   const editorCursorPosition = useRef<{ x: number; y: number } | null>(null);
@@ -54,13 +53,69 @@ const WorkflowEditor = ({
       const editor = editorInstanceRef.current;
       if (!editor) return;
       await editor.removeNode(nodeId);
+
+      // Delete Related Connections
+      const relatedConnections = editor
+        .getConnections()
+        .filter((c) => c.source === nodeId || c.target === nodeId);
+      if (relatedConnections.length > 0) {
+        relatedConnections.forEach((connection) => {
+          editor.removeConnection(connection.id);
+        });
+      }
+
       if (currentNodeRef.current && currentNodeRef.current.id === nodeId) {
         toggleOptionbar(false);
       }
-      setNodeIdToDelete(undefined);
+      setNodeIdToActOn(undefined);
     } catch (err) {
       console.log(`Cannot delete the node: ${nodeId}`);
     }
+  };
+
+  const handleNodeDuplication = async (nodeId: string) => {
+    try {
+      const editor = editorInstanceRef.current;
+      const area = areaInstanceRef.current;
+      if (!editor || !area) throw new Error("Can't load area or editor...");
+
+      const nodeToDuplicate = await editor.getNode(nodeId);
+      if (!nodeToDuplicate)
+        throw new Error("Can't get old node from editor...");
+
+      const duplicatedNode = nodeToDuplicate.duplicate();
+      if (!duplicatedNode) throw new Error("Can't duplicate the node...");
+
+      const res = await editor.addNode(duplicatedNode);
+      if (!res) throw new Error("Can't add the node...");
+
+      // Translate new node
+      const oldNodeView = area.nodeViews.get(nodeToDuplicate.id);
+      if (!oldNodeView) throw new Error("Can't get old node view...");
+
+      const { x, y } = getDuplicatedNodePosition(oldNodeView);
+      await area.translate(duplicatedNode.id, { x, y });
+
+      console.log("@DEBUG", "Node duplicated", duplicatedNode.id);
+    } catch (err) {
+      console.log(`Cannot duplicate the node: ${nodeId}`);
+    }
+    setNodeIdToActOn(undefined);
+  };
+
+  const getDuplicatedNodePosition = (
+    oldNodeView: NodeView
+  ): { x: number; y: number } => {
+    const randomX = Math.round(Math.random() * 300);
+    const randomY = Math.round(Math.random() * 450);
+    let xPosition =
+      oldNodeView.position.x +
+      oldNodeView.element.getBoundingClientRect().width +
+      35 +
+      randomX;
+    let yPosition = oldNodeView.position.y + randomY;
+
+    return { x: xPosition, y: yPosition };
   };
 
   useEffect(() => {
@@ -87,6 +142,12 @@ const WorkflowEditor = ({
         customize: {
           node() {
             return CustomNode;
+          },
+          connection() {
+            return CustomConnection;
+          },
+          socket() {
+            return CustomSocket;
           },
         },
       })
@@ -120,7 +181,7 @@ const WorkflowEditor = ({
     setTimeout(() => {
       // wait until nodes rendered because they dont have predefined width and height
       AreaExtensions.zoomAt(area, editor.getNodes());
-    }, 10);
+    }, 30);
 
     return {
       destroy: () => area.destroy(),
@@ -138,9 +199,14 @@ const WorkflowEditor = ({
       }
 
       // Listen to node to delete
-      if (state.nodeIdToDelete) {
-        // Handle Node Deletion
-        handleNodeDeletion(state.nodeIdToDelete);
+      if (state.nodeIdToActOn && state.nodeIdToActOn.nodeId) {
+        if (state.nodeIdToActOn.operation === "Delete") {
+          // Handle Node Deletion
+          handleNodeDeletion(state.nodeIdToActOn.nodeId);
+        } else if (state.nodeIdToActOn.operation === "Duplicate") {
+          // Handle Node Duplication
+          handleNodeDuplication(state.nodeIdToActOn.nodeId);
+        }
       }
     });
 
@@ -163,14 +229,12 @@ const WorkflowEditor = ({
     const area = areaInstanceRef.current;
     selectorRef.current = new VsSelector((_, $) => {});
 
-    const accumulating = AreaExtensions.accumulateOnCtrl();
-
     if (!editor || !area || !selectorRef.current) return;
     const selectableNodes = AreaExtensions.selectableNodes(
       area,
       selectorRef.current,
       {
-        accumulating,
+        accumulating: AreaExtensions.accumulateOnCtrl(),
       }
     );
 

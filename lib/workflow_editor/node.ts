@@ -3,6 +3,11 @@ import { OperationItem, WorkflowEditorNode } from "./types/w_types";
 import { LucideIcon } from "lucide-react";
 import { workflowEditorSections } from "./constants/w_constants";
 import { deepClone } from "../utils";
+import { VsInput, VsOutput, VsSocket } from "./sockets";
+import { Socket } from "rete/_types/presets/classic";
+
+export type VsNodeInputsType = (typeof VsNode.prototype)["inputs"];
+export type VsNodeOutputsType = (typeof VsNode.prototype)["outputs"];
 
 export class VsNode extends ClassicPreset.Node {
   public iconColor: string;
@@ -12,6 +17,12 @@ export class VsNode extends ClassicPreset.Node {
   public sectionName?: keyof typeof workflowEditorSections;
   public operations: OperationItem[] = [];
 
+  override inputs: { [key in keyof VsInput]?: ClassicPreset.Input<VsSocket> } =
+    {};
+  override outputs: {
+    [key in keyof VsOutput]?: ClassicPreset.Input<VsSocket>;
+  } = {};
+
   constructor(node: WorkflowEditorNode) {
     super(node.label);
     this.iconColor = node.iconColor;
@@ -20,6 +31,11 @@ export class VsNode extends ClassicPreset.Node {
     this.tooltip = node.tooltip;
     this.sectionName = node.sectionName;
     this.operations = node.operations;
+
+    const anySocket = new VsSocket("any", this.iconColor);
+
+    this.addInput("input", new VsInput(anySocket));
+    this.addOutput("output", new VsOutput(anySocket));
   }
 
   removeOperation(id: string): this {

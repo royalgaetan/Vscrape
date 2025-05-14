@@ -1,3 +1,15 @@
+export const allowedNumberControlKeys = [
+  "Backspace",
+  "Tab",
+  "Delete",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Home",
+  "End",
+];
+
 export const copyToClipboard = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text);

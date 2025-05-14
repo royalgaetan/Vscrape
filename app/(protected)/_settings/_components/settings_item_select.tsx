@@ -1,3 +1,4 @@
+import { TooltipAlign, TooltipSide } from "@/components/global/simple_tooltip";
 import {
   Select,
   SelectContent,
@@ -19,6 +20,9 @@ export type SettingItemSelectDataType = Record<
     icon?: LucideIcon;
     iconClassName?: string;
     iconColorHex?: string;
+    tooltipContent?: string;
+    tooltipSide?: TooltipSide;
+    tooltipAlign?: TooltipAlign;
   }[]
 >;
 

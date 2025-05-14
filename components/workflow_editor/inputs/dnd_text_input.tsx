@@ -11,7 +11,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { restoreCaret, waitForElement } from "@/lib/dom_utils";
+import {
+  allowedNumberControlKeys,
+  restoreCaret,
+  waitForElement,
+} from "@/lib/dom_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { TokenInputType } from "@/lib/workflow_editor/types/w_types";
 
@@ -185,6 +189,8 @@ const DnDTextInput = ({
   };
 
   const handleSpace = (e?: KeyboardEvent) => {
+    // If Inputtype === "number", skip Non-Number NaN
+
     // if (e.key !== " ") return;
 
     const editor = DnDInputRef.current;
@@ -344,6 +350,20 @@ const DnDTextInput = ({
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
+          }
+          if (inputType === "number") {
+            const ctrlOrMeta = e.ctrlKey || e.metaKey;
+
+            // Allow digits (0–9), control keys, or key combos like Ctrl+C, Ctrl+V
+            const isDigit = /^\d$/.test(e.key);
+            const isAllowedControl = allowedNumberControlKeys.includes(e.key);
+
+            if (isDigit || isAllowedControl || ctrlOrMeta) {
+              return;
+            } else {
+              // Prevent all other input
+              e.preventDefault();
+            }
           }
         }}
         tabIndex={0}

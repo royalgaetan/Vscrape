@@ -1,34 +1,65 @@
+import { Schemes } from "@/app/(protected)/w/[workflowId]/editor/_components/w_editor";
 import { cn } from "@/lib/utils";
+import {
+  VsNodeInputsType,
+  VsNodeOutputsType,
+} from "@/lib/workflow_editor/node";
 import { Circle } from "lucide-react";
-import { Drag } from "rete-react-plugin";
+import { Drag, Presets } from "rete-react-plugin";
+
+const { RefSocket } = Presets.classic;
 
 const NodeHandle = ({
   iconClassName,
-  containerClassName,
-  iconColor,
+  throughput,
+  nodeId,
+  side,
+  emit,
 }: {
   iconClassName?: string;
-  containerClassName?: string;
-  iconColor?: string;
+  throughput: VsNodeInputsType | VsNodeOutputsType;
+  nodeId: string;
+  side: "input" | "output";
+  emit: Presets.classic.RenderEmit<Schemes>;
 }) => {
   return (
-    <span
-      className={cn(
-        "w-1/3 h-16 items-center transition-all duration-100 ease-in-out",
-        containerClassName
-      )}
-    >
-      <Drag.NoDrag>
-        <Circle
+    <Drag.NoDrag>
+      <div
+        onPointerDown={(e) => {
+          e.stopPropagation();
+        }}
+        className={cn("flex flex-col gap-2 relative")}
+      >
+        <div
           className={cn(
-            "size-2 inline-block transition-transform duration-100 ease-in-out cursor-grab",
-            iconClassName
+            "-translate-x-[40%] -translate-y-[25%] pointer-events-none w-[4rem] h-16 items-center transition-all duration-100 ease-in-out absolute flex justify-end group"
           )}
-          stroke={iconColor ?? "#6460aa"}
-          fill={iconColor ?? "#6460aa"}
-        />
-      </Drag.NoDrag>
-    </span>
+        ></div>
+
+        {Object.entries(throughput).map(
+          ([key, throughput]) =>
+            throughput && (
+              <div
+                key={key}
+                className={cn(
+                  iconClassName,
+                  "origin-center group-hover:scale-[1.8] inline-block transition-transform duration-100 ease-in-out cursor-grab"
+                )}
+                data-testid={`${side}-${key}`}
+              >
+                <RefSocket
+                  name={`${side}-socket`}
+                  emit={emit}
+                  side={side}
+                  socketKey={key}
+                  nodeId={nodeId}
+                  payload={throughput.socket}
+                />
+              </div>
+            )
+        )}
+      </div>
+    </Drag.NoDrag>
   );
 };
 

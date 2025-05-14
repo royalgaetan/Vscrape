@@ -8,6 +8,7 @@ import {
   BellRingIcon,
   ChevronsDownIcon,
   Coins,
+  Copy,
   LucideIcon,
   Plus,
   Trash2,
@@ -31,7 +32,7 @@ const OptionbarEditor = () => {
   const isWorkflowOptionbarOpen = useWorkflowEditorStore(
     (s) => s.isWorkflowOptionbarOpen
   );
-  const setNodeIdToDelete = useWorkflowEditorStore((s) => s.setNodeIdToDelete);
+  const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
   // End Store
 
   const [operationOrigin, setOperationOrigin] = useState<
@@ -139,7 +140,7 @@ const OptionbarEditor = () => {
                     <Button
                       variant={"ghost"}
                       className={cn(
-                        "flex truncate px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                        "flex truncate !min-w-10 px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
                       )}
                     >
                       <Coins className="size-4 stroke-neutral-400 inline" />
@@ -159,7 +160,7 @@ const OptionbarEditor = () => {
                     <Button
                       variant={"ghost"}
                       className={cn(
-                        "flex truncate px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                        "flex truncate min-w-fit px-2 border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
                       )}
                       onClick={(e) => {
                         console.log("Toggle Notification");
@@ -179,6 +180,7 @@ const OptionbarEditor = () => {
                       </span>
                     </Button>
                   </SimpleTooltip>
+
                   {/* Test Node */}
                   <SimpleTooltip tooltipText="Test Node" side="bottom">
                     <Button
@@ -197,7 +199,27 @@ const OptionbarEditor = () => {
                           unitTestInfo.iconClassname
                         )}
                       />
-                      <span>{unitTestInfo.label}</span>
+                      <span className="scale-90 truncate w-full">Test</span>
+                    </Button>
+                  </SimpleTooltip>
+
+                  {/* Duplicate Node */}
+                  <SimpleTooltip tooltipText="Duplicate Node" side="bottom">
+                    <Button
+                      variant={"ghost"}
+                      className={cn(
+                        "flex truncate px-2 min-w-fit border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+                      )}
+                      onClick={() => {
+                        // Handle Node Duplication
+                        setNodeIdToActOn({
+                          nodeId: currentNode.id,
+                          operation: "Duplicate",
+                        });
+                      }}
+                    >
+                      {/* Icon */}
+                      <Copy className="group-hover/deleleNodeBtn:stroke-destructive-foreground !size-3 stroke-[2.5px] translate-y-[1px] stroke-neutral-500" />
                     </Button>
                   </SimpleTooltip>
 
@@ -210,7 +232,10 @@ const OptionbarEditor = () => {
                       )}
                       onClick={(e) => {
                         // Handle Node Deletion
-                        setNodeIdToDelete(currentNode.id);
+                        setNodeIdToActOn({
+                          nodeId: currentNode.id,
+                          operation: "Delete",
+                        });
                       }}
                     >
                       {/* Icon */}

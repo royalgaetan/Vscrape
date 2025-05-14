@@ -322,7 +322,7 @@ const SingleFilterRow = ({
                   !filterObj?.inputID || !getInputType(filterObj?.inputID)
                 }
                 triggerClassName={cn(
-                  "max-w-[85px] min-w-[85px] !h-[var(--input-height)] bg-slate-100/40 flex flex-1 mb-1",
+                  "max-w-[4.7rem] min-w-[4.7rem] !h-[var(--input-height)] bg-slate-100/40 flex flex-1 mb-1",
                   errorCriteria && inputErrorClassName
                 )}
                 popoverAlignment="center"

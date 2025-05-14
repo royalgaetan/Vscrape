@@ -1,12 +1,15 @@
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 import React, { useId } from "react";
 
 const SimpleSwitchInput = ({
   isChecked,
   onCheckedChange,
+  className,
 }: {
   isChecked: boolean;
   onCheckedChange: (isChecked: boolean) => void;
+  className?: string;
 }) => {
   const componentId = useId();
   return (
@@ -16,7 +19,10 @@ const SimpleSwitchInput = ({
         onCheckedChange(changes);
       }}
       key={`switch_${componentId}`}
-      className="mb-2 mt-1 data-[state=unchecked]:bg-neutral-300 data-[state=checked]:bg-neutral-500"
+      className={cn(
+        "mb-2 mt-1 data-[state=unchecked]:bg-neutral-300 data-[state=checked]:bg-neutral-500",
+        className
+      )}
     />
   );
 };
