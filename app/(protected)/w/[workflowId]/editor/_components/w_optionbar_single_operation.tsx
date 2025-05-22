@@ -221,29 +221,33 @@ const OptionbarOperation = ({
             </div>
 
             {/* More Options List: Detect Duplicate, Enable Loop */}
-            {currentOperation && (
-              <div>
-                <div className="flex flex-col justify-start items-start  px-4 pr-4">
-                  <FieldLabel
-                    label={"More Options"}
-                    Icon={CircleEllipsisIcon}
-                  />
+            {currentOperation &&
+              (currentOperation.loopThrough !== undefined ||
+                currentOperation.skipDuplicate) && (
+                <div>
+                  <div className="flex flex-col justify-start items-start  px-4 pr-4">
+                    <div className="mb-2">
+                      <FieldLabel
+                        label={"More Options"}
+                        Icon={CircleEllipsisIcon}
+                      />
+                    </div>
 
-                  {/* Loop Through */}
-                  {currentOperation.loopThrough !== undefined && (
-                    <MoreOptionInput optionType="loopThrough" />
-                  )}
+                    {/* Loop Through */}
+                    {currentOperation.loopThrough !== undefined && (
+                      <MoreOptionInput optionType="loopThrough" />
+                    )}
 
-                  {/* Skip Duplicates */}
-                  {currentOperation.skipDuplicate && (
-                    <MoreOptionInput optionType="skipDuplicate" />
-                  )}
+                    {/* Skip Duplicates */}
+                    {currentOperation.skipDuplicate && (
+                      <MoreOptionInput optionType="skipDuplicate" />
+                    )}
 
-                  {/* Separator */}
+                    {/* Separator */}
+                  </div>
+                  <Separator className="my-2" />
                 </div>
-                <Separator className="my-2" />
-              </div>
-            )}
+              )}
 
             {/* Filters */}
             {currentOperation && (

@@ -72,7 +72,7 @@ const MoreOptionInput = ({ optionType }: Props) => {
   switch (optionType) {
     case "skipDuplicate":
       return (
-        <div className="flex flex-1 items-center w-full">
+        <div className="flex flex-1 items-center w-full mb-2">
           <MoreOptionLabel label={"Skip Duplicate"} />
 
           <SimpleSwitchInput
@@ -84,7 +84,7 @@ const MoreOptionInput = ({ optionType }: Props) => {
 
     case "loopThrough":
       return (
-        <div className="flex flex-1 items-center w-full">
+        <div className="flex flex-1 items-center w-full mb-2">
           <MoreOptionLabel label={"Loop Through"} />
 
           <SimpleSwitchInput

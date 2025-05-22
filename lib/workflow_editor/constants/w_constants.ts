@@ -161,6 +161,7 @@ export const workflowEditorNodes: Omit<
     label: "Database reader",
     icon: DatabaseIcon,
     tooltip: "",
+    isDisabled: true,
     sectionName: "Data Reading",
     operations: [],
   },

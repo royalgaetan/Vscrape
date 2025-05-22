@@ -16,32 +16,20 @@ const RecordInput = ({
 }) => {
   const [localRecords, setLocalRecords] = useState<RecordArray>(initialRecords);
 
-  const saveChanges = (
-    newRecord: {
-      key: string;
-      value: any;
-    },
-    index: number
-  ) => {
-    const updated = [...localRecords];
-    updated[index] = newRecord;
-    setLocalRecords(updated);
-    onChange && onChange(updated);
-  };
-
-  useEffect(() => {
-    onChange && onChange(localRecords);
-  }, [localRecords]);
-
   return (
-    <div className="flex flex-col">
+    <div
+      className="flex flex-col"
+      role="button"
+      tabIndex={1}
+      onMouseLeave={() => onChange && onChange(localRecords)}
+    >
       {localRecords.map((record, idx) => {
         return (
           <SingleRecordRow
             initialRecordKey={record.key}
             initialRecordValue={record.value}
-            onBlur={(newRecord) => {
-              saveChanges(newRecord, idx);
+            onSave={(newRecord) => {
+              localRecords[idx] = newRecord;
             }}
             isLast={localRecords.length === idx + 1}
             key={generateHexRandomString()}
@@ -62,7 +50,7 @@ export default RecordInput;
 
 type SingleRecordRowProps = {
   onChange?: (recordValue: { key: string; value: any }) => void;
-  onBlur: (recordValue: { key: string; value: any }) => void;
+  onSave: (recordValue: { key: string; value: any }) => void;
   onDelete: () => void;
   onAdd: () => void;
   isLast: boolean;
@@ -74,7 +62,7 @@ const SingleRecordRow = ({
   onChange,
   onDelete,
   onAdd,
-  onBlur,
+  onSave,
   isLast,
   initialRecordKey,
   initialRecordValue,
@@ -83,25 +71,30 @@ const SingleRecordRow = ({
   const [recordValue, setRecordValue] = useState<string>(initialRecordValue);
 
   return (
-    <div className="flex flex-1 gap-2 group/recordItem h-7 mt-1 mb-4 [--dndInputWidth:6.5rem]">
+    <div
+      className="flex flex-1 gap-2 group/recordItem h-7 mt-1 mb-2 [--dndInputWidth:6.5rem]"
+      role="button"
+      tabIndex={1}
+    >
       <DnDTextInput
         key={"name"}
         placeholder={"Name..."}
         className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
         inputType="text"
         inputValue={recordkey}
-        onBlur={(text) => {
-          if (!text) return;
-          onBlur && onBlur({ key: text, value: recordValue });
-        }}
+        // onBlur={(text) => {
+        //   if (!text) return;
+        //   onBlur && onBlur({ key: text, value: recordValue });
+        // }}
         onElementDropped={(text) => {
           if (!text || text === recordkey) return;
           setRecordkey(text);
-          // onBlur && onBlur({ key: text, value: recordValue });
+          onSave && onSave({ key: text, value: recordValue });
         }}
         onTextChange={(text) => {
           if (!text || text === recordkey) return;
           setRecordkey(text);
+          onSave && onSave({ key: text, value: recordValue });
         }}
       />
       <DnDTextInput
@@ -110,18 +103,19 @@ const SingleRecordRow = ({
         inputType="text"
         className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
         inputValue={recordValue}
-        onBlur={(text) => {
-          if (!text) return;
-          onBlur && onBlur({ key: recordkey, value: text });
-        }}
+        // onBlur={(text) => {
+        //   if (!text) return;
+        //   onBlur && onBlur({ key: recordkey, value: text });
+        // }}
         onElementDropped={(text) => {
           if (!text || text === recordValue) return;
           setRecordValue(text);
-          // onBlur && onBlur({ key: recordkey, value: text });
+          onSave && onSave({ key: recordkey, value: text });
         }}
         onTextChange={(text) => {
           if (!text || text === recordValue) return;
           setRecordValue(text);
+          onSave && onSave({ key: recordkey, value: text });
         }}
       />
       <div className="w-8 h-[1.73rem]">

@@ -92,6 +92,9 @@ const ParameterItemLine = ({
           onChange={onValueChange}
           placeHolder={paramData.paramInputPlaceholder}
           valuesToPickFrom={paramData.valuesToPickFrom}
+          isTextarea={
+            paramData.type === "primitive/text" && paramData.isTextarea
+          }
         />
       </div>
     </div>

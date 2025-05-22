@@ -7,7 +7,6 @@ import { cn, debounce } from "@/lib/utils";
 import React, {
   HTMLInputTypeAttribute,
   useEffect,
-  useId,
   useRef,
   useState,
 } from "react";
@@ -31,6 +30,7 @@ const DnDTextInput = ({
   onElementDropped,
   reRenderOnInputValueChange,
   inputType,
+  isTextarea,
 }: {
   inputValue?: string | readonly string[] | number;
   inputType?: HTMLInputTypeAttribute;
@@ -39,6 +39,7 @@ const DnDTextInput = ({
   isDisabled?: boolean;
   readOnly?: boolean;
   hasError?: boolean;
+  isTextarea?: boolean;
   reRenderOnInputValueChange?: boolean;
 
   onTextChange?: (text: string | null) => void;
@@ -68,10 +69,10 @@ const DnDTextInput = ({
       isTrulyEmpty(extractTextFromHTML(toStringSafe(html))));
 
   const cleanHTML = (html: any) => {
-    return toStringSafe(html)
-      .replace(/<br\s*\/?>/g, "")
-      .replace(/\u200B/g, "")
-      .trim();
+    const cleaned = toStringSafe(html).replace(/\u200B/g, "");
+    cleaned.replace(/<br\s*\/?>/g, "");
+
+    return cleaned.trim();
   };
 
   const parseEditorText = (text: string) => {
@@ -82,7 +83,7 @@ const DnDTextInput = ({
 
     function walk(node: Node): void {
       if (node.nodeType === Node.TEXT_NODE) {
-        const content = node.textContent || "";
+        const content = node.textContent ?? "";
         if (!regex.test(content)) return;
 
         const parent = node.parentNode;
@@ -118,7 +119,9 @@ const DnDTextInput = ({
     zwsp.innerText = "\u200B ";
     container.appendChild(zwsp);
 
-    return container.innerHTML.replace(/<br\s*\/?>/g, "");
+    container.innerHTML.replace(/<br\s*\/?>/g, "");
+
+    return container.innerHTML;
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -178,9 +181,8 @@ const DnDTextInput = ({
     sel?.addRange(finalRange);
 
     // Update state
-    const editorContentCleaned = editor.innerHTML
-      .replace(/<br\s*\/?>/g, "")
-      .replace(/\u200B/g, "");
+    const editorContentCleaned = editor.innerHTML.replace(/\u200B/g, "");
+    editorContentCleaned.replace(/<br\s*\/?>/g, "");
 
     setHtml(editorContentCleaned);
     onTextChange && onTextChange(editorContentCleaned);
@@ -189,10 +191,6 @@ const DnDTextInput = ({
   };
 
   const handleSpace = (e?: KeyboardEvent) => {
-    // If Inputtype === "number", skip Non-Number NaN
-
-    // if (e.key !== " ") return;
-
     const editor = DnDInputRef.current;
     if (!editor) return;
 
@@ -213,8 +211,10 @@ const DnDTextInput = ({
     const html = parseEditorText(rawText);
 
     if (editor.innerHTML !== html) {
-      editor.innerHTML = html;
-      restoreCaret(editor, caretPosition);
+      if (!isTextarea) {
+        editor.innerHTML = html;
+        restoreCaret(editor, caretPosition);
+      }
 
       // Update state
       const editorContentCleaned = cleanHTML(html);
@@ -302,12 +302,14 @@ const DnDTextInput = ({
     <div
       role="button"
       tabIndex={1}
+      onKeyDown={() => {}}
       onClick={() => {
         if (!DnDInputRef.current || isDisabled) return;
         DnDInputRef.current.focus();
       }}
       className={cn(
-        "relative min-w-20 max-w-20 text-left text-xs md:text-xs cursor-text rounded-sm border border-gray-300 bg-white flex flex-1 justify-center items-center content-center truncate line-clamp-1 overflow-hidden [--DnDInputHeight:1.74rem] max-h-[var(--DnDInputHeight)] min-h-[var(--DnDInputHeight)] transition-colors file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-foreground placeholder:font-semibold placeholder:text-muted-foreground/70 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        !isTextarea ? "[--DnDInputHeight:1.74rem]" : "[--DnDInputHeight:5rem]",
+        "relative min-w-20 max-w-20 text-left text-xs cursor-text rounded-sm border border-gray-300 bg-white flex flex-1 justify-center items-center content-center truncate line-clamp-1 overflow-hidden max-h-[var(--DnDInputHeight)] min-h-[var(--DnDInputHeight)] transition-colors file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-foreground placeholder:font-semibold placeholder:text-muted-foreground/70 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         !isDisabled &&
           "focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/50 focus-within:outline-none transition-all duration-300",
         className,
@@ -320,7 +322,14 @@ const DnDTextInput = ({
     >
       {/* PlaceHolder */}
       {isInputEmpty() && (
-        <div className="absolute z-[9] left-2 top-[0.35rem] min-h-[var(--DnDInputHeight)] line-clamp-1 text-wrap pointer-events-none select-none text-muted-foreground/70">
+        <div
+          className={cn(
+            "absolute z-[9] left-2 top-[0.3rem] min-h-[var(--DnDInputHeight)] pointer-events-none select-none text-muted-foreground/70",
+            isTextarea
+              ? "line-clamp-none text-wrap w-[95%]"
+              : "truncate w-[90%]"
+          )}
+        >
           {placeholder ?? "Type something..."}
         </div>
       )}
@@ -334,7 +343,6 @@ const DnDTextInput = ({
         onDragOver={(e: React.DragEvent) => {
           e.preventDefault();
           if (!isDragging) setIsDragging(true);
-          // e.dataTransfer.dropEffect = "move";
         }}
         onDragLeave={() => {
           if (isDragging) setIsDragging(false);
@@ -348,20 +356,43 @@ const DnDTextInput = ({
           handleDrop(e);
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && !isTextarea) {
             e.preventDefault();
+            return;
           }
+          const isAllowedControl = allowedNumberControlKeys.includes(e.key);
+          const ctrlOrMeta = e.ctrlKey || e.metaKey;
+          if (ctrlOrMeta || isAllowedControl) return;
           if (inputType === "number") {
-            const ctrlOrMeta = e.ctrlKey || e.metaKey;
-
             // Allow digits (0–9), control keys, or key combos like Ctrl+C, Ctrl+V
-            const isDigit = /^\d$/.test(e.key);
-            const isAllowedControl = allowedNumberControlKeys.includes(e.key);
+            const isDigit = /^\d$/.test(e.key) || e.key === ".";
 
-            if (isDigit || isAllowedControl || ctrlOrMeta) {
-              return;
-            } else {
+            if (!isDigit) {
               // Prevent all other input
+              e.preventDefault();
+            }
+          }
+
+          if (inputType === "tel") {
+            // Allow digits, space, hyphen, parentheses, plus
+            const isTelChar = /^[\d\s\-()+]$/.test(e.key);
+            if (!isTelChar) {
+              e.preventDefault();
+            }
+          }
+
+          if (inputType === "email") {
+            // Allow alphanumeric, basic special chars, @, .
+            const isEmailChar = /^[a-zA-Z0-9@._\-+]$/.test(e.key);
+            if (!isEmailChar) {
+              e.preventDefault();
+            }
+          }
+
+          if (inputType === "url") {
+            // Allow URL-safe characters
+            const isUrlChar = /^[a-zA-Z0-9/:?&=._\-#]$/.test(e.key);
+            if (!isUrlChar) {
               e.preventDefault();
             }
           }
@@ -370,7 +401,10 @@ const DnDTextInput = ({
         role="textbox"
         suppressContentEditableWarning
         className={cn(
-          "flex flex-1 gap-1 line-clamp-1 place-content-center p-0 min-h-[1.4rem] max-h-[1.4rem] outline-none border-none ring-0 focus:outline-none focus:ring-0 w-full overflow-x-scroll scrollbar-hide"
+          "flex flex-1 gap-1 line-clamp-1 p-0 min-h-[1.4rem] place-content-center max-h-[1.4rem] outline-none border-none ring-0 focus:outline-none focus:ring-0 w-full overflow-x-scroll",
+          isTextarea
+            ? "whitespace-pre-wrap break-words hyphens-auto place-content-start min-h-[calc(var(--DnDInputHeight)-0.5rem)] pt-[2.4px] line-clamp-none overflow-y-auto overflow-x-hidden"
+            : "scrollbar-hide"
         )}
       ></div>
     </div>

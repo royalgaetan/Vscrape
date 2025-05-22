@@ -12,7 +12,9 @@ import {
 export type vsText = {
   value: string;
   type: (typeof vsPrimitiveMIMETypes)["text"];
+  isTextarea?: boolean;
 };
+
 export type vsArray<T = unknown> = {
   value: Array<T>;
   type: (typeof vsPrimitiveMIMETypes)["array"];
@@ -55,6 +57,10 @@ export type vsSwitch = {
   value: boolean;
   type: (typeof vsPrimitiveMIMETypes)["switch"];
 };
+export type vsRadio = {
+  value: string;
+  type: (typeof vsPrimitiveMIMETypes)["radio"];
+};
 export type vsCustomSwitch = {
   value: string;
   type: (typeof vsPrimitiveMIMETypes)["customSwitch"];
@@ -76,6 +82,7 @@ export type vsAnyPrimitives =
   | vsDateTime
   | vsTimeMs
   | vsSwitch
+  | vsRadio
   | vsCustomSwitch
   | vsRecord;
 

@@ -1,26 +1,30 @@
 import React from "react";
 import Image from "next/image";
-import { useWorkflowEditor } from "@/hooks/useWorkflowEditor";
-import { WorkflowEditorToolItem } from "@/lib/workflow_editor/types/w_types";
+import { WorkflowEditorNode } from "@/lib/workflow_editor/types/w_types";
+import { cn } from "@/lib/utils";
 
 const ToolItemLine = ({
   item,
   iconColor,
 }: {
-  item: WorkflowEditorToolItem;
+  item: WorkflowEditorNode;
   iconColor: string;
 }) => {
   const Icon = item.icon;
   return (
     <div
-      draggable
+      draggable={!item.isDisabled}
       role="button"
       tabIndex={2}
       onDragStart={(e: React.DragEvent) => {
+        if (item.isDisabled) return;
         e.dataTransfer.setData("application/workflowEditor", item.label);
         e.dataTransfer.effectAllowed = "move";
       }}
-      className="cursor-grabbing rounded-md select-none col-span-1 px-3 h-8 flex gap-2 justify-start items-center bg-neutral-100 hover:bg-neutral-200/80 transition-all duration-100"
+      className={cn(
+        "cursor-grabbing rounded-md select-none col-span-1 px-3 h-8 flex gap-2 justify-start items-center bg-neutral-100 hover:bg-neutral-200/80 transition-all duration-100",
+        item.isDisabled && "pointer-events-none opacity-50"
+      )}
     >
       {/* Icon */}
       <div className="size-4">

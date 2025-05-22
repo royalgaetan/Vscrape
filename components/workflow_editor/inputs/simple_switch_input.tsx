@@ -20,7 +20,7 @@ const SimpleSwitchInput = ({
       }}
       key={`switch_${componentId}`}
       className={cn(
-        "mb-2 mt-1 data-[state=unchecked]:bg-neutral-300 data-[state=checked]:bg-neutral-500",
+        "mb-0 mt-1 data-[state=unchecked]:bg-neutral-300 data-[state=checked]:bg-neutral-500",
         className
       )}
     />

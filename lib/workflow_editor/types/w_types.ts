@@ -13,6 +13,7 @@ export type WorkflowEditorNode = {
   icon?: LucideIcon;
   logoPath?: string;
   tooltip?: string;
+  isDisabled?: boolean;
   sectionName: keyof typeof workflowEditorSections;
   operations: OperationItem[];
 };
@@ -44,6 +45,7 @@ export type OperationParamItem = {
   paramInputPlaceholder?: string;
   paramDescription: string;
   valuesToPickFrom?: number[] | string[] | boolean[];
+  isOptional?: boolean;
 } & (vsAnyRawTypes | vsAnyPrimitives);
 
 // Workflow Editor Types

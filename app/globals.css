@@ -104,8 +104,11 @@
     color: rgba(100, 96, 170, 0.8); /* text-primary/80 */
     cursor: pointer;
     font-size: 0.75rem; /* text-xs */
-    overflow: hidden;
     transition: all 0.2s ease-in-out;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: break-all;
   }
 
   .token-chip:hover {

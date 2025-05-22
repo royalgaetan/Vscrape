@@ -1,4 +1,111 @@
-import { format, formatDistanceToNow, subDays } from "date-fns";
+import {
+  Duration,
+  DurationUnit,
+  format,
+  formatDistanceToNow,
+  subDays,
+} from "date-fns";
+import { twoDigits } from "./string_utils";
+
+const MS_PER_SECOND = 1000;
+const MS_PER_MINUTE = MS_PER_SECOND * 60;
+const MS_PER_HOUR = MS_PER_MINUTE * 60;
+const MS_PER_DAY = MS_PER_HOUR * 24;
+const MS_PER_WEEK = MS_PER_DAY * 7;
+const MS_PER_MONTH = MS_PER_DAY * 30.44; // Average month length
+const MS_PER_YEAR = MS_PER_DAY * 365.25; // Average year length with leap years
+
+export const getDurationLabel = (unit: DurationUnit) => {
+  switch (unit) {
+    case "days":
+      return "d";
+    case "hours":
+      return "hrs";
+    case "minutes":
+      return "min";
+    case "seconds":
+      return "sec";
+    default:
+      return "";
+  }
+};
+
+export const formatDurationMs = (
+  durationMs: number,
+  display: (
+    | "years"
+    | "months"
+    | "weeks"
+    | "days"
+    | "hours"
+    | "minutes"
+    | "seconds"
+  )[]
+) => {
+  const _fullDuration = millisecondsToDuration(durationMs);
+  const y = display.includes("years")
+    ? `:${twoDigits(_fullDuration.years)}`
+    : "";
+  const m = display.includes("months")
+    ? `:${twoDigits(_fullDuration.months)}`
+    : "";
+  const w = display.includes("weeks")
+    ? `:${twoDigits(_fullDuration.weeks)}`
+    : "";
+  const d = display.includes("days") ? `:${twoDigits(_fullDuration.days)}` : "";
+  const hrs = display.includes("hours")
+    ? `:${twoDigits(_fullDuration.hours)}`
+    : "";
+  const min = display.includes("minutes")
+    ? `:${twoDigits(_fullDuration.minutes)}`
+    : "";
+  const sec = display.includes("seconds")
+    ? `:${twoDigits(_fullDuration.seconds)}`
+    : "";
+  const format = `${y}${m}${w}${d}${hrs}${min}${sec}`;
+  if (format.startsWith(":")) {
+    return format.slice(1);
+  }
+  return format;
+};
+
+export const durationToMilliseconds = (duration: Duration): number => {
+  return (
+    (duration.years ?? 0) * MS_PER_YEAR +
+    (duration.months ?? 0) * MS_PER_MONTH +
+    (duration.weeks ?? 0) * MS_PER_WEEK +
+    (duration.days ?? 0) * MS_PER_DAY +
+    (duration.hours ?? 0) * MS_PER_HOUR +
+    (duration.minutes ?? 0) * MS_PER_MINUTE +
+    (duration.seconds ?? 0) * MS_PER_SECOND
+  );
+};
+
+export const millisecondsToDuration = (ms: number): Duration => {
+  const duration: Duration = {};
+
+  duration.years = Math.floor(ms / MS_PER_YEAR);
+  ms -= duration.years * MS_PER_YEAR;
+
+  duration.months = Math.floor(ms / MS_PER_MONTH);
+  ms -= duration.months * MS_PER_MONTH;
+
+  duration.weeks = Math.floor(ms / MS_PER_WEEK);
+  ms -= duration.weeks * MS_PER_WEEK;
+
+  duration.days = Math.floor(ms / MS_PER_DAY);
+  ms -= duration.days * MS_PER_DAY;
+
+  duration.hours = Math.floor(ms / MS_PER_HOUR);
+  ms -= duration.hours * MS_PER_HOUR;
+
+  duration.minutes = Math.floor(ms / MS_PER_MINUTE);
+  ms -= duration.minutes * MS_PER_MINUTE;
+
+  duration.seconds = Math.floor(ms / MS_PER_SECOND);
+
+  return duration;
+};
 
 export const isValidISODateString = (
   testDate: string | undefined | null

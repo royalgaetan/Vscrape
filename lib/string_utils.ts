@@ -1,4 +1,8 @@
+import { millisecondsToDuration } from "./date_time_utils";
+
 export const formatNumber = (n: number) => Intl.NumberFormat("en-US").format(n);
+
+export const twoDigits = (n: any) => String(n).padStart(2, "0");
 
 export const isTrulyEmpty = (text: string) => {
   return text.replace(/\u200B/g, "").trim().length === 0;

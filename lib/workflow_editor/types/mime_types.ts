@@ -69,6 +69,7 @@ export const vsPrimitiveMIMETypes = {
   dateTime: "primitive/dateTime",
   timeMs: "primitive/milliseconds",
   switch: "primitive/switch",
+  radio: "primitive/radio",
   customSwitch: "primitive/customSwitch",
   record: "primitive/record",
 } as const;
