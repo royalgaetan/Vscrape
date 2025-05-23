@@ -51,14 +51,14 @@ const ParamInput = ({
           <Select onValueChange={onChange} value={initialValue}>
             <SelectTrigger
               className={cn(
-                "h-[1.9rem]",
+                "h-[1.9rem] w-[15.7rem]",
                 isWithinAGroup && "min-w-24 max-w-24"
               )}
             >
               <SelectValue className="text-xs" placeholder="Select..." />
             </SelectTrigger>
 
-            <SelectContent className="max-h-64">
+            <SelectContent className="max-h-64 w-[15.7rem]">
               {valuesToPickFrom.map((val) => {
                 const choice = toStringSafe(val);
                 return (

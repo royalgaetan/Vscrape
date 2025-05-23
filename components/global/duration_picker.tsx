@@ -210,7 +210,7 @@ const DurationPicker = ({
           </Button>
         </div>
         <div className="flex flex-1 justify-center items-center text-xs scale-75 mb-1 text-neutral-400/70 font-medium">
-          Use and <KeyBox Icon={ArrowUp} /> and <KeyBox Icon={ArrowDown} /> to
+          Use <KeyBox Icon={ArrowUp} /> and <KeyBox Icon={ArrowDown} /> to
           change.
         </div>
       </PopoverContent>

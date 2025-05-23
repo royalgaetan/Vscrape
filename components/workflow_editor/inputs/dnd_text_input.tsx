@@ -321,7 +321,9 @@ const DnDTextInput = ({
         onClick && onClick();
       }}
       className={cn(
-        !isTextarea ? "[--DnDInputHeight:1.74rem]" : "[--DnDInputHeight:5rem]",
+        !isTextarea
+          ? "[--DnDInputHeight:1.74rem]"
+          : "[--DnDInputHeight:5rem] !w-44",
         "relative min-w-20 max-w-20 text-left text-xs cursor-text rounded-sm border border-gray-300 bg-white flex flex-1 justify-center items-center content-center truncate line-clamp-1 overflow-hidden max-h-[var(--DnDInputHeight)] min-h-[var(--DnDInputHeight)] transition-colors file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-foreground placeholder:font-semibold placeholder:text-muted-foreground/70 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         !isDisabled &&
           "focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/50 focus-within:outline-none transition-all duration-300",

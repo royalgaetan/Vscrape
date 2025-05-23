@@ -142,7 +142,9 @@ const OptionbarOperation = ({
                     setCurrentOperation(undefined);
                   } else {
                     const operation = workflowOperations.find(
-                      (op) => op.operationName === opSelected
+                      (op) =>
+                        op.operationName === opSelected &&
+                        op.nodeName === currentNode?.label
                     );
                     if (!operation) return;
                     setCurrentOperation(
@@ -172,7 +174,7 @@ const OptionbarOperation = ({
                     return (
                       <div key={`${generateHexRandomString(20)}_param_${id}`}>
                         {Array.isArray(params) ? (
-                          <div className="flex flex-1 !w-full justify-start gap-0 px-4 pr-4 mt-3">
+                          <div className="flex flex-1 !w-full justify-start gap-0 px-4 pr-4 mt-2 mb-2">
                             {params.map((param, idx) => (
                               <div
                                 key={`${generateHexRandomString(

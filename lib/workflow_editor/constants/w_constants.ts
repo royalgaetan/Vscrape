@@ -342,14 +342,7 @@ export const workflowEditorNodes: Omit<
     operations: [],
   },
   {
-    label: "PDF Converter",
-    icon: FileTextIcon,
-    tooltip: "Convert extracted or processed data into a PDF document.",
-    sectionName: "Data Conversion",
-    operations: [],
-  },
-  {
-    label: "To Markup",
+    label: "Markup",
     icon: FileCode,
     tooltip: "Convert data into a Markup language",
     sectionName: "Data Conversion",
