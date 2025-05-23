@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import DnDTextInput from "./dnd_text_input";
 import { cn } from "@/lib/utils";
 import { Clock, X } from "lucide-react";
@@ -18,10 +18,15 @@ const DurationInput = ({
   isDisabled: boolean;
   hasError: boolean;
 }) => {
+  const [openDurationPicker, setOpenDurationPicker] = useState(false);
+
   return (
     <div className="!h-[var(--input-height)] relative group/durationInput">
-      {JSON.stringify(initialValue)}
       <DnDTextInput
+        onClick={() => {
+          if (typeof initialValue === "number" && initialValue > 0)
+            setOpenDurationPicker(true);
+        }}
         placeholder={"00:00:00"}
         inputValue={
           typeof initialValue === "number"
@@ -29,6 +34,7 @@ const DurationInput = ({
             : toStringSafe(initialValue)
         }
         reRenderOnInputValueChange={true}
+        replaceContentOnDrop={true}
         inputType={"text"}
         isDisabled={isDisabled}
         onElementDropped={(text) => {
@@ -41,7 +47,7 @@ const DurationInput = ({
         }
       />
       {/* Clear Date Button */}
-      {typeof initialValue === "number" && initialValue > 0 && (
+      {typeof initialValue !== "undefined" && initialValue !== null ? (
         <button
           className={cn(
             "group-hover/durationInput:inline hidden group/clearDurationBtn absolute top-[2px] right-2 !h-[1.5rem] !px-[0.3rem] !w-5 transition-all duration-300 justify-center items-center rounded-l-none bg-gradient-to-l from-white from-30% to-transparent cursor-pointer"
@@ -52,21 +58,25 @@ const DurationInput = ({
         >
           <X className="size-4 stroke-neutral-600 group-hover/clearDurationBtn:opacity-80 group-active/clearDurationBtn:scale-[0.97]" />
         </button>
+      ) : (
+        <></>
       )}
 
       {/* Date Picker Button */}
       <DurationPicker
+        setOpen={openDurationPicker}
         initialDurationMs={initialValue}
         onSelect={(selectedDurationMs) => {
+          setOpenDurationPicker(false);
           onSave(selectedDurationMs);
         }}
       >
         <Button
           className={cn(
             "absolute top-[2px] right-[2px] !h-[1.5rem] !px-[0.3rem] !w-[var(--input-height)] transition-all duration-300 justify-center items-center gap-2 hover:opacity-80 hover:bg-white bg-white cursor-pointer",
-            typeof initialValue === "number" && initialValue > 0
-              ? "hidden"
-              : "flex"
+            typeof initialValue === "undefined" || initialValue === null
+              ? "flex"
+              : "hidden"
           )}
         >
           <Clock className="stroke-neutral-600" />

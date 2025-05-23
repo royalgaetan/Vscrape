@@ -51,6 +51,7 @@ const FilterValueInput = ({
                 : currentValue
             }
             reRenderOnInputValueChange={true}
+            replaceContentOnDrop={true}
             inputType={"text"}
             isDisabled={isDisabled}
             onElementDropped={(text) => {

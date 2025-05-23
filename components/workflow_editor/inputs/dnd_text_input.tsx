@@ -29,8 +29,10 @@ const DnDTextInput = ({
   readOnly,
   onElementDropped,
   reRenderOnInputValueChange,
+  replaceContentOnDrop,
   inputType,
   isTextarea,
+  onClick,
 }: {
   inputValue?: string | readonly string[] | number;
   inputType?: HTMLInputTypeAttribute;
@@ -41,10 +43,12 @@ const DnDTextInput = ({
   hasError?: boolean;
   isTextarea?: boolean;
   reRenderOnInputValueChange?: boolean;
+  replaceContentOnDrop?: boolean;
 
   onTextChange?: (text: string | null) => void;
   onElementDropped?: (text: string | null) => void;
   onBlur?: (text?: string) => void;
+  onClick?: () => void;
 }) => {
   const DnDInputRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -136,39 +140,47 @@ const DnDTextInput = ({
     );
     if (!inputData) return;
     let range: Range | null = null;
+    let rawText;
 
-    // Get caret range from drop coordinates
-    if (document.caretRangeFromPoint) {
-      range = document.caretRangeFromPoint(e.clientX, e.clientY);
-    } else if ((document as any).caretPositionFromPoint) {
-      const pos = (document as any).caretPositionFromPoint(
-        e.clientX,
-        e.clientY
-      );
-      range = document.createRange();
-      range.setStart(pos.offsetNode, pos.offset);
-      range.collapse(true);
-    }
+    if (replaceContentOnDrop) {
+      rawText = inputData;
+    } else {
+      // Get caret range from drop coordinates
+      if (document.caretRangeFromPoint) {
+        range = document.caretRangeFromPoint(e.clientX, e.clientY);
+      } else if ((document as any).caretPositionFromPoint) {
+        const pos = (document as any).caretPositionFromPoint(
+          e.clientX,
+          e.clientY
+        );
+        range = document.createRange();
+        range.setStart(pos.offsetNode, pos.offset);
+        range.collapse(true);
+      }
 
-    if (!range) return;
+      if (!range) return;
 
-    // Insert the data at the drop location
-    const fragment = document.createRange().createContextualFragment(inputData);
-    range.deleteContents();
-    range.insertNode(fragment);
+      // Insert the data at the drop location
+      const fragment = document
+        .createRange()
+        .createContextualFragment(inputData);
+      range.deleteContents();
+      range.insertNode(fragment);
 
-    // Move caret to end of inserted content
-    const selection = window.getSelection();
-    if (selection) {
-      selection.removeAllRanges();
-      const endRange = document.createRange();
-      endRange.selectNodeContents(editor);
-      endRange.collapse(false);
-      selection.addRange(endRange);
+      // Move caret to end of inserted content
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        const endRange = document.createRange();
+        endRange.selectNodeContents(editor);
+        endRange.collapse(false);
+        selection.addRange(endRange);
+      }
+
+      rawText = editor.innerHTML;
     }
 
     // Re-parse editor content after insertion
-    const rawText = editor.innerHTML;
     const html = parseEditorText(rawText);
     editor.innerHTML = html;
 
@@ -306,6 +318,7 @@ const DnDTextInput = ({
       onClick={() => {
         if (!DnDInputRef.current || isDisabled) return;
         DnDInputRef.current.focus();
+        onClick && onClick();
       }}
       className={cn(
         !isTextarea ? "[--DnDInputHeight:1.74rem]" : "[--DnDInputHeight:5rem]",

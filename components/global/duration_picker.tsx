@@ -15,20 +15,37 @@ import {
 } from "@/lib/date_time_utils";
 import { twoDigits } from "@/lib/string_utils";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 const DurationPicker = ({
   children,
   onSelect,
   initialDurationMs,
+  setOpen,
 }: {
   children: React.ReactNode;
   onSelect: (durationMs: number) => void;
   initialDurationMs: number;
+  setOpen?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentDuration, setCurrentDuration] = useState<Duration>(
-    millisecondsToDuration(initialDurationMs)
-  );
+  const [currentDuration, setCurrentDuration] = useState<
+    Duration | undefined
+  >();
+
+  useEffect(() => {
+    if (isOpen === true) {
+      setCurrentDuration(
+        typeof initialDurationMs === "number"
+          ? millisecondsToDuration(initialDurationMs)
+          : undefined
+      );
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (setOpen) setIsOpen(setOpen);
+  }, [setOpen]);
 
   const increase = (unit: DurationUnit) => {
     let _duration: Duration = { ...currentDuration };
@@ -126,14 +143,25 @@ const DurationPicker = ({
       open={isOpen}
       onOpenChange={(isOpen) => {
         setIsOpen(isOpen);
-        if (isOpen === false) {
-          onSelect(durationToMilliseconds(currentDuration));
+
+        const durationToMs =
+          currentDuration && durationToMilliseconds(currentDuration);
+        if (isOpen === false && durationToMs && durationToMs > 0) {
+          onSelect(durationToMs);
         }
       }}
     >
       <PopoverTrigger>{children}</PopoverTrigger>
-      <PopoverContent className="w-54 justify-center items-center py-0 px-7 rounded-sm border border-border">
-        <div className="flex flex-1 justify-center items-center gap-5 my-2">
+      <PopoverContent
+        onInteractOutside={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(false);
+          onSelect(initialDurationMs);
+        }}
+        className="w-54 justify-center items-center px-0 py-0 rounded-sm border border-border"
+      >
+        <div className="flex flex-1 justify-center items-center gap-5 my-2 mx-7">
           {/* Hours */}
           <SectionPicker
             value={currentDuration?.hours ?? 0}
@@ -168,6 +196,19 @@ const DurationPicker = ({
             }}
           />
         </div>
+        <div className="flex flex-1">
+          <Button
+            onClick={() => {
+              setIsOpen(false);
+              if (currentDuration)
+                onSelect(durationToMilliseconds(currentDuration));
+            }}
+            variant={"ghost"}
+            className="w-full mx-3 h-6 mb-2 mt-0 hover:bg-accent/80 bg-accent/40 hover:text-accent-foreground text-accent-foreground/70"
+          >
+            Save
+          </Button>
+        </div>
         <div className="flex flex-1 justify-center items-center text-xs scale-75 mb-1 text-neutral-400/70 font-medium">
           Use and <KeyBox Icon={ArrowUp} /> and <KeyBox Icon={ArrowDown} /> to
           change.
@@ -195,7 +236,7 @@ const SectionPicker = ({
 
   return (
     <button
-      className="flex flex-col justify-evenly items-center w-1/3"
+      className="flex flex-col justify-evenly items-center w-1/3 group/sectionPicker"
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           if (upBtn.current) upBtn.current.focus();
@@ -222,9 +263,10 @@ const SectionPicker = ({
 
       {/* Numerical Value */}
       <div className="w-7 font-medium flex flex-col">
-        <span className="text-neutral-700 text-base">{twoDigits(value)}</span>{" "}
-        <span className="text-neutral-500 text-sm">
-          {" "}
+        <span className="text-neutral-700 group-focus-within/sectionPicker:text-primary text-base">
+          {twoDigits(value)}
+        </span>
+        <span className="text-neutral-500 group-focus-within/sectionPicker:text-primary/70 text-sm">
           {getDurationLabel(unit)}
         </span>
       </div>
