@@ -3,13 +3,7 @@ import Image from "next/image";
 import { WorkflowEditorNode } from "@/lib/workflow_editor/types/w_types";
 import { cn } from "@/lib/utils";
 
-const ToolItemLine = ({
-  item,
-  iconColor,
-}: {
-  item: WorkflowEditorNode;
-  iconColor: string;
-}) => {
+const ToolItemLine = ({ item }: { item: WorkflowEditorNode }) => {
   const Icon = item.icon;
   return (
     <div
@@ -28,7 +22,7 @@ const ToolItemLine = ({
     >
       {/* Icon */}
       <div className="size-4">
-        {Icon && <Icon className={"size-4"} stroke={iconColor} />}
+        {Icon && <Icon className={"size-4"} stroke={item.iconColor} />}
         {item.logoPath && (
           <div className="relative h-4 w-4 mb-2">
             <Image

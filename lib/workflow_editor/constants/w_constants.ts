@@ -129,7 +129,8 @@ export const workflowEditorNodes: Omit<
   {
     label: "Chat Bot",
     icon: MessageCircleMoreIcon,
-    tooltip: "Trigger the workflow when the chat assistant receive a message",
+    tooltip:
+      "Trigger the workflow when a new conversation is started with the chat assistant",
     sectionName: "Entry Point",
     operations: [],
   },
@@ -224,7 +225,7 @@ export const workflowEditorNodes: Omit<
     label: "Send",
     icon: Send,
     tooltip:
-      "Send an email, ChatBot Message, SMS, leave a voicemail or launch a phone call",
+      "Send an Email, Chat Message, SMS, leave a Voicemail or launch a Phone Call",
     sectionName: "Core",
     operations: [],
   },
@@ -349,8 +350,7 @@ export const workflowEditorNodes: Omit<
     operations: [],
   },
 
-  // Dataa Preview
-
+  // Data Preview
   {
     label: "PDF Viewer",
     icon: NotebookTextIcon,

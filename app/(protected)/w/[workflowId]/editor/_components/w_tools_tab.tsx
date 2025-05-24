@@ -76,8 +76,7 @@ const WToolsTab = () => {
                       return (
                         <ToolItemLine
                           key={item.label}
-                          item={item}
-                          iconColor={sectionValues.iconColor}
+                          item={{ ...item, iconColor: sectionValues.iconColor }}
                         />
                       );
                     })}

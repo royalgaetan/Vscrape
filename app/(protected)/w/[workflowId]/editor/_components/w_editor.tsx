@@ -18,6 +18,7 @@ import { VsSelector } from "@/lib/workflow_editor/selector";
 import { VsConnection } from "@/lib/workflow_editor/connections";
 import CustomSocket from "@/components/workflow_editor/custom_socket";
 import CustomConnection from "@/components/workflow_editor/custom_connection";
+import EditorGettingStartedButton from "@/components/workflow_editor/editor_getting_started";
 
 export type Schemes = GetSchemes<VsNode, VsConnection<VsNode>>;
 export type AreaExtra = ReactArea2D<Schemes>;
@@ -330,12 +331,21 @@ const WorkflowEditor = ({
 
   return (
     <div className="flex flex-col w-full h-full justify-center items-center z-[20] relative group/workflowEditorArena">
+      {/* Loader */}
       {displayLoader && (
         <div className="bg-white w-full h-full z-10 absolute top-0">
           <CustomLoader text="Loading editor..." className="w-full h-full" />
         </div>
       )}
 
+      {/* Get Started Button */}
+      <div className="w-full h-full z-10 absolute top-0">
+        <EditorGettingStartedButton
+          onEntryPointSelected={(entryPointNode) => onNodeAdded(entryPointNode)}
+        />
+      </div>
+
+      {/* Editor */}
       <div
         ref={editorRef}
         className="flex flex-1 w-full editor-background-dots"
