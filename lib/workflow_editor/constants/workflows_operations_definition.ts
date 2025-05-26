@@ -18,6 +18,9 @@ export const workflowOperations: Omit<OperationItem, "operationId">[] = [
   //
   //
   // FormInput Operations
+  // Note: Here "Operation" === "Field". FormInput contains a collection of Fields[]
+  // Refer to workflow_formfields_definition file
+
   //
   //
   //

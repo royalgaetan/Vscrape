@@ -1,29 +1,27 @@
 import { cn } from "@/lib/utils";
-import {
-  OperationItem,
-  OperationMoreOptionType,
-} from "@/lib/workflow_editor/types/w_types";
+import { OperationMoreOptionType } from "@/lib/workflow_editor/types/w_types";
 import React, { useState } from "react";
 import SimpleSwitchInput from "./inputs/simple_switch_input";
 import { LucideIcon } from "lucide-react";
 import FilterInput from "./inputs/filter_input";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
 
 const getInitialOptionValues = ({
   optionType,
-  currentOperation,
+  currentBlock,
 }: {
   optionType: OperationMoreOptionType;
-  currentOperation?: OperationItem;
+  currentBlock?: OperationItem;
 }): any => {
-  if (!currentOperation) return;
+  if (!currentBlock) return;
   switch (optionType) {
     case "skipDuplicate":
-      return currentOperation.skipDuplicate;
+      return currentBlock.skipDuplicate;
     case "loopThrough":
-      return currentOperation.loopThrough;
+      return currentBlock.loopThrough;
     case "filters":
-      return currentOperation.inputFilters;
+      return currentBlock.inputFilters;
     default:
       break;
   }
@@ -35,35 +33,35 @@ type Props = {
 
 const MoreOptionInput = ({ optionType }: Props) => {
   // Store
-  const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
-  const setCurrentOperation = useWorkflowEditorStore(
-    (s) => s.setCurrentOperation
-  );
+  const currentBlock = useWorkflowEditorStore(
+    (s) => s.currentBlock
+  ) as OperationItem;
+  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
   // End Store
 
   const [internalValue, setInternalValue] = useState<any>(
     getInitialOptionValues({
       optionType: optionType,
-      currentOperation: currentOperation,
+      currentBlock: currentBlock,
     })
   );
 
   const updateValue = (newValue: any) => {
     setInternalValue(newValue);
-    if (!currentOperation) return;
+    if (!currentBlock) return;
     switch (optionType) {
       case "skipDuplicate":
-        currentOperation.skipDuplicate = newValue;
-        setCurrentOperation(currentOperation);
-
+        currentBlock.skipDuplicate = newValue;
+        setCurrentBlock(currentBlock);
+        break;
       case "loopThrough":
-        currentOperation.loopThrough = newValue;
-        setCurrentOperation(currentOperation);
-
+        currentBlock.loopThrough = newValue;
+        setCurrentBlock(currentBlock);
+        break;
       case "filters":
-        currentOperation.inputFilters = newValue;
-        setCurrentOperation(currentOperation);
-
+        currentBlock.inputFilters = newValue;
+        setCurrentBlock(currentBlock);
+        break;
       default:
         break;
     }

@@ -1,6 +1,16 @@
 import React, { useRef, useState } from "react";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
+import MultiSelect from "@/components/global/multi_select";
+import { Separator } from "@/components/ui/separator";
+import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
+import { delay, generateHexRandomString } from "@/lib/numbers_utils";
+import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
+import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
+import { NodeBlockType, useWorkflowEditorStore } from "@/stores/workflowStore";
+import FieldLabel from "../field_label";
+import OperationParamCard from "./operation_param_card";
+import PanelHeader from "../panel_header";
 import {
   Check,
   CircleEllipsisIcon,
@@ -12,19 +22,10 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import MultiSelect from "@/components/global/multi_select";
-import { Separator } from "@/components/ui/separator";
-import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
-import { delay, generateHexRandomString } from "@/lib/numbers_utils";
-import ParameterItemLine from "./w_optionbar_param_itemline";
-import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
-import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
-import { FieldLabel, OptionbarHeader } from "./w_optionbar_editor";
-import { useWorkflowEditorStore } from "@/stores/workflowStore";
-import { VsNode } from "@/lib/workflow_editor/node";
-import { OperationItem } from "@/lib/workflow_editor/types/w_types";
+import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
+import { VsNode } from "@/lib/workflow_editor/classes/node";
 
-const OptionbarOperation = ({
+const SingleOperationPanel = ({
   nodeOrigin,
   operationOrigin,
   onBack,
@@ -35,20 +36,20 @@ const OptionbarOperation = ({
   nodeOrigin: VsNode;
   operationOrigin?: OperationItem;
   onBack?: () => void;
-  onSave: (operation: OperationItem) => void;
+  onSave: (block?: NodeBlockType) => void;
   onDelete: (operationId: string) => void;
   displayBackButton?: boolean;
 }) => {
   const operationId = useRef<string>(
-    operationOrigin?.operationId ?? crypto.randomUUID()
+    operationOrigin?.id ?? crypto.randomUUID()
   );
+
   // Store
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-
-  const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
-  const setCurrentOperation = useWorkflowEditorStore(
-    (s) => s.setCurrentOperation
-  );
+  const currentBlock = useWorkflowEditorStore(
+    (s) => s.currentBlock
+  ) as OperationItem;
+  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
   // End Store
 
   const availableOperations = workflowOperations.filter(
@@ -59,12 +60,13 @@ const OptionbarOperation = ({
   const [SavingOperationResultIcon, setSavingOperationResultIcon] = useState<
     LucideIcon | undefined
   >(undefined);
+
   const saveOperation = async () => {
     setSavingOperationResultIcon(undefined);
     setIsSavingOperation(true);
     await delay(400);
 
-    if (!currentNode || !currentOperation) {
+    if (!currentNode || !currentBlock) {
       setIsSavingOperation(false);
       setSavingOperationResultIcon(X);
       await delay(1000);
@@ -76,7 +78,7 @@ const OptionbarOperation = ({
       setSavingOperationResultIcon(Check);
       await delay(150);
       setSavingOperationResultIcon(undefined);
-      onSave(currentOperation);
+      onSave(currentBlock);
     } catch (e) {
       console.log("Err", e);
       setIsSavingOperation(false);
@@ -87,13 +89,15 @@ const OptionbarOperation = ({
     }
   };
 
+  //   if (!(currentBlock instanceof OperationItem)) return;
+
   return (
     <div>
       <div className="flex flex-col w-full max-h-full relative">
         <div className="flex flex-col w-full max-h-full overflow-x-clip overflow-y-scroll scrollbar-hide">
           {/* Header */}
           <div className="px-4 w-full">
-            <OptionbarHeader
+            <PanelHeader
               nodeOrigin={nodeOrigin}
               displayBackButton={displayBackButton}
               onBack={() => onBack && onBack()}
@@ -119,7 +123,7 @@ const OptionbarOperation = ({
                 popoverAlignment="center"
                 selectionMode="single"
                 popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
-                label={currentOperation?.operationName ?? "Pick an operation"}
+                label={currentBlock?.operationName ?? "Pick an operation"}
                 itemTooltipClassname="w-52"
                 data={{
                   "": availableOperations.map((op) => ({
@@ -133,13 +137,16 @@ const OptionbarOperation = ({
                   })),
                 }}
                 selectedValues={
-                  currentOperation?.operationName
-                    ? [currentOperation.operationName]
+                  currentBlock?.operationName
+                    ? [currentBlock.operationName]
                     : []
                 }
                 handleSelect={(opSelected) => {
-                  if (opSelected === currentOperation?.operationName) {
-                    setCurrentOperation(undefined);
+                  if (
+                    currentBlock &&
+                    opSelected === currentBlock.operationName
+                  ) {
+                    setCurrentBlock(undefined);
                   } else {
                     const operation = workflowOperations.find(
                       (op) =>
@@ -147,11 +154,11 @@ const OptionbarOperation = ({
                         op.nodeName === currentNode?.label
                     );
                     if (!operation) return;
-                    setCurrentOperation(
+                    setCurrentBlock(
                       structuredClone({
-                        operationId: operationId.current,
+                        id: operationId.current,
                         ...operation,
-                      })
+                      } as OperationItem)
                     );
                   }
                 }}
@@ -161,13 +168,9 @@ const OptionbarOperation = ({
 
             {/* Parameters List */}
             <div className="flex flex-col justify-start items-start">
-              {!currentOperation ||
-              !currentOperation.params ||
-              currentOperation.params.length === 0 ? (
-                <div className="h-[0vh]"></div>
-              ) : (
+              {currentBlock?.params!.length > 0 && (
                 <div className="flex flex-col w-full gap-4">
-                  {currentOperation?.params?.map((params, id) => {
+                  {currentBlock?.params?.map((params, id) => {
                     // If Params is an Array: meaning it contains "nested" params
                     // => Display all of them in the same line
                     // Else Params is a Param: Display it in the 1 line
@@ -185,7 +188,7 @@ const OptionbarOperation = ({
                                   maxWidth: `${90 / params.length}%`,
                                 }}
                               >
-                                <ParameterItemLine
+                                <OperationParamCard
                                   isWithinAGroup={true}
                                   paramData={param}
                                   labelClassName={
@@ -207,7 +210,7 @@ const OptionbarOperation = ({
                           </div>
                         ) : (
                           <div className="flex flex-1 w-full px-4 pr-4">
-                            <ParameterItemLine
+                            <OperationParamCard
                               paramData={params}
                               isWithinAGroup={false}
                             />
@@ -216,16 +219,15 @@ const OptionbarOperation = ({
                       </div>
                     );
                   })}
-
                   <Separator className="my-2" />
                 </div>
               )}
             </div>
 
             {/* More Options List: Detect Duplicate, Enable Loop */}
-            {currentOperation &&
-              (currentOperation.loopThrough !== undefined ||
-                currentOperation.skipDuplicate) && (
+            {currentBlock &&
+              (currentBlock.loopThrough !== undefined ||
+                currentBlock.skipDuplicate) && (
                 <div>
                   <div className="flex flex-col justify-start items-start  px-4 pr-4">
                     <div className="mb-2">
@@ -236,12 +238,12 @@ const OptionbarOperation = ({
                     </div>
 
                     {/* Loop Through */}
-                    {currentOperation.loopThrough !== undefined && (
+                    {currentBlock.loopThrough !== undefined && (
                       <MoreOptionInput optionType="loopThrough" />
                     )}
 
                     {/* Skip Duplicates */}
-                    {currentOperation.skipDuplicate && (
+                    {currentBlock.skipDuplicate && (
                       <MoreOptionInput optionType="skipDuplicate" />
                     )}
 
@@ -252,7 +254,7 @@ const OptionbarOperation = ({
               )}
 
             {/* Filters */}
-            {currentOperation && (
+            {currentBlock && (
               <div className="mt-1 flex flex-col justify-start items-start">
                 <MoreOptionInput optionType="filters" />
               </div>
@@ -265,7 +267,7 @@ const OptionbarOperation = ({
       </div>
 
       {/* Fixed Bottom Bar */}
-      {currentOperation && (
+      {currentBlock && (
         <div className="flex flex-col w-[var(--optionbarwidth)] bg-white z-10 fixed bottom-[7vh]">
           {/* Shared Outputs DnD Buttons */}
           <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
@@ -306,7 +308,7 @@ const OptionbarOperation = ({
                     className="w-fit"
                     onClick={() => {
                       // Delete Operation
-                      onDelete(operationOrigin.operationId);
+                      onDelete(operationOrigin.id);
                     }}
                   >
                     <Trash2 />
@@ -342,4 +344,4 @@ const OptionbarOperation = ({
   );
 };
 
-export default OptionbarOperation;
+export default SingleOperationPanel;

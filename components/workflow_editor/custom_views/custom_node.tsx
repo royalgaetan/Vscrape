@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Presets } from "rete-react-plugin";
 import Image from "next/image";
 import { Copy, GripVertical, LucideIcon } from "lucide-react";
-import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import SimpleTooltip from "../global/simple_tooltip";
 import NodeHandle from "./node_handle";
-import { VsNode } from "@/lib/workflow_editor/node";
 import { Schemes } from "@/app/(protected)/w/[workflowId]/editor/_components/w_editor";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { hexToRgba } from "@/lib/colors_utils";
-
-const { RefSocket } = Presets.classic;
+import SimpleTooltip from "@/components/global/simple_tooltip";
+import { Button } from "@/components/ui/button";
+import { VsNode } from "@/lib/workflow_editor/classes/node";
 
 const CustomNode = ({
   data: node,
@@ -23,8 +21,8 @@ const CustomNode = ({
   const Icon = node.icon as LucideIcon;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [nodeOperationsLength, setNodeOperationsLength] = useState<number>(
-    node.operations.length
+  const [nodeBlocksLength, setNodeBlocksLength] = useState<number>(
+    node.blocks ? node.blocks.length : 0
   );
   // Store
   const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
@@ -35,8 +33,10 @@ const CustomNode = ({
     const unsub = useWorkflowEditorStore.subscribe((state, prev) => {
       if (!state.currentNode) return;
       if (state.currentNode.id !== node.id) return;
-
-      setNodeOperationsLength(state.currentNode.operations.length);
+      const newlength = state.currentNode.blocks
+        ? state.currentNode.blocks.length
+        : 0;
+      setNodeBlocksLength(newlength);
     });
 
     return () => unsub();
@@ -144,8 +144,8 @@ const CustomNode = ({
           {/* Rests... */}
           <div className="flex flex-1 items-center justify-center gap-1 pointer-events-none">
             <p className="w-full text-center line-clamp-1 font-normal text-neutral-500 text-sm">
-              {nodeOperationsLength} Operation
-              {nodeOperationsLength > 1 && "s"}
+              {nodeBlocksLength} Operation
+              {nodeBlocksLength > 1 && "s"}
             </p>
             {/* Button: Duplicate */}
             <SimpleTooltip tooltipText="Duplicate" side="bottom">

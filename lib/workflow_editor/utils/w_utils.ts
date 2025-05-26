@@ -9,10 +9,9 @@ import {
   workflowEditorNodes,
   workflowEditorSections,
 } from "../constants/w_constants";
-import { NodeTest, OperationItem, WorkflowEditorNode } from "../types/w_types";
+import { NodeTest, WorkflowEditorNode } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
-import { VsNode } from "../node";
-import { deepClone } from "@/lib/utils";
+import { VsNode } from "../classes/node";
 
 export const isDynamicInputDataOnly = (content: string) => {
   // Check if the provided content is only a data input. E.g. {{ Variables }}

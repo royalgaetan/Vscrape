@@ -4,9 +4,9 @@ import {
   ExtendedOperationFilterType,
   OperationFilterType,
 } from "@/lib/workflow_editor/types/w_types";
-import { FieldLabel } from "@/app/(protected)/w/[workflowId]/editor/_components/w_optionbar_editor";
 import { ListFilterPlusIcon } from "lucide-react";
 import SingleFilterRow from "./filter_input_row";
+import FieldLabel from "../panel/field_label";
 
 const FilterInput = ({
   initialFilters,

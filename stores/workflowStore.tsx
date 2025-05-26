@@ -1,11 +1,13 @@
-import { VsNode } from "@/lib/workflow_editor/node";
+import { VsFormInputField } from "@/lib/workflow_editor/classes/form_field_item";
+import { VsNode } from "@/lib/workflow_editor/classes/node";
+import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
 import {
-  OperationItem,
   SharedOutputSelectedItem,
   TokenInputType,
 } from "@/lib/workflow_editor/types/w_types";
 import { create } from "zustand";
 
+export type NodeBlockType = OperationItem | VsFormInputField;
 export type NodeToActOn =
   | {
       nodeId: string;
@@ -18,21 +20,21 @@ interface WorkflowEditorState {
   isWorkflowChatOpen: boolean;
   toggleWorkflowChat: (isOpen: boolean) => void;
 
-  // Workflow Option Bar (Right bar)
-  isWorkflowOptionbarOpen: boolean;
+  // Workflow Panel
+  isWorkflowPanelOpen: boolean;
   currentNode: VsNode | undefined;
   updateCurrentNode: (val: VsNode) => void;
-  currentOperation: OperationItem | undefined;
-  setCurrentOperation: (operation: OperationItem | undefined) => void;
-  toggleOptionbar: (isOpen: boolean, node?: VsNode) => void;
+  currentBlock?: NodeBlockType;
+  setCurrentBlock: (block?: NodeBlockType) => void;
+  toggleWorkflowPanel: (isOpen: boolean, node?: VsNode) => void;
 
-  // Node Operations: Duplicate, Delete
+  // Node Actions: Duplicate, Delete
   setNodeIdToActOn: (act: NodeToActOn) => void;
   nodeIdToActOn: NodeToActOn;
 
   // Worfklow Shared Outputs Dialog
   isSharedOutputsDialogOpen: boolean;
-  setIsWorkflowOptionbarOpen: (isOpen: boolean) => void;
+  setisWorkflowPanelOpen: (isOpen: boolean) => void;
   sharedOutputSelected: SharedOutputSelectedItem | undefined;
   setSharedOutputSelected: (
     sharedOutput: SharedOutputSelectedItem | undefined
@@ -50,23 +52,22 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
     isWorkflowChatOpen: false,
     toggleWorkflowChat: (isOpen) => set({ isWorkflowChatOpen: isOpen }),
 
-    //   Optionbar-related
-    isWorkflowOptionbarOpen: false,
-    setIsWorkflowOptionbarOpen: (isOpen) =>
-      set({ isWorkflowOptionbarOpen: isOpen }),
+    // Workflow Panel-related
+    isWorkflowPanelOpen: false,
+    setisWorkflowPanelOpen: (isOpen) => set({ isWorkflowPanelOpen: isOpen }),
     currentNode: undefined,
     updateCurrentNode: (val) => set({ currentNode: val }),
-    currentOperation: undefined,
-    setCurrentOperation: (operation) => set({ currentOperation: operation }),
-    toggleOptionbar: (isOpen, node) => {
+    currentBlock: undefined,
+    setCurrentBlock: (block) => set({ currentBlock: block }),
+    toggleWorkflowPanel: (isOpen, node) => {
       set({
-        isWorkflowOptionbarOpen: isOpen,
+        isWorkflowPanelOpen: isOpen,
         currentNode: node,
-        currentOperation: undefined,
+        currentBlock: undefined,
       });
     },
 
-    // Node Operations: Duplicate, Delete
+    // Node Actions: Duplicate, Delete
     nodeIdToActOn: undefined,
     setNodeIdToActOn: (act) => set({ nodeIdToActOn: act }),
 

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import WChatTab from "./w_chat_tab";
-import WToolsTab from "./w_tools_tab";
 import { LucideIcon } from "lucide-react";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import TabNodesList from "@/components/workflow_editor/sidebar/tab_nodes";
+import TabChat from "@/components/workflow_editor/sidebar/tab_chat";
 
 export type WSidebarType = {
   label: string;
@@ -31,12 +31,12 @@ const WEditorSidebar = () => {
   }, [isWorkflowChatOpen]);
   return (
     <div className="min-w-[18rem] max-w-[18rem] h-full bg-white border-r flex flex-col items-start justify-start relative">
-      {/* Tools list | Or chat assistant */}
+      {/* Nodes list | Or chat assistant */}
       <div
         ref={chatHistoryContainer}
         className="flex flex-1 w-full max-h-full overflow-y-scroll scrollbar-hide"
       >
-        {isWorkflowChatOpen ? <WChatTab /> : <WToolsTab />}
+        {isWorkflowChatOpen ? <TabChat /> : <TabNodesList />}
       </div>
     </div>
   );

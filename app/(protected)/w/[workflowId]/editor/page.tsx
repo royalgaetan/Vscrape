@@ -3,7 +3,7 @@ import React from "react";
 import WEditorSidebar from "./_components/w_sidebar_editor";
 import { useParams } from "next/navigation";
 import { DraftingCompass } from "lucide-react";
-import OptionbarEditor from "./_components/w_optionbar_editor";
+import OptionbarEditor from "./_components/w_editor_panel";
 import WorflowEditorWrapper from "./_components/w_editor_wrapper";
 
 const WorkflowEditorPage = () => {

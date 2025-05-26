@@ -70,8 +70,10 @@ export const vsPrimitiveMIMETypes = {
   timeMs: "primitive/milliseconds",
   switch: "primitive/switch",
   radio: "primitive/radio",
+  checkbox: "primitive/checkbox",
   customSwitch: "primitive/customSwitch",
   record: "primitive/record",
+  hidden: "primitive/hidden",
 } as const;
 
 export const ImageMIMETypes = {

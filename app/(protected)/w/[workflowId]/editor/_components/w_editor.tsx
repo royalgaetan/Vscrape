@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { NodeEditor, GetSchemes, ClassicPreset } from "rete";
+import { NodeEditor, GetSchemes } from "rete";
 import CustomLoader from "@/components/global/loader";
 import { createRoot } from "react-dom/client";
 import { ReactPlugin, Presets, ReactArea2D } from "rete-react-plugin";
@@ -9,28 +9,31 @@ import {
   Presets as ConnectionPresets,
 } from "rete-connection-plugin";
 import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
-import CustomNode from "@/components/workflow_editor/custom_node";
 import { convertDropPositionToEditorCoords } from "@/lib/workflow_editor/utils/convert_position_to_editor_coords";
-import { VsNode } from "@/lib/workflow_editor/node";
 import { getVsNodeFromLabel } from "@/lib/workflow_editor/utils/w_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
-import { VsSelector } from "@/lib/workflow_editor/selector";
-import { VsConnection } from "@/lib/workflow_editor/connections";
-import CustomSocket from "@/components/workflow_editor/custom_socket";
-import CustomConnection from "@/components/workflow_editor/custom_connection";
-import EditorGettingStartedButton from "@/components/workflow_editor/editor_getting_started";
+import { VsConnection } from "@/lib/workflow_editor/classes/connections";
+import CustomConnection from "@/components/workflow_editor/custom_views/custom_connection";
+import EditorGettingStartedButton from "@/components/workflow_editor/buttons/getting_started_button";
+import CustomNode from "@/components/workflow_editor/custom_views/custom_node";
+import CustomSocket from "@/components/workflow_editor/custom_views/custom_socket";
+import { VsNode } from "@/lib/workflow_editor/classes/node";
+import { VsSelector } from "@/lib/workflow_editor/classes/selector";
 
 export type Schemes = GetSchemes<VsNode, VsConnection<VsNode>>;
 export type AreaExtra = ReactArea2D<Schemes>;
 
 const WorkflowEditor = ({
   elementDropped,
+  editorOnboardingState,
 }: {
   elementDropped?: DroppedToolItem;
+  editorOnboardingState: (isDisplayed: boolean) => void;
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const initialisedRef = useRef<boolean>(false);
   const [displayLoader, setDisplayLoader] = useState<boolean>(true);
+  const [displayEditorOnboarding, setDisplayEditorOnboarding] = useState(true);
 
   // Editor + Plugins refs
   const editorInstanceRef = useRef<NodeEditor<Schemes>>();
@@ -40,7 +43,9 @@ const WorkflowEditor = ({
   const selectorRef = useRef<VsSelector<any>>();
 
   // Store
-  const toggleOptionbar = useWorkflowEditorStore((s) => s.toggleOptionbar);
+  const toggleWorkflowPanel = useWorkflowEditorStore(
+    (s) => s.toggleWorkflowPanel
+  );
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
   const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
   // End Store
@@ -66,7 +71,7 @@ const WorkflowEditor = ({
       }
 
       if (currentNodeRef.current && currentNodeRef.current.id === nodeId) {
-        toggleOptionbar(false);
+        toggleWorkflowPanel(false);
       }
       setNodeIdToActOn(undefined);
     } catch (err) {
@@ -127,8 +132,6 @@ const WorkflowEditor = ({
     // Check if the editor div element has been loaded and Avoid double-initialization
     if (!editorRef.current || initialisedRef.current) return;
     initialisedRef.current = true;
-    // Remove Loader
-    setDisplayLoader(false);
 
     // Init Editor, Area, Render and Connections
     const editor = new NodeEditor<Schemes>();
@@ -182,6 +185,12 @@ const WorkflowEditor = ({
     setTimeout(() => {
       // wait until nodes rendered because they dont have predefined width and height
       AreaExtensions.zoomAt(area, editor.getNodes());
+
+      // Remove Loader
+      setDisplayLoader(false);
+
+      // Display Editor Onboarding
+      setDisplayEditorOnboarding(true);
     }, 30);
 
     return {
@@ -195,7 +204,7 @@ const WorkflowEditor = ({
     // Listen to Workflow Editor Store
     const unsub = useWorkflowEditorStore.subscribe((state) => {
       // Listen to OptionBar Display State
-      if (state.isWorkflowOptionbarOpen === false) {
+      if (state.isWorkflowPanelOpen === false) {
         selectorRef.current && selectorRef.current?.unselectAll();
       }
 
@@ -271,10 +280,10 @@ const WorkflowEditor = ({
             currentNodeRef.current.id === nodeIdDragged
           ) {
             selectableNodes.unselect(nodeIdDragged);
-            toggleOptionbar(false);
+            toggleWorkflowPanel(false);
           } else {
             selectableNodes.select(nodeIdDragged, true);
-            toggleOptionbar(true, concernedNode);
+            toggleWorkflowPanel(true, concernedNode);
           }
         }
       }
@@ -323,7 +332,7 @@ const WorkflowEditor = ({
 
     if (dx < threshold && dy < threshold) {
       // Click
-      toggleOptionbar(false);
+      toggleWorkflowPanel(false);
     } else {
       // Pan / Drag
     }
@@ -339,11 +348,20 @@ const WorkflowEditor = ({
       )}
 
       {/* Get Started Button */}
-      {/* <div className="w-full h-full z-10 absolute top-0">
-        <EditorGettingStartedButton
-          onEntryPointSelected={(entryPointNode) => onNodeAdded(entryPointNode)}
-        />
-      </div> */}
+      {!displayLoader && displayEditorOnboarding && (
+        <div className="w-full h-full z-10 absolute top-0">
+          <EditorGettingStartedButton
+            onEntryPointSelected={(entryPointNode) => {
+              if (entryPointNode) {
+                onNodeAdded(entryPointNode);
+              }
+              // Dismiss Editor Onboarding
+              setDisplayEditorOnboarding(false);
+              editorOnboardingState(false);
+            }}
+          />
+        </div>
+      )}
 
       {/* Editor */}
       <div

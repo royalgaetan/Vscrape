@@ -61,6 +61,14 @@ export type vsRadio = {
   value: string;
   type: (typeof vsPrimitiveMIMETypes)["radio"];
 };
+export type vsCheckbox = {
+  value: string[];
+  type: (typeof vsPrimitiveMIMETypes)["checkbox"];
+};
+export type vsHidden = {
+  value: string;
+  type: (typeof vsPrimitiveMIMETypes)["hidden"];
+};
 export type vsCustomSwitch = {
   value: string;
   type: (typeof vsPrimitiveMIMETypes)["customSwitch"];
@@ -83,7 +91,9 @@ export type vsAnyPrimitives =
   | vsTimeMs
   | vsSwitch
   | vsRadio
+  | vsCheckbox
   | vsCustomSwitch
+  | vsHidden
   | vsRecord;
 
 // Raw

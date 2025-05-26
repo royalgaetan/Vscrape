@@ -1,11 +1,27 @@
 import { LucideIcon } from "lucide-react";
-import { vsAnyPrimitives, vsAnyRawTypes, vsStructuredData } from "./data_types";
+import {
+  vsAnyPrimitives,
+  vsAnyRawTypes,
+  vsCheckbox,
+  vsDateTime,
+  vsEmailURL,
+  vsHidden,
+  vsNumber,
+  vsRadio,
+  vsStructuredData,
+  vsSwitch,
+  vsTel,
+  vsText,
+  vsTimeMs,
+} from "./data_types";
 import { vsCriteria } from "./data_types_criteria";
 import {
   workflowEditorNodes,
   workflowEditorSections,
 } from "../constants/w_constants";
 import { Nullable } from "@/lib/types";
+import { OperationItem } from "../classes/operation_item";
+import { VsFormInputField } from "../classes/form_field_item";
 
 export type WorkflowEditorNode = {
   label: string;
@@ -14,12 +30,23 @@ export type WorkflowEditorNode = {
   logoPath?: string;
   tooltip?: string;
   isDisabled?: boolean;
+  isSpecialNode?: boolean;
   sectionName: keyof typeof workflowEditorSections;
-  operations: OperationItem[];
+} & (NodeWithOperationBlocks | NodeWithFormFieldBlocks);
+export type NodeBlockStringType = "operation" | "formField";
+
+export type NodeWithOperationBlocks = {
+  blockType: "operation";
+  blocks: OperationItem[];
 };
 
-export type OperationItem = {
-  operationId: string;
+export type NodeWithFormFieldBlocks = {
+  blockType: "formField";
+  blocks: VsFormInputField[];
+};
+
+export type OperationItemType = {
+  id: string;
   operationName: string;
   operationDescription: string;
   nodeName: (typeof workflowEditorNodes)[number]["label"];
@@ -38,6 +65,27 @@ export type OperationItem = {
   loopThrough?: "All items" | number | boolean;
 };
 
+export type VsFormInputFieldType = {
+  id: string;
+  fieldName: string;
+  fieldDescription: string;
+  fieldPlaceholder: string;
+  fieldValueToPickFrom?: string[];
+  isOptional?: boolean;
+} & VsFormInputFieldTypeUnion;
+type VsFormInputFieldTypeUnion =
+  | vsText
+  | vsEmailURL
+  | vsTel
+  | vsNumber
+  | vsRadio
+  | vsSwitch
+  | vsCheckbox
+  | vsDateTime
+  | vsTimeMs
+  | vsHidden
+  | vsAnyRawTypes;
+
 export type OperationThroughput = vsStructuredData;
 
 export type OperationParamItem = {
@@ -49,12 +97,10 @@ export type OperationParamItem = {
 } & (vsAnyRawTypes | vsAnyPrimitives);
 
 // Workflow Editor Types
+export type nodeDropPosition = { x: number; y: number } | "center";
 export type DroppedToolItem = {
   label: string;
-  position?: {
-    x: number;
-    y: number;
-  };
+  position?: nodeDropPosition;
 };
 
 // --------------------------------------------------------

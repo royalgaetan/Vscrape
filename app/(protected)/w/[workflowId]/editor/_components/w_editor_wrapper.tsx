@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   BugPlayIcon,
-  DraftingCompass,
   InfoIcon,
   LockKeyholeOpenIcon,
   LucideIcon,
@@ -22,6 +21,12 @@ import SimpleTooltip from "@/components/global/simple_tooltip";
 import WorkflowEditor from "./w_editor";
 import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import UndoRedoButtons from "@/components/workflow_editor/buttons/undo_redo_buttons";
+import ToggleChatButton from "@/components/workflow_editor/buttons/toggle_chat_button";
+import ViewButtons from "@/components/workflow_editor/buttons/editor_view_buttons";
+import ExecuteButton from "@/components/workflow_editor/buttons/execute_button";
+import DebugButton from "@/components/workflow_editor/buttons/debug_button";
+import RevertVersionButton from "@/components/workflow_editor/buttons/revert_version_button";
 
 const WorflowEditorWrapper = ({
   workflowId,
@@ -30,24 +35,19 @@ const WorflowEditorWrapper = ({
   workflowId: string;
   isHistory?: boolean;
 }) => {
-  // Store
-  const toggleWorkflowChat = useWorkflowEditorStore(
-    (s) => s.toggleWorkflowChat
-  );
-  const isWorkflowChatOpen = useWorkflowEditorStore(
-    (s) => s.isWorkflowChatOpen
-  );
-  // End Store
-
   const [droppedElement, setDroppedElement] = useState<DroppedToolItem>();
+  const [isEditorOnboardingDisplayed, setIsEditorOnboardingDisplayed] =
+    useState(true);
 
   return (
     <div
       onDragOver={(e: React.DragEvent) => {
+        if (isEditorOnboardingDisplayed) return;
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
       }}
       onDrop={(e: React.DragEvent) => {
+        if (isEditorOnboardingDisplayed) return;
         e.preventDefault();
         setDroppedElement({
           label: e.dataTransfer.getData("application/workflowEditor"),
@@ -61,10 +61,15 @@ const WorflowEditorWrapper = ({
       tabIndex={2}
       className="cursor-default flex flex-col justify-center items-center h-full w-full relative"
     >
-      {/* Workflow Editor Arena */}
-      <WorkflowEditor elementDropped={droppedElement} />
+      {/* Editor: Workflow Arena */}
+      <WorkflowEditor
+        editorOnboardingState={(isDisplay) =>
+          setIsEditorOnboardingDisplayed(isDisplay)
+        }
+        elementDropped={droppedElement}
+      />
 
-      {/* Workflow Editor Action Buttons */}
+      {/* Overlay: Action Buttons */}
       <div className="flex flex-1 items-end w-full absolute z-[21] pointer-events-none bottom-0 px-3 pb-3">
         {/* Info Button */}
         <div className="flex justify-start items-center w-1/3">
@@ -89,66 +94,19 @@ const WorflowEditorWrapper = ({
 
         {/* Execution Buttons */}
         <div className="flex flex-1 gap-2 pointer-events-auto justify-center items-center w-1/3">
-          {isHistory && (
-            <Button
-              variant={"default"}
-              className="rounded-2xl h-7 text-xs gap-1 px-3 active:scale-[0.97]"
-            >
-              <UndoDotIcon className="stroke-white" />
-              <span className="">Revert this version</span>
-            </Button>
-          )}
+          {isHistory && <RevertVersionButton />}
 
-          {isHistory === undefined && (
-            <SimpleTooltip
-              tooltipText={isWorkflowChatOpen ? "Close Chat" : "Open Chat"}
-            >
-              <Button
-                onClick={() => toggleWorkflowChat(!isWorkflowChatOpen)}
-                variant={"secondary"}
-                className={cn(
-                  "duration-0 rounded-2xl h-7 text-xs gap-1 px-3",
-                  isWorkflowChatOpen &&
-                    "bg-primary text-primary-foreground hover:bg-primary/90"
-                )}
-              >
-                <MessageCircleMoreIcon
-                  className={cn(
-                    "stroke-neutral-800",
-                    isWorkflowChatOpen && "stroke-white"
-                  )}
-                />
-              </Button>
-            </SimpleTooltip>
-          )}
+          {isHistory === undefined && <ToggleChatButton />}
 
-          {isHistory === undefined && (
-            <Button
-              variant={"default"}
-              className="!bg-yellow-500 hover:!bg-yellow-500/70 rounded-2xl h-7 text-xs gap-1 px-3 "
-            >
-              <BugPlayIcon className="stroke-white" />
-            </Button>
-          )}
+          {isHistory === undefined && <DebugButton />}
 
           {isHistory === undefined && <UndoRedoButtons />}
 
-          {isHistory === undefined && (
-            <Button
-              variant={"default"}
-              className="rounded-2xl h-7 text-xs gap-1 px-3 active:scale-[0.97]"
-            >
-              <Play className="stroke-white" />
-              <span className="">Execute</span>
-            </Button>
-          )}
+          {isHistory === undefined && <ExecuteButton />}
         </div>
 
         {/* View Buttons */}
-        <div
-          className="flex flex-1 justify-end pointer-eve
-        $ùnts-auto items-center"
-        >
+        <div className="flex flex-1 justify-end pointer-events-auto items-center">
           <ViewButtons />
         </div>
       </div>
@@ -157,69 +115,3 @@ const WorflowEditorWrapper = ({
 };
 
 export default WorflowEditorWrapper;
-
-export const ViewButtons = () => {
-  const viewIcons: { icon: LucideIcon; name: string }[] = [
-    {
-      icon: Plus,
-      name: "Zoom in",
-    },
-    {
-      icon: Minus,
-      name: "Zoom out",
-    },
-    {
-      icon: Maximize,
-      name: "Fit",
-    },
-    {
-      icon: LockKeyholeOpenIcon,
-      name: "Lock",
-    },
-  ];
-
-  return (
-    <div className="rounded-2xl border divide-y-2 overflow-clip flex flex-col w-7 h-min bg-white">
-      {viewIcons.map((el) => {
-        const Icon = el.icon;
-        return (
-          <button
-            key={el.name}
-            className="h-7 flex justify-center group/viewBtn items-center bg-transparent hover:bg-neutral-200 cursor-pointer"
-          >
-            <Icon className="size-4 stroke-neutral-700 group-active/viewBtn:scale-[0.80] transition-all duration-200" />
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-export const UndoRedoButtons = () => {
-  const doButtons: { icon: LucideIcon; name: string }[] = [
-    {
-      icon: Undo2,
-      name: "Undo",
-    },
-    {
-      icon: Redo2,
-      name: "Redo",
-    },
-  ];
-
-  return (
-    <div className="rounded-2xl border divide-x-2 overflow-clip flex h-7 w-min bg-white">
-      {doButtons.map((el) => {
-        const Icon = el.icon;
-        return (
-          <button
-            key={el.name}
-            className="w-10 flex justify-center group/viewBtn items-center bg-transparent hover:bg-neutral-200 cursor-pointer"
-          >
-            <Icon className="size-4 stroke-neutral-700 group-active/viewBtn:scale-[0.80] transition-all duration-200" />
-          </button>
-        );
-      })}
-    </div>
-  );
-};

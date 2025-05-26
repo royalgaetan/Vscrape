@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FilterIcon, Trash2 } from "lucide-react";
 import MultiSelect from "@/components/global/multi_select";
 import {

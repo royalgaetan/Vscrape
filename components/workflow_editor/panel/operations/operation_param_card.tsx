@@ -4,7 +4,7 @@ import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { useState } from "react";
 
-const ParameterItemLine = ({
+const OperationParamCard = ({
   paramData,
   className,
   inputClassName,
@@ -18,14 +18,12 @@ const ParameterItemLine = ({
   isWithinAGroup: boolean;
 }) => {
   // Store
-  const currentOperation = useWorkflowEditorStore((s) => s.currentOperation);
-  const setCurrentOperation = useWorkflowEditorStore(
-    (s) => s.setCurrentOperation
-  );
+  const currentBlock = useWorkflowEditorStore((s) => s.currentBlock);
+  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
   // End Store
 
   const getParam = (): OperationParamItem | undefined => {
-    return currentOperation?.params
+    return currentBlock?.params
       ?.flatMap((p) => p)
       .find((p) => p.paramName === paramData.paramName);
   };
@@ -40,9 +38,9 @@ const ParameterItemLine = ({
   const onValueChange = (newValue: any) => {
     setInternalValue(newValue);
 
-    if (!currentOperation || !currentOperation.params) return;
+    if (!currentBlock || !currentBlock.params) return;
 
-    const updatedOperationParams = currentOperation.params.map((param) => {
+    const updatedOperationParams = currentBlock.params.map((param) => {
       if (Array.isArray(param)) {
         return param.map((subParam) => {
           if (subParam.paramName === paramData.paramName) {
@@ -57,10 +55,10 @@ const ParameterItemLine = ({
         return param;
       }
     });
-    currentOperation.params = updatedOperationParams;
-    setCurrentOperation(currentOperation);
+    currentBlock.params = updatedOperationParams;
+    setCurrentBlock(currentBlock);
     // console.log("@debug", "Internal Value", internalValue);
-    // console.log("@debug", "(provider) currentOperation", currentOperation);
+    // console.log("@debug", "(provider) currentBlock", currentBlock);
   };
 
   return (
@@ -101,4 +99,4 @@ const ParameterItemLine = ({
   );
 };
 
-export default ParameterItemLine;
+export default OperationParamCard;

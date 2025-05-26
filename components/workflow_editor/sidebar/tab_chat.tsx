@@ -5,7 +5,7 @@ import { fakeConversation1 } from "@/lib/fake_data";
 import { LucideArrowRight } from "lucide-react";
 import React, { useState } from "react";
 
-const WChatTab = () => {
+const TabChat = () => {
   const [avatarPath] = useState(generateAvatar()?.toDataUri ?? "");
 
   return (
@@ -37,4 +37,4 @@ const WChatTab = () => {
   );
 };
 
-export default WChatTab;
+export default TabChat;

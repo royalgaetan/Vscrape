@@ -11,7 +11,7 @@ import { fakeInputs } from "@/lib/fake_data";
 import { humanizeKey } from "@/lib/string_utils";
 import React, { useEffect, useState } from "react";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
-import SharedOutputsViewer from "../shared_outputs_viewer";
+import SharedOutputsViewer from "./shared_outputs_viewer";
 
 const SelectInputDataDialog = () => {
   const [currentKeyTab, setCurrentKeyTab] = useState("");

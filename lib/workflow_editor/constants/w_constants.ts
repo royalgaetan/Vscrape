@@ -24,7 +24,6 @@ import {
   ZapIcon,
   GitBranch,
   DatabaseZapIcon,
-  FileTextIcon,
   Merge,
   CodeXmlIcon,
   Send,
@@ -43,6 +42,8 @@ import {
 import { PreviousInputDataType, WorkflowEditorNode } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
 import { deepFreeze } from "@/lib/utils";
+import { OperationItem } from "../classes/operation_item";
+import { VsFormInputField } from "../classes/form_field_item";
 
 export const previousInputData: PreviousInputDataType[] = [
   {
@@ -102,37 +103,43 @@ export const workflowEditorNodes: Omit<
     icon: Webhook,
     tooltip: "Trigger the workflow when an external service sends a request.",
     sectionName: "Entry Point",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Manual",
     icon: Play,
     tooltip: "Manually start the workflow when needed.",
     sectionName: "Entry Point",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Cron",
     icon: AlarmClock,
     tooltip: "Run the workflow on a scheduled time or interval.",
     sectionName: "Entry Point",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Form Input",
     icon: PenLine,
-
+    isSpecialNode: true,
     tooltip: "Start the workflow when a user submits a form.",
     sectionName: "Entry Point",
-    operations: [],
+    blockType: "formField",
+    blocks: [] as VsFormInputField[],
   },
   {
     label: "Chat Bot",
     icon: MessageCircleMoreIcon,
+    isDisabled: true,
     tooltip:
       "Trigger the workflow when a new conversation is started with the chat assistant",
     sectionName: "Entry Point",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   // Data Reading
@@ -141,21 +148,24 @@ export const workflowEditorNodes: Omit<
     icon: Globe,
     tooltip: "",
     sectionName: "Data Reading",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "File reader",
     icon: FileSearch,
     tooltip: "",
     sectionName: "Data Reading",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Knowledge Base",
     icon: DatabaseZapIcon,
     tooltip: "",
     sectionName: "Data Reading",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -164,7 +174,8 @@ export const workflowEditorNodes: Omit<
     tooltip: "",
     isDisabled: true,
     sectionName: "Data Reading",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   // Core
@@ -173,14 +184,16 @@ export const workflowEditorNodes: Omit<
     icon: Clock,
     tooltip: "Add a delay before moving to the next step",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Set Variables",
     icon: Variable,
     tooltip: "Add/Remove Global Variables",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -189,7 +202,8 @@ export const workflowEditorNodes: Omit<
 
     tooltip: "Add a condition if/else inside your workflow",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -198,28 +212,32 @@ export const workflowEditorNodes: Omit<
 
     tooltip: "Add a multiple branch at any stage of the workflow",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Merge",
     icon: Merge,
     tooltip: "Merge data into a single object",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Call Workflow",
     icon: ZapIcon,
     tooltip: "Launch another workflow to take over",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Call API",
     icon: CodeXmlIcon,
     tooltip: "Call an external API",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Send",
@@ -227,7 +245,8 @@ export const workflowEditorNodes: Omit<
     tooltip:
       "Send an Email, Chat Message, SMS, leave a Voicemail or launch a Phone Call",
     sectionName: "Core",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   // Data Extraction
@@ -236,21 +255,24 @@ export const workflowEditorNodes: Omit<
     icon: Pickaxe,
     tooltip: "Retrieve data from a webpage, API, or document.",
     sectionName: "Data Extraction",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Tag",
     icon: Tag,
     tooltip: "Auto-tagging or intent detection",
     sectionName: "Data Extraction",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Field Mapper",
     icon: ArrowLeftRight,
     tooltip: "Manually attach certain data to specific field",
     sectionName: "Data Extraction",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   // Data Manipulation
@@ -259,14 +281,16 @@ export const workflowEditorNodes: Omit<
     icon: Type,
     tooltip: "Enhance and modify any data text",
     sectionName: "Data Manipulation",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "AI Generation",
     tooltip: "Generate anything with AI",
     icon: BrainIcon,
     sectionName: "Data Manipulation",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -275,35 +299,40 @@ export const workflowEditorNodes: Omit<
     tooltip:
       "Analyze a data and determine the overall sentiment (positive, negative, neutral).",
     sectionName: "Data Manipulation",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Data Enrichment",
     icon: DatabaseZap,
     tooltip: "Fetch relevant data around data source",
     sectionName: "Data Manipulation",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Image Manipulation",
     icon: Images,
     tooltip: "Modify, resize, or process images within the workflow.",
     sectionName: "Data Manipulation",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Video Manipulation",
     icon: Video,
     tooltip: "Modify or edit videos within the workflow.",
     sectionName: "Data Manipulation",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Audio Manipulation",
     tooltip: "Modify or edit any audio file",
     icon: AudioLines,
     sectionName: "Data Manipulation",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   // Data Conversion
@@ -312,42 +341,48 @@ export const workflowEditorNodes: Omit<
     icon: FileInput,
     tooltip: "Convert extracted or processed data into a another format.",
     sectionName: "Data Conversion",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Image Converter",
     icon: FileImage,
     tooltip: "Convert any image into another format.",
     sectionName: "Data Conversion",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Video Converter",
     icon: FileVideo2,
     tooltip: "Convert any video into another format.",
     sectionName: "Data Conversion",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Audio Converter",
     icon: FileVolume,
     tooltip: "Convert any audio file into another format.",
     sectionName: "Data Conversion",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Encoding",
     icon: FileDigit,
     tooltip: "Convert your data to format like binary, hex, base64, etc.",
     sectionName: "Data Conversion",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Markup",
     icon: FileCode,
     tooltip: "Convert data into a Markup language",
     sectionName: "Data Conversion",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   // Data Preview
@@ -356,42 +391,48 @@ export const workflowEditorNodes: Omit<
     icon: NotebookTextIcon,
     tooltip: "Preview or render a PDF from a file or URL",
     sectionName: "Data Preview",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Docs Viewer",
     icon: FileText,
     tooltip: "Preview or render your data inside a Word-like previewer",
     sectionName: "Data Preview",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Spreadsheet Viewer",
     icon: TableProperties,
     tooltip: "Preview your data inside a Spreadsheet",
     sectionName: "Data Preview",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Image Preview",
     icon: LucideGalleryHorizontalEnd,
     tooltip: "Preview any image",
     sectionName: "Data Preview",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Media Player",
     icon: TvMinimalPlayIcon,
     tooltip: "Play your video or audio",
     sectionName: "Data Preview",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Code Preview",
     icon: Braces,
     tooltip: "Preview a Code's snippet (JSON, XML, Markdown, etc.)",
     sectionName: "Data Preview",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   // Data Sync
@@ -400,14 +441,16 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/dropbox.svg",
     tooltip: "Sync and organize files automatically in Dropbox.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Google Drive",
     logoPath: "/logos/google drive.svg",
     tooltip: "Sync files and folders between workflows and Google Drive.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -415,7 +458,8 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/airtable.svg",
     tooltip: "Sync and manage Airtable records seamlessly.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -423,7 +467,8 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/mailchimp.svg",
     tooltip: "Automate email campaigns and sync subscriber lists.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -431,21 +476,24 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/trello.svg",
     tooltip: "Manage Trello boards, lists, and cards automatically.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Figma",
     logoPath: "/logos/figma.svg",
     tooltip: "Retrieve designs and track changes in Figma.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Github",
     logoPath: "/logos/github.svg",
     tooltip: "Automate issues, pull requests, and repo management.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -453,28 +501,32 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/hubspot.svg",
     tooltip: "Manage contacts, deals, and automation within HubSpot.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Zoom",
     logoPath: "/logos/zoom.svg",
     tooltip: "Automate Zoom meeting scheduling and data sync.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Slack",
     logoPath: "/logos/slack.svg",
     tooltip: "Send messages and automate notifications in Slack.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Asana",
     logoPath: "/logos/asana.svg",
     tooltip: "Automate task creation and project management in Asana.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -482,28 +534,32 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/notion.svg",
     tooltip: "Create and update Notion pages automatically.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Shopify",
     logoPath: "/logos/shopify.svg",
     tooltip: "Sync orders, products, and customer details with Shopify.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "WordPress",
     logoPath: "/logos/wordpress.svg",
     tooltip: "Sync posts, pages, and custom fields with WordPress.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
   {
     label: "Calendly",
     logoPath: "/logos/calendly.svg",
     tooltip: "Automate meeting scheduling and follow-ups with Calendly.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -511,7 +567,8 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/bigcommerce.svg",
     tooltip: "Sync products, orders, and customer data with BigCommerce.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 
   {
@@ -519,6 +576,7 @@ export const workflowEditorNodes: Omit<
     logoPath: "/logos/webflow.svg",
     tooltip: "Automate Webflow site updates and CMS management.",
     sectionName: "Data Sync",
-    operations: [],
+    blockType: "operation",
+    blocks: [] as OperationItem[],
   },
 ] as const);

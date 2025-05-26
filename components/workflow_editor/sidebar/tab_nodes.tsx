@@ -8,13 +8,13 @@ import {
 
 import { isSearchTermFound } from "@/lib/string_utils";
 import React, { useState } from "react";
-import ToolItemLine from "./w_tools_tab_item";
 import {
   workflowEditorNodes,
   workflowEditorSections,
 } from "@/lib/workflow_editor/constants/w_constants";
+import TabNodeItem from "./tab_node_item";
 
-const WToolsTab = () => {
+const TabNodesList = () => {
   const [searchContent, setSearchContent] = useState("");
 
   const filteredWorkflowEditorToolItems = workflowEditorNodes.filter((node) => {
@@ -51,7 +51,7 @@ const WToolsTab = () => {
           />
         </div>
 
-        {/* Items list */}
+        {/* Nodes list */}
         {Object.entries(workflowEditorSections)
           .filter(
             (section) =>
@@ -74,9 +74,9 @@ const WToolsTab = () => {
                     .filter((item) => item.sectionName === sectionName)
                     .map((item) => {
                       return (
-                        <ToolItemLine
+                        <TabNodeItem
                           key={item.label}
-                          item={{ ...item, iconColor: sectionValues.iconColor }}
+                          node={{ ...item, iconColor: sectionValues.iconColor }}
                         />
                       );
                     })}
@@ -89,4 +89,4 @@ const WToolsTab = () => {
   );
 };
 
-export default WToolsTab;
+export default TabNodesList;
