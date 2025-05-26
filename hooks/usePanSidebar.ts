@@ -1,3 +1,5 @@
+"use client";
+
 import { PanSidebarContext } from "@/providers/panSidebarProvider";
 import { useContext } from "react";
 

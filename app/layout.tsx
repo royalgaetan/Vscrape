@@ -1,4 +1,4 @@
-import { geistSans, openSans } from "@/lib/fonts";
+import { geistSans } from "@/lib/fonts";
 import "./globals.css";
 import { appName } from "@/lib/constants";
 import { cn } from "@/lib/utils";

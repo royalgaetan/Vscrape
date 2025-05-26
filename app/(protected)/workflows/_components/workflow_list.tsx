@@ -71,7 +71,7 @@ const WorkflowList = ({
       <div className="flex relative">
         {/* Workflow List */}
         <div className="flex flex-1">
-          <div className="flex flex-col w-full">
+          <div className="flex flex-col w-full pt-3 pl-1">
             {filteredWorkflowsList.length === 0 ? (
               <div className=" text-muted-foreground text-xs font-semibold flex justify-center items-center h-36">
                 No workflow found.
@@ -80,6 +80,7 @@ const WorkflowList = ({
               filteredWorkflowsList.map((workflow) => {
                 return (
                   <WorkflowCard
+                    key={workflow.title}
                     onClick={() => {
                       if (
                         workflowSelected &&

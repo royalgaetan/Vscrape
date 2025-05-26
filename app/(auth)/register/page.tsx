@@ -3,7 +3,7 @@
 import { registerFormSchema } from "@/lib/schema_validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import LogoAndText from "../_components/logo_and_text";
 import { useAuth } from "@/hooks/useAuth";
 import CustomLoader from "@/components/global/loader";

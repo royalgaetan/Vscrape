@@ -339,11 +339,11 @@ const WorkflowEditor = ({
       )}
 
       {/* Get Started Button */}
-      <div className="w-full h-full z-10 absolute top-0">
+      {/* <div className="w-full h-full z-10 absolute top-0">
         <EditorGettingStartedButton
           onEntryPointSelected={(entryPointNode) => onNodeAdded(entryPointNode)}
         />
-      </div>
+      </div> */}
 
       {/* Editor */}
       <div

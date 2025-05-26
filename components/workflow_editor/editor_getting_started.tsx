@@ -22,22 +22,22 @@ const EditorGettingStartedButton = ({
           setDisplayEntryNodes((prev) => !prev);
         }}
         className={cn(
-          "relative flex justify-center items-center transition-all active:scale-[0.95]"
+          "relative flex justify-center items-center transition-all active:scale-[0.97]"
         )}
       >
         <div
           className={cn(
-            "w-[4.5rem] h-[4.5rem] ring-8 absolute z-[8] ring-neutral-400 aspect-square rounded-full",
+            "w-fit h-fit ring-8 absolute z-[8] ring-neutral-400 rounded-full",
             displayEntryNodes ? "animate-none" : "animate-pulse"
           )}
         ></div>
 
-        <div className="w-[4.5rem] h-[4.5rem] aspect-square absolute z-[9] bg-neutral-600 flex justify-center items-center rounded-full">
+        <div className="w-32 h-8 px-7 py-2 absolute z-[9] bg-neutral-600 flex justify-center items-center rounded-full">
           {displayEntryNodes ? (
-            <X className="stroke-white/80 !size-6" />
+            <X className="stroke-white/80 size-4" />
           ) : (
-            <span className="text-white/80 text-center font-medium text-xs scale-[0.75] transition-all duration-0">
-              Start here
+            <span className="w-full text-white/80 text-center font-medium text-xs scale-[0.75] transition-all duration-0">
+              Click to Start
             </span>
           )}
         </div>

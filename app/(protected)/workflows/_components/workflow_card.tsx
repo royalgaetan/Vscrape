@@ -91,14 +91,14 @@ const WorkflowCard = ({
   return (
     <div
       className={cn(
-        "cursor-pointer group mb-3 w-full gap-1 p-0 bg-transparent hover:bg-neutral-100/45 border-neutral-200 border rounded-2xl overflow-clip",
-        isSelected && "border-neutral-400 border-[2.7px] bg-neutral-100/45",
+        "cursor-pointer group mb-3 w-full gap-1 p-0 bg-transparent hover:bg-neutral-100/45 ring-0 border-[1.4px] ring-neutral-200 rounded-2xl overflow-clip",
+        isSelected && "ring-neutral-400 ring-2 bg-neutral-100/45",
         workflow.hasError &&
           !isSelected &&
-          "border-red-100 hover:border-red-300/80 hover:bg-red-100/60 bg-red-100/30",
+          "ring-red-100 hover:ring-red-300/80 !border-2 border-red-200 hover:bg-red-100/60 bg-red-100/30",
         workflow.hasError &&
           isSelected &&
-          "border-red-300/80 hover:border-red-300/80 hover:bg-red-100/60 bg-red-100/60"
+          "ring-red-300/80 hover:ring-red-300/80 !border-2 border-red-200 hover:bg-red-100/60 bg-red-100/60"
       )}
     >
       <div className="flex flex-1 gap-3 w-full px-4 py-4 h-[5.5rem]">
