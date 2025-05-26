@@ -68,7 +68,7 @@ const OperationsList = ({
                   </div>
                 )}
                 {isLast && (
-                  <div className="group-hover/optionBar:flex hidden flex-col w-full my-2 mt-5 items-center gap-2">
+                  <div className="group-hover/workflowPanel:flex hidden flex-col w-full my-2 mt-5 items-center gap-2">
                     {/* Arrow Flow Indicator */}
                     {/* <ChevronsDownIcon className="stroke-neutral-400 size-5 stroke-[1.8px]" /> */}
 

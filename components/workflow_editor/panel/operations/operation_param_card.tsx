@@ -1,5 +1,6 @@
 import ParamInput from "@/components/workflow_editor/param_inputs";
 import { cn } from "@/lib/utils";
+import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
 import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { useState } from "react";
@@ -18,7 +19,9 @@ const OperationParamCard = ({
   isWithinAGroup: boolean;
 }) => {
   // Store
-  const currentBlock = useWorkflowEditorStore((s) => s.currentBlock);
+  const currentBlock = useWorkflowEditorStore(
+    (s) => s.currentBlock
+  ) as OperationItem;
   const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
   // End Store
 

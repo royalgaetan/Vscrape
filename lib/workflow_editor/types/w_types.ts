@@ -68,12 +68,13 @@ export type OperationItemType = {
 export type VsFormInputFieldType = {
   id: string;
   fieldName: string;
+  fieldLabel: string;
   fieldDescription: string;
   fieldPlaceholder: string;
   fieldValueToPickFrom?: string[];
   isOptional?: boolean;
 } & VsFormInputFieldTypeUnion;
-type VsFormInputFieldTypeUnion =
+export type VsFormInputFieldTypeUnion =
   | vsText
   | vsEmailURL
   | vsTel

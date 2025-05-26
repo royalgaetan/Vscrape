@@ -1,4 +1,3 @@
-import { VsFormInputField } from "@/lib/workflow_editor/classes/form_field_item";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
 import {
@@ -6,8 +5,9 @@ import {
   TokenInputType,
 } from "@/lib/workflow_editor/types/w_types";
 import { create } from "zustand";
+import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 
-export type NodeBlockType = OperationItem | VsFormInputField;
+export type NodeBlockType = OperationItem | FieldBlockType;
 export type NodeToActOn =
   | {
       nodeId: string;

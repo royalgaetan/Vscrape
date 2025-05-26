@@ -268,7 +268,7 @@ const SingleOperationPanel = ({
 
       {/* Fixed Bottom Bar */}
       {currentBlock && (
-        <div className="flex flex-col w-[var(--optionbarwidth)] bg-white z-10 fixed bottom-[7vh]">
+        <div className="flex flex-col w-[var(--workflowPanelWidth)] bg-white z-10 fixed bottom-[7vh]">
           {/* Shared Outputs DnD Buttons */}
           <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
             {previousInputData.map((inputData) => (

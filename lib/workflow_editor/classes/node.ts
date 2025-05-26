@@ -4,10 +4,10 @@ import { VsInput, VsOutput, VsSocket } from "./sockets";
 import { deepClone } from "@/lib/utils";
 import { workflowEditorSections } from "../constants/w_constants";
 import { NodeBlockStringType, WorkflowEditorNode } from "../types/w_types";
-import { VsFormInputField } from "./form_field_item";
 import { OperationItem } from "./operation_item";
+import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 
-export type VsNodeBlockType = OperationItem[] | VsFormInputField[];
+export type VsNodeBlockType = OperationItem[] | FieldBlockType[];
 export type VsNodeInputsType = (typeof VsNode.prototype)["inputs"];
 export type VsNodeOutputsType = (typeof VsNode.prototype)["outputs"];
 
@@ -54,7 +54,7 @@ export class VsNode extends ClassicPreset.Node {
     return this;
   }
 
-  upsertBlock(block: OperationItem | VsFormInputField): this {
+  upsertBlock(block: OperationItem | FieldBlockType): this {
     // Update if the block already exists
     const blockIdsList = this.blocks.map((b) => b.id);
 
