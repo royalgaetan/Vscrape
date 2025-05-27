@@ -31,6 +31,7 @@ const MultiSelect = ({
   selectionMode = "multi",
   isTriggerDisabled,
   itemTooltipClassname,
+  dismissPopoverOnItemClick,
 }: {
   data: SettingItemSelectDataType;
   selectionMode?: "single" | "multi";
@@ -39,6 +40,7 @@ const MultiSelect = ({
   label: string;
   triggerClassName?: string;
   isTriggerDisabled?: boolean;
+  dismissPopoverOnItemClick?: boolean;
   popoverClassName?: string;
   popoverAlignment?: "end" | "center" | "start";
   popoverSide?: "top" | "right" | "bottom" | "left";
@@ -89,8 +91,9 @@ const MultiSelect = ({
                         key={option.value}
                         value={option.value}
                         onSelect={(value) => {
-                          // If selection Mode is "Single": close the popover after item selected
                           handleSelect(value);
+
+                          // If selection Mode is "Single": close the popover after item selected
                           if (selectionMode === "single") {
                             setOpen(false);
                           }

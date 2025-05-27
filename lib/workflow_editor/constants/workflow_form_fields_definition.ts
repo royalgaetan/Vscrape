@@ -3,15 +3,33 @@ import {
   VsFormInputFieldTypeUnion,
 } from "../types/w_types";
 import { vsAnyRawTypes } from "../types/data_types";
+import {
+  AtSign,
+  CalendarDays,
+  CheckSquare2Icon,
+  CircleDot,
+  Clock,
+  EyeOff,
+  Hash,
+  LucideIcon,
+  PanelTopOpen,
+  Phone,
+  ToggleRight,
+  Upload,
+  User,
+} from "lucide-react";
 
 export class FormFieldBlock {
   public id: string;
   public fieldName: string;
   public fieldLabel: string;
-  public fieldDescription: string;
-  public fieldPlaceholder: string;
+  public fieldDescription?: string;
+  public fieldPlaceholder?: string;
+  public fieldDefaultPlaceholder?: string;
+  public fieldDefaultDescription?: string;
   public fieldValueToPickFrom?: string[];
   public isOptional?: boolean;
+  public isHidden?: boolean;
   public fieldValue: any;
   public fieldType: VsFormInputFieldTypeUnion["type"];
 
@@ -23,8 +41,11 @@ export class FormFieldBlock {
     this.fieldValue = formField.value;
     this.fieldDescription = formField.fieldDescription;
     this.fieldPlaceholder = formField.fieldPlaceholder;
+    this.fieldDefaultPlaceholder = formField.fieldDefaultPlaceholder;
+    this.fieldDefaultDescription = formField.fieldDefaultDescription;
     this.fieldValueToPickFrom = formField.fieldValueToPickFrom;
     this.isOptional = formField.isOptional;
+    this.isHidden = formField.isHidden;
   }
 }
 // --------------------------------------------------------------------------------------
@@ -37,15 +58,15 @@ export class FormFieldTextInput extends FormFieldBlock {
   constructor({ isMultiline }: { isMultiline?: boolean }) {
     super({
       fieldName: "Text Field",
-      fieldLabel: "Text Field",
-      fieldPlaceholder: `${
+      fieldLabel: "Text",
+      fieldPlaceholder: "",
+      fieldDescription: "",
+      fieldDefaultPlaceholder: `${
         isMultiline ? "Write your message here..." : "Type here..."
-      }`,
-      fieldDescription: `${
-        isMultiline ? "Multi-line text input" : "Single-line text input"
       }`,
       type: "primitive/text",
       value: "",
+      isOptional: false,
     });
     this.isTextArea = isMultiline;
   }
@@ -55,11 +76,13 @@ export class FormFieldEmailInput extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Email Field",
-      fieldLabel: "Email Field",
-      fieldPlaceholder: "e.g. abc@company.com",
-      fieldDescription: "Enter your email address",
+      fieldLabel: "",
+      fieldPlaceholder: "",
+      fieldDescription: "",
+      fieldDefaultPlaceholder: "e.g. abc@company.com",
       type: "primitive/emailUrl",
       value: "",
+      isOptional: false,
     });
   }
 }
@@ -68,11 +91,13 @@ export class FormFieldPhoneNumber extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Phone Number Field",
-      fieldLabel: "Phone Number Field",
-      fieldPlaceholder: "e.g. +1 234 567 890",
-      fieldDescription: "Enter your phone number",
+      fieldLabel: "Phone Number",
+      fieldPlaceholder: "",
+      fieldDescription: "",
+      fieldDefaultPlaceholder: "e.g. +1 234 567 890",
       type: "primitive/tel",
       value: "",
+      isOptional: false,
     });
   }
 }
@@ -81,11 +106,13 @@ export class FormFieldNumberInput extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Number Field",
-      fieldLabel: "Number Field",
-      fieldPlaceholder: "Enter a number",
-      fieldDescription: "Numeric input only",
+      fieldLabel: "Number",
+      fieldPlaceholder: "",
+      fieldDescription: "",
+      fieldDefaultPlaceholder: "Enter a number",
       type: "primitive/number",
       value: 0,
+      isOptional: true,
     });
   }
 }
@@ -94,12 +121,14 @@ export class FormFieldSelect extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Dropdown",
-      fieldLabel: "Dropdown",
-      fieldPlaceholder: "Select an option",
-      fieldDescription: "Choose from a list of options",
+      fieldLabel: "Select an option",
+      fieldPlaceholder: undefined,
+      fieldDescription: "",
+      fieldDefaultDescription: "Choose from a list of options",
       type: "primitive/text",
       fieldValueToPickFrom: ["Option A", "Option B", "Option C"],
       value: "",
+      isOptional: true,
     });
   }
 }
@@ -109,11 +138,13 @@ export class FormFieldRadioButtons extends FormFieldBlock {
     super({
       fieldName: "Radio Buttons",
       fieldLabel: "Radio Buttons",
-      fieldPlaceholder: "",
-      fieldDescription: "Choose one option",
+      fieldPlaceholder: undefined,
+      fieldDescription: "",
+      fieldDefaultDescription: "Choose one option",
       type: "primitive/radio",
       fieldValueToPickFrom: ["Option A", "Option B"],
       value: "",
+      isOptional: true,
     });
   }
 }
@@ -123,11 +154,13 @@ export class FormFieldCheckboxes extends FormFieldBlock {
     super({
       fieldName: "Checkboxes",
       fieldLabel: "Checkboxes",
-      fieldPlaceholder: "",
-      fieldDescription: "Select one or more options",
+      fieldPlaceholder: undefined,
+      fieldDescription: "",
+      fieldDefaultDescription: "Select one or more options",
       type: "primitive/checkbox",
       fieldValueToPickFrom: ["Option A", "Option B", "Option C"],
       value: [""],
+      isOptional: true,
     });
   }
 }
@@ -136,11 +169,13 @@ export class FormFieldDatePicker extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Date Picker",
-      fieldLabel: "Date Picker",
-      fieldPlaceholder: "Pick a date",
-      fieldDescription: "Choose a date from calendar",
+      fieldLabel: "Select a date",
+      fieldPlaceholder: "",
+      fieldDescription: "",
+      fieldDefaultPlaceholder: "Pick a date",
       type: "primitive/dateTime",
       value: "",
+      isOptional: true,
     });
   }
 }
@@ -149,11 +184,13 @@ export class FormFieldTimePicker extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Time Picker",
-      fieldLabel: "Time Picker",
-      fieldPlaceholder: "Pick a time",
-      fieldDescription: "Select a specific time",
+      fieldLabel: "Select a time",
+      fieldPlaceholder: "",
+      fieldDescription: "",
+      fieldDefaultPlaceholder: "Pick a time",
       type: "primitive/milliseconds",
       value: 0,
+      isOptional: true,
     });
   }
 }
@@ -162,11 +199,13 @@ export class FormFieldYesNoToggle extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Yes/No Toggle",
-      fieldLabel: "Yes/No Toggle",
-      fieldPlaceholder: "",
-      fieldDescription: "Toggle between yes or no",
+      fieldLabel: "Toggle to select",
+      fieldPlaceholder: undefined,
+      fieldDescription: "",
+      fieldDefaultDescription: "Toggle between yes or no",
       type: "primitive/switch",
       value: false,
+      isOptional: true,
     });
   }
 }
@@ -175,9 +214,10 @@ export class FormFieldHidden extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Hidden Field",
-      fieldLabel: "Hidden Field",
-      fieldPlaceholder: "",
-      fieldDescription: "Invisible field for metadata",
+      fieldLabel: "",
+      fieldPlaceholder: undefined,
+      fieldDescription: undefined,
+      isHidden: true,
       type: "primitive/hidden",
       value: "",
     });
@@ -185,23 +225,25 @@ export class FormFieldHidden extends FormFieldBlock {
 }
 
 export class FormFieldFileUpload extends FormFieldBlock {
-  public fileLimit?: number;
+  public acceptedExtensions: vsAnyRawTypes["type"][] = [];
   constructor({
-    fileType,
-    limit,
+    fileChoosenType,
+    acceptedExtensions,
   }: {
-    fileType: vsAnyRawTypes["type"];
-    limit?: number;
+    acceptedExtensions: vsAnyRawTypes["type"][];
+    fileChoosenType: vsAnyRawTypes["type"];
   }) {
     super({
       fieldName: "File Upload",
-      fieldLabel: "File Upload",
+      fieldLabel: "Upload a file",
       fieldPlaceholder: "",
-      fieldDescription: "Upload files or images",
-      type: fileType,
+      fieldDescription: "",
+      fieldDefaultPlaceholder: "Drag and drop your file here",
+      type: fileChoosenType,
       value: "",
+      isOptional: true,
     });
-    this.fileLimit = limit;
+    this.acceptedExtensions = acceptedExtensions;
   }
 }
 
@@ -227,60 +269,73 @@ export type PossibleFieldBlockType =
 export const workflowFormFieldBlocks: {
   fieldName: string;
   fieldTooltipContent: string;
+  fieldIcon: LucideIcon;
 }[] = [
   {
     fieldName: "Text Field",
     fieldTooltipContent:
       "Let people type a short answer, like a name or title.",
+    fieldIcon: User,
   },
   {
     fieldName: "Email Field",
     fieldTooltipContent:
       "Ask for their email address (we’ll check it looks correct).",
+    fieldIcon: AtSign,
   },
   {
     fieldName: "Phone Number Field",
     fieldTooltipContent:
       "Collect a phone number so you can call or message them.",
+    fieldIcon: Phone,
   },
   {
     fieldName: "Number Field",
     fieldTooltipContent:
       "Only allows numbers — perfect for age, quantity, or budget.",
+    fieldIcon: Hash,
   },
   {
     fieldName: "Dropdown",
     fieldTooltipContent: "Let people pick one option from a list you provide.",
+    fieldIcon: PanelTopOpen,
   },
   {
     fieldName: "Radio Buttons",
     fieldTooltipContent: "Show all options and let them choose just one.",
+    fieldIcon: CircleDot,
   },
   {
     fieldName: "Checkboxes",
     fieldTooltipContent: "Let people select multiple options if needed.",
+    fieldIcon: CheckSquare2Icon,
   },
   {
     fieldName: "Date Picker",
     fieldTooltipContent: "Adds a calendar so users can easily choose a date.",
+    fieldIcon: CalendarDays,
   },
   {
     fieldName: "Time Picker",
     fieldTooltipContent: "Let users choose a time, like for a call or meeting.",
+    fieldIcon: Clock,
   },
   {
     fieldName: "Yes/No Toggle",
     fieldTooltipContent: "A simple switch for yes or no questions.",
+    fieldIcon: ToggleRight,
   },
   {
     fieldName: "Hidden Field",
     fieldTooltipContent:
       "Info that gets submitted but isn’t shown to the user like UTM tags or source IDs.",
+    fieldIcon: EyeOff,
   },
   {
     fieldName: "File Upload",
     fieldTooltipContent:
       "Let users attach a file — like an image, CV, or document.",
+    fieldIcon: Upload,
   },
 ] as const;
 
@@ -309,7 +364,10 @@ export const getFormFieldBlockByName = (fieldName: string) => {
     case "Hidden Field":
       return new FormFieldHidden();
     case "File Upload":
-      return new FormFieldFileUpload({ fileType: "image/png" });
+      return new FormFieldFileUpload({
+        fileChoosenType: "image/png",
+        acceptedExtensions: [],
+      });
     default:
       return undefined;
   }

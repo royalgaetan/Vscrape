@@ -1,4 +1,4 @@
-import { VsNode } from "@/lib/workflow_editor/node";
+import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 

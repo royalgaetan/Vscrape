@@ -22,11 +22,13 @@ const DurationPicker = ({
   onSelect,
   initialDurationMs,
   setOpen,
+  isTimePicker,
 }: {
   children: React.ReactNode;
   onSelect: (durationMs: number) => void;
   initialDurationMs: number;
   setOpen?: boolean;
+  isTimePicker?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentDuration, setCurrentDuration] = useState<
@@ -79,8 +81,9 @@ const DurationPicker = ({
 
     // Increase Hours
     else if (unit === "hours") {
+      const hourLimitMax = isTimePicker ? 23 : 99;
       if (typeof _duration.hours !== "undefined" && !isNaN(_duration.hours)) {
-        if (_duration.hours < 99) {
+        if (_duration.hours < hourLimitMax) {
           _duration.hours += 1;
         }
       } else {
@@ -185,16 +188,18 @@ const DurationPicker = ({
             }}
           />
           {/* Seconds */}
-          <SectionPicker
-            value={currentDuration?.seconds ?? 0}
-            unit="seconds"
-            onIncrease={() => {
-              increase("seconds");
-            }}
-            onDecrease={() => {
-              decrease("seconds");
-            }}
-          />
+          {!isTimePicker && (
+            <SectionPicker
+              value={currentDuration?.seconds ?? 0}
+              unit="seconds"
+              onIncrease={() => {
+                increase("seconds");
+              }}
+              onDecrease={() => {
+                decrease("seconds");
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-1">
           <Button

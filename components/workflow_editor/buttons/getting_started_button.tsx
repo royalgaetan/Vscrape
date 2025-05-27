@@ -29,7 +29,7 @@ const EditorGettingStartedButton = ({
         >
           <div
             className={cn(
-              "w-fit h-fit ring-8 absolute z-[8] ring-neutral-400 rounded-full",
+              "w-32 h-8 ring-4 absolute z-[8] ring-neutral-300 rounded-full",
               displayEntryNodes ? "animate-none" : "animate-pulse"
             )}
           ></div>
@@ -41,6 +41,8 @@ const EditorGettingStartedButton = ({
           </div>
         </button>
       )}
+
+      {/* Entry Nodes Selection */}
       {displayEntryNodes && (
         <div className="flex flex-col">
           {/* Entry Nodes */}

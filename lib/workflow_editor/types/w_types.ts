@@ -69,10 +69,13 @@ export type VsFormInputFieldType = {
   id: string;
   fieldName: string;
   fieldLabel: string;
-  fieldDescription: string;
-  fieldPlaceholder: string;
+  fieldDescription?: string;
+  fieldPlaceholder?: string;
+  fieldDefaultPlaceholder?: string;
+  fieldDefaultDescription?: string;
   fieldValueToPickFrom?: string[];
   isOptional?: boolean;
+  isHidden?: boolean;
 } & VsFormInputFieldTypeUnion;
 export type VsFormInputFieldTypeUnion =
   | vsText
