@@ -1,8 +1,8 @@
+import { BehaviorSubject } from "rxjs";
 import {
   VsFormInputFieldType,
   VsFormInputFieldTypeUnion,
 } from "../types/w_types";
-import { vsAnyRawTypes } from "../types/data_types";
 import {
   AtSign,
   CalendarDays,
@@ -13,39 +13,135 @@ import {
   Hash,
   LucideIcon,
   PanelTopOpen,
+  PenLine,
   Phone,
   ToggleRight,
   Upload,
-  User,
 } from "lucide-react";
 
 export class FormFieldBlock {
-  public id: string;
-  public fieldName: string;
-  public fieldLabel: string;
-  public fieldDescription?: string;
-  public fieldPlaceholder?: string;
-  public fieldDefaultPlaceholder?: string;
-  public fieldDefaultDescription?: string;
-  public fieldValueToPickFrom?: string[];
-  public isOptional?: boolean;
-  public isHidden?: boolean;
-  public fieldValue: any;
-  public fieldType: VsFormInputFieldTypeUnion["type"];
+  protected stream: BehaviorSubject<FormFieldBlock>;
+
+  private _id: string;
+  private _fieldName: string;
+  private _fieldLabel: string;
+  private _fieldDescription?: string;
+  private _fieldPlaceholder?: string;
+  private _fieldDefaultPlaceholder?: string;
+  private _fieldDefaultDescription?: string;
+  private _fieldValueToPickFrom?: string[];
+  private _isOptional?: boolean;
+  private _isHidden?: boolean;
+  private _fieldValue: any;
+  private _fieldType: VsFormInputFieldTypeUnion["type"];
 
   constructor(formField: Omit<VsFormInputFieldType, "id">) {
-    this.id = crypto.randomUUID();
-    this.fieldName = formField.fieldName;
-    this.fieldLabel = formField.fieldLabel;
-    this.fieldType = formField.type;
-    this.fieldValue = formField.value;
-    this.fieldDescription = formField.fieldDescription;
-    this.fieldPlaceholder = formField.fieldPlaceholder;
-    this.fieldDefaultPlaceholder = formField.fieldDefaultPlaceholder;
-    this.fieldDefaultDescription = formField.fieldDefaultDescription;
-    this.fieldValueToPickFrom = formField.fieldValueToPickFrom;
-    this.isOptional = formField.isOptional;
-    this.isHidden = formField.isHidden;
+    this._id = crypto.randomUUID();
+    this._fieldName = formField.fieldName;
+    this._fieldLabel = formField.fieldLabel;
+    this._fieldType = formField.type;
+    this._fieldValue = formField.value;
+    this._fieldDescription = formField.fieldDescription;
+    this._fieldPlaceholder = formField.fieldPlaceholder;
+    this._fieldDefaultPlaceholder = formField.fieldDefaultPlaceholder;
+    this._fieldDefaultDescription = formField.fieldDefaultDescription;
+    this._fieldValueToPickFrom = formField.fieldValueToPickFrom;
+    this._isOptional = formField.isOptional;
+    this._isHidden = formField.isHidden;
+
+    this.stream = new BehaviorSubject<FormFieldBlock>(this);
+  }
+
+  // Return the latest class instance's data in readonly
+  stream$() {
+    return this.stream.asObservable();
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  get fieldName() {
+    return this._fieldName;
+  }
+
+  set fieldLabel(value: string) {
+    this._fieldLabel = value;
+    // Notify all subscribers
+    this.stream.next(this);
+  }
+
+  get fieldLabel() {
+    return this._fieldLabel;
+  }
+
+  get fieldType() {
+    return this._fieldType;
+  }
+
+  set fieldDescription(value: string) {
+    this._fieldDescription = value;
+    // Notify all subscribers
+    this.stream.next(this);
+  }
+  get fieldDescription(): string | undefined {
+    return this._fieldDescription;
+  }
+
+  get fieldDefaultDescription(): string | undefined {
+    return this._fieldDefaultDescription;
+  }
+
+  set fieldPlaceholder(value: string) {
+    this._fieldPlaceholder = value;
+    // Notify all subscribers
+    this.stream.next(this);
+  }
+  get fieldPlaceholder(): string | undefined {
+    return this._fieldPlaceholder;
+  }
+  get fieldDefaultPlaceholder(): string | undefined {
+    return this._fieldDefaultPlaceholder;
+  }
+
+  set fieldValueToPickFrom(value: string[]) {
+    this._fieldValueToPickFrom = value;
+    // Notify all subscribers
+    this.stream.next(this);
+  }
+
+  get fieldValueToPickFrom(): string[] | undefined {
+    return this._fieldValueToPickFrom;
+  }
+
+  set isOptional(value: boolean) {
+    this._isOptional = value;
+    // Notify all subscribers
+    this.stream.next(this);
+  }
+
+  get isOptional(): boolean | undefined {
+    return this._isOptional;
+  }
+
+  set isHidden(value: boolean) {
+    this._isHidden = value;
+    // Notify all subscribers
+    this.stream.next(this);
+  }
+
+  get isHidden(): boolean | undefined {
+    return this._isHidden;
+  }
+
+  set fieldValue(value: any) {
+    this._fieldValue = value;
+    // Notify all subscribers
+    this.stream.next(this);
+  }
+
+  get fieldValue(): any {
+    return this._fieldValue;
   }
 }
 // --------------------------------------------------------------------------------------
@@ -54,11 +150,11 @@ export class FormFieldBlock {
 // --------------------------------------------------------------------------------------
 
 export class FormFieldTextInput extends FormFieldBlock {
-  public isTextArea?: boolean;
+  public _isTextArea?: boolean;
   constructor({ isMultiline }: { isMultiline?: boolean }) {
     super({
       fieldName: "Text Field",
-      fieldLabel: "Text",
+      fieldLabel: "Text Input",
       fieldPlaceholder: "",
       fieldDescription: "",
       fieldDefaultPlaceholder: `${
@@ -68,7 +164,15 @@ export class FormFieldTextInput extends FormFieldBlock {
       value: "",
       isOptional: false,
     });
-    this.isTextArea = isMultiline;
+    this._isTextArea = isMultiline;
+  }
+
+  set isMultiline(isMultiline: boolean) {
+    this._isTextArea = isMultiline;
+    this.stream.next(this);
+  }
+  get isMultiline(): boolean | undefined {
+    return this._isTextArea;
   }
 }
 
@@ -76,7 +180,7 @@ export class FormFieldEmailInput extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Email Field",
-      fieldLabel: "",
+      fieldLabel: "Email",
       fieldPlaceholder: "",
       fieldDescription: "",
       fieldDefaultPlaceholder: "e.g. abc@company.com",
@@ -214,7 +318,7 @@ export class FormFieldHidden extends FormFieldBlock {
   constructor() {
     super({
       fieldName: "Hidden Field",
-      fieldLabel: "",
+      fieldLabel: "Hidden Field",
       fieldPlaceholder: undefined,
       fieldDescription: undefined,
       isHidden: true,
@@ -225,25 +329,27 @@ export class FormFieldHidden extends FormFieldBlock {
 }
 
 export class FormFieldFileUpload extends FormFieldBlock {
-  public acceptedExtensions: vsAnyRawTypes["type"][] = [];
-  constructor({
-    fileChoosenType,
-    acceptedExtensions,
-  }: {
-    acceptedExtensions: vsAnyRawTypes["type"][];
-    fileChoosenType: vsAnyRawTypes["type"];
-  }) {
+  public _acceptedExtensions: string[] = [];
+  constructor() {
     super({
       fieldName: "File Upload",
       fieldLabel: "Upload a file",
       fieldPlaceholder: "",
       fieldDescription: "",
       fieldDefaultPlaceholder: "Drag and drop your file here",
-      type: fileChoosenType,
+      type: "image/png",
       value: "",
       isOptional: true,
     });
-    this.acceptedExtensions = acceptedExtensions;
+  }
+
+  set acceptedExtensions(extensionsList: string[]) {
+    this._acceptedExtensions = extensionsList;
+    this.stream.next(this);
+  }
+
+  get acceptedExtensions(): string[] {
+    return this._acceptedExtensions;
   }
 }
 
@@ -275,7 +381,7 @@ export const workflowFormFieldBlocks: {
     fieldName: "Text Field",
     fieldTooltipContent:
       "Let people type a short answer, like a name or title.",
-    fieldIcon: User,
+    fieldIcon: PenLine,
   },
   {
     fieldName: "Email Field",
@@ -364,10 +470,7 @@ export const getFormFieldBlockByName = (fieldName: string) => {
     case "Hidden Field":
       return new FormFieldHidden();
     case "File Upload":
-      return new FormFieldFileUpload({
-        fileChoosenType: "image/png",
-        acceptedExtensions: [],
-      });
+      return new FormFieldFileUpload();
     default:
       return undefined;
   }

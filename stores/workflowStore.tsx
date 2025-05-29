@@ -6,6 +6,8 @@ import {
 } from "@/lib/workflow_editor/types/w_types";
 import { create } from "zustand";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
+import { getVersion, proxy } from "valtio";
+import { isProxy } from "@/lib/utils";
 
 export type NodeBlockType = OperationItem | FieldBlockType;
 export type NodeToActOn =
@@ -56,9 +58,13 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
     isWorkflowPanelOpen: false,
     setisWorkflowPanelOpen: (isOpen) => set({ isWorkflowPanelOpen: isOpen }),
     currentNode: undefined,
-    updateCurrentNode: (val) => set({ currentNode: val }),
+    updateCurrentNode: (node) => {
+      set({ currentNode: node });
+    },
     currentBlock: undefined,
-    setCurrentBlock: (block) => set({ currentBlock: block }),
+    setCurrentBlock: (block) => {
+      set({ currentBlock: block });
+    },
     toggleWorkflowPanel: (isOpen, node) => {
       set({
         isWorkflowPanelOpen: isOpen,
@@ -81,3 +87,11 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
       set({ isSharedOutputsDialogOpen: isOpen, inputToken: inputToken }),
   })
 );
+
+const getObjectOrProxy = <T extends object>(obj: T): T => {
+  if (isProxy(obj)) {
+    return obj;
+  } else {
+    return proxy(obj);
+  }
+};

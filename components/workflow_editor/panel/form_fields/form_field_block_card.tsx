@@ -40,7 +40,7 @@ const FormFieldBlockCard = ({
             <Label className="text-xs text-neutral-500">{fieldAttrName}</Label>
           )}
           <Input
-            onChange={onValueChange}
+            onChange={(e) => onValueChange(e.target.value)}
             defaultValue={currentValue}
             className="h-7"
             placeholder={fieldAttrPlaceholder}
@@ -84,6 +84,7 @@ const FormFieldBlockCard = ({
           {fieldAttrName && (
             <Label className="text-xs text-neutral-500">{fieldAttrName}</Label>
           )}
+
           <MultiSelect
             triggerClassName="h-[1.9rem] w-[15.9rem] flex flex-1 mb-1"
             popoverAlignment="center"
@@ -91,39 +92,42 @@ const FormFieldBlockCard = ({
             popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
             label={
               (currentValue as string[]).length > 0
-                ? initialValue.join(", ")
+                ? getExtensionNamesJoinned(currentValue as string[])
                 : `${fieldAttrPlaceholder ?? "Select..."}`
             }
             itemTooltipClassname="w-52"
             data={{
-              Images: Object.keys(ImageMIMETypes).map((ext) => ({
+              Images: Object.entries(ImageMIMETypes).map(([ext, mime]) => ({
                 label: ext,
-                value: ext,
+                value: JSON.stringify({ [ext]: mime }),
               })),
-              Videos: Object.keys(VideoMIMETypes).map((ext) => ({
+              Videos: Object.entries(VideoMIMETypes).map(([ext, mime]) => ({
                 label: ext,
-                value: ext,
+                value: JSON.stringify({ [ext]: mime }),
               })),
-              Audio: Object.keys(AudioMIMETypes).map((ext) => ({
+              Audio: Object.entries(AudioMIMETypes).map(([ext, mime]) => ({
                 label: ext,
-                value: ext,
+                value: JSON.stringify({ [ext]: mime }),
               })),
-              Documents: Object.keys(DocumentMIMETypes).map((ext) => ({
-                label: ext,
-                value: ext,
-              })),
+              Documents: Object.entries(DocumentMIMETypes).map(
+                ([ext, mime]) => ({
+                  label: ext,
+                  value: JSON.stringify({ [ext]: mime }),
+                })
+              ),
             }}
             selectedValues={currentValue}
-            handleSelect={(extensionSelected) => {
-              if (!extensionSelected) return;
-              if ((currentValue as string[]).includes(extensionSelected)) {
+            handleSelect={(extMimeSelected) => {
+              if (!extMimeSelected) return;
+
+              if ((currentValue as string[]).includes(extMimeSelected)) {
                 onValueChange(
                   currentValue.filter(
-                    (v: any) => toStringSafe(v) !== extensionSelected
+                    (v: any) => toStringSafe(v) !== extMimeSelected
                   )
                 );
               } else {
-                onValueChange([...currentValue, extensionSelected]);
+                onValueChange([...currentValue, extMimeSelected]);
               }
             }}
           />
@@ -136,3 +140,31 @@ const FormFieldBlockCard = ({
 };
 
 export default FormFieldBlockCard;
+
+export const getExtensionNamesJoinned = (arr: any) => {
+  return (arr as string[])
+    .map((extMime: any) => getExtMineFromJSON(extMime))
+    .filter((v) => v !== undefined)
+    .map((v) => v.ext)
+    .join(", ");
+};
+
+export const getExtMineFromJSON = (
+  jsonString: string
+): { ext: string; mime: string } | undefined => {
+  try {
+    // Try Parsing
+    const extMime = JSON.parse(jsonString);
+
+    const ext = Object.keys(extMime)[0];
+    const mime = Object.values(extMime)[0];
+    if (!ext || !mime || typeof mime !== "string") return;
+    return {
+      ext,
+      mime,
+    };
+  } catch (e) {
+    console.log("Can't parse...");
+    return undefined;
+  }
+};

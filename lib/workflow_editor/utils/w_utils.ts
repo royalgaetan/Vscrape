@@ -12,6 +12,7 @@ import {
 import { NodeTest, WorkflowEditorNode } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
 import { VsNode } from "../classes/node";
+import { proxy } from "valtio";
 
 export const isDynamicInputDataOnly = (content: string) => {
   // Check if the provided content is only a data input. E.g. {{ Variables }}
@@ -21,11 +22,10 @@ export const isDynamicInputDataOnly = (content: string) => {
 export const getVsNodeFromLabel = (label: string): VsNode | null => {
   const node = workflowEditorNodes.find((node) => node.label === label);
   if (!node) return null;
-  const vsNode: VsNode = new VsNode({
+  const vsNode = new VsNode({
     iconColor: getWorkflowSectionColor(node.sectionName),
     ...node,
   } as WorkflowEditorNode);
-
   return vsNode;
 };
 

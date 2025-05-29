@@ -57,6 +57,20 @@ export const isDocumentMimeType = (
   );
 };
 
+export const getMimeNameFromExtension = (extension: string) => {
+  const match = Object.entries(allMimesObj).find(
+    ([ext, mimeType]) => ext === extension
+  );
+  return match?.[1];
+};
+
+export const getExtensionNameFromMime = (mime: string) => {
+  const match = Object.entries(allMimesObj).find(
+    ([ext, mimeType]) => mimeType === mime
+  );
+  return match?.[0];
+};
+
 export const vsPrimitiveMIMETypes = {
   text: "primitive/text",
   array: "primitive/array",
@@ -154,3 +168,11 @@ export const DocumentMIMETypes = {
   ".tar": "application/x-tar",
   ".rar": "application/vnd.rar",
 } as const;
+
+// ----------------------------------------------------------------------
+export const allMimesObj = {
+  ...ImageMIMETypes,
+  ...VideoMIMETypes,
+  ...AudioMIMETypes,
+  ...DocumentMIMETypes,
+};

@@ -21,7 +21,7 @@ const ArrayInput = ({
       className="flex flex-col"
       role="button"
       tabIndex={1}
-      onMouseLeave={() => onChange && onChange(localArray)}
+      // onMouseLeave={() => onChange && onChange(localArray)}
     >
       {localArray.map((arrItem, idx) => {
         const isLast = localArray.length === idx + 1;
@@ -39,6 +39,14 @@ const ArrayInput = ({
               // onBlur={(text) => {
               //   if (!text) return;
               // }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+
+                  let updatedArr = [...localArray];
+                  onChange && onChange(updatedArr);
+                }
+              }}
               onElementDropped={(text) => {
                 if (!text) return;
                 localArray[idx] = text;
@@ -56,13 +64,14 @@ const ArrayInput = ({
                 )}
                 onClick={(e) => {
                   e.preventDefault();
+                  let updatedArr = [...localArray];
                   if (isLast) {
-                    setLocalArray([...localArray, ""]);
+                    updatedArr = [...updatedArr, ""];
                   } else {
-                    setLocalArray((prev) =>
-                      prev.filter((p, index) => index !== idx)
-                    );
+                    updatedArr = updatedArr.filter((p, index) => index !== idx);
                   }
+                  setLocalArray(updatedArr);
+                  onChange && onChange(updatedArr);
                 }}
               >
                 {/* Icon */}

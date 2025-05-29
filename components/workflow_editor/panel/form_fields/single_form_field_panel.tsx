@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
 import { delay } from "@/lib/numbers_utils";
@@ -28,7 +28,6 @@ import {
   X,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 
 const SingleFormFieldPanel = ({
   nodeOrigin,
@@ -42,16 +41,14 @@ const SingleFormFieldPanel = ({
   fieldBlockOrigin?: FieldBlockType;
   onBack?: () => void;
   onSave: (block?: NodeBlockType) => void;
-  onDelete: (FormFieldBlockId: string) => void;
+  onDelete: (fieldBlockId: string) => void;
   displayBackButton?: boolean;
 }) => {
-  const fieldId = useRef<string>(fieldBlockOrigin?.id ?? crypto.randomUUID());
-
   // Store
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-  const currentBlock = useWorkflowEditorStore(
-    (s) => s.currentBlock
-  ) as FieldBlockType;
+  const currentBlock = useWorkflowEditorStore((s) => s.currentBlock) as
+    | FieldBlockType
+    | undefined;
   const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
   // End Store
 
@@ -76,6 +73,7 @@ const SingleFormFieldPanel = ({
       setSavingFormFieldBlockResultIcon(Check);
       await delay(150);
       setSavingFormFieldBlockResultIcon(undefined);
+
       onSave(currentBlock);
     } catch (e) {
       console.log("Err", e);
@@ -86,8 +84,6 @@ const SingleFormFieldPanel = ({
       return;
     }
   };
-
-  // if (!(currentBlock instanceof FieldBlockType)) return;
 
   return (
     <div className="flex flex-col w-full max-h-full relative">
@@ -158,6 +154,7 @@ const SingleFormFieldPanel = ({
               {/* Edit Field Block: Parameters List */}
               <div className="flex flex-col gap-5 w-full px-4 pr-4">
                 {/* Field Label */}
+                {JSON.stringify(currentBlock.fieldLabel)}
                 {typeof currentBlock.fieldLabel === "string" &&
                   !currentBlock.isHidden && (
                     <FormFieldBlockCard
@@ -166,7 +163,11 @@ const SingleFormFieldPanel = ({
                       fieldAttrPlaceholder={"Enter the field label..."}
                       fieldAttrType={"text"}
                       initialValue={currentBlock.fieldLabel}
-                      onChange={(newVal) => (currentBlock.fieldLabel = newVal)}
+                      onChange={(newVal) => {
+                        currentBlock.fieldLabel = newVal;
+                        setCurrentBlock(currentBlock);
+                        console.log("Entered", currentBlock.fieldLabel);
+                      }}
                     />
                   )}
 
@@ -179,9 +180,9 @@ const SingleFormFieldPanel = ({
                       fieldAttrPlaceholder={"Enter the field placeholder..."}
                       fieldAttrType={"text"}
                       initialValue={currentBlock.fieldPlaceholder}
-                      onChange={(newVal) =>
-                        (currentBlock.fieldPlaceholder = newVal)
-                      }
+                      onChange={(newVal) => {
+                        currentBlock.fieldPlaceholder = newVal;
+                      }}
                     />
                   )}
 
@@ -194,9 +195,9 @@ const SingleFormFieldPanel = ({
                       fieldAttrPlaceholder={"Enter the field description..."}
                       fieldAttrType={"text"}
                       initialValue={currentBlock.fieldDescription}
-                      onChange={(newVal) =>
-                        (currentBlock.fieldDescription = newVal)
-                      }
+                      onChange={(newVal) => {
+                        currentBlock.fieldDescription = newVal;
+                      }}
                     />
                   )}
 
@@ -209,7 +210,9 @@ const SingleFormFieldPanel = ({
                     fieldAttrPlaceholder={"Enter the field value..."}
                     fieldAttrType={"text"}
                     initialValue={currentBlock.fieldValue}
-                    onChange={(newVal) => (currentBlock.fieldValue = newVal)}
+                    onChange={(newVal) => {
+                      currentBlock.fieldValue = newVal;
+                    }}
                   />
                 )}
 
@@ -221,8 +224,10 @@ const SingleFormFieldPanel = ({
                       key={`${currentBlock.id}_fieldEnableTextarea`}
                       fieldAttrName="Is Multi-line"
                       fieldAttrType={"switch"}
-                      initialValue={currentBlock.isTextArea}
-                      onChange={(newVal) => (currentBlock.isTextArea = newVal)}
+                      initialValue={currentBlock.isMultiline}
+                      onChange={(newVal) => {
+                        currentBlock.isMultiline = newVal;
+                      }}
                     />
                   )}
 
@@ -236,9 +241,9 @@ const SingleFormFieldPanel = ({
                       fieldAttrPlaceholder={"Select allowed extensions..."}
                       fieldAttrType={"fileExtensions"}
                       initialValue={currentBlock.acceptedExtensions}
-                      onChange={(newVal) =>
-                        (currentBlock.acceptedExtensions = newVal)
-                      }
+                      onChange={(mimeArr) => {
+                        currentBlock.acceptedExtensions = mimeArr;
+                      }}
                     />
                   )}
 
@@ -250,7 +255,9 @@ const SingleFormFieldPanel = ({
                       fieldAttrName="Is Optional"
                       fieldAttrType={"switch"}
                       initialValue={currentBlock.isOptional}
-                      onChange={(newVal) => (currentBlock.isOptional = newVal)}
+                      onChange={(newVal) => {
+                        currentBlock.isOptional = newVal;
+                      }}
                     />
                   )}
 
@@ -262,27 +269,26 @@ const SingleFormFieldPanel = ({
                       fieldAttrName="Possible Choices"
                       fieldAttrType={"array"}
                       initialValue={currentBlock.fieldValueToPickFrom}
-                      onChange={(newVal) =>
-                        (currentBlock.fieldValueToPickFrom = newVal)
-                      }
+                      onChange={(newVal) => {
+                        currentBlock.fieldValueToPickFrom = newVal;
+                      }}
                     />
                   )}
               </div>
 
               {/* Separator */}
-              {currentBlock && <Separator className="mt-6 mb-[0.5px]" />}
+              <Separator className="mt-6 mb-[0.5px]" />
 
               {/* Field Block Preview */}
-              {currentBlock && (
-                <div className="flex flex-col w-full max-h-fit min-h-28 bg-neutral-200/50 px-4 pr-4 editor-background-dots">
-                  <Label className="text-xs text-neutral-500 mt-3 mb-4">
-                    Field Preview
-                  </Label>
-                  <div className="flex flex-1">
-                    <FormFieldBlockPreview fieldBlock={currentBlock} />
-                  </div>
+
+              <div className="flex flex-col w-full max-h-fit min-h-28 bg-neutral-200/50 px-4 pr-4 pb-7 editor-background-dots">
+                <Label className="text-xs text-neutral-500 mt-3 mb-4">
+                  Field Preview
+                </Label>
+                <div className="flex flex-1">
+                  <FormFieldBlockPreview fieldBlockToPreview={currentBlock} />
                 </div>
-              )}
+              </div>
 
               {/* Spacer */}
               <div className="h-20"></div>

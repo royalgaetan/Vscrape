@@ -10,6 +10,7 @@ import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/
 export type VsNodeBlockType = OperationItem[] | FieldBlockType[];
 export type VsNodeInputsType = (typeof VsNode.prototype)["inputs"];
 export type VsNodeOutputsType = (typeof VsNode.prototype)["outputs"];
+export type MoveBlockDirection = "Up" | "Down";
 
 export class VsNode extends ClassicPreset.Node {
   public iconColor: string;
@@ -69,6 +70,27 @@ export class VsNode extends ClassicPreset.Node {
       console.log(`🐪 Node ${this.id}: 1 Block Added`, this.blocks.length);
     }
 
+    return this;
+  }
+
+  moveBlock(blockId: string, direction: MoveBlockDirection): this {
+    // Get corresponding block index from blockId
+    const blockIndex = this.blocks.findIndex((b) => b.id === blockId);
+    if (blockIndex === -1) return this;
+
+    const targetIndex = direction === "Up" ? blockIndex - 1 : blockIndex + 1;
+
+    // Prevent out-of-bounds move
+    if (targetIndex < 0 || targetIndex >= this.blocks.length) return this;
+
+    // Safe Swap: using Array destructuring
+    const blockCopy = [...this.blocks];
+    [blockCopy[blockIndex], blockCopy[targetIndex]] = [
+      blockCopy[targetIndex],
+      blockCopy[blockIndex],
+    ];
+
+    this.blocks = blockCopy as VsNodeBlockType;
     return this;
   }
 

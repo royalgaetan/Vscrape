@@ -14,7 +14,7 @@ const EditorGettingStartedButton = ({
     <div
       className={cn(
         "flex flex-1 w-full h-full justify-center items-center transition-all duration-300",
-        displayEntryNodes ? "bg-neutral-900/70" : "bg-neutral-900/40"
+        displayEntryNodes ? "bg-neutral-900/70" : "bg-transparent"
       )}
     >
       {/* Get Started Button: Circle Rounded */}
@@ -29,13 +29,13 @@ const EditorGettingStartedButton = ({
         >
           <div
             className={cn(
-              "w-32 h-8 ring-4 absolute z-[8] ring-neutral-300 rounded-full",
+              "w-32 h-8 ring-4 absolute z-[8] ring-primary/70 rounded-full",
               displayEntryNodes ? "animate-none" : "animate-pulse"
             )}
           ></div>
 
-          <div className="w-32 h-8 px-7 py-2 absolute z-[9] bg-neutral-600 flex justify-center items-center rounded-full">
-            <span className="w-full text-white/80 text-center font-medium text-xs scale-[0.75] transition-all duration-0">
+          <div className="w-32 h-8 px-7 py-2 absolute z-[9] bg-primary flex justify-center items-center rounded-full">
+            <span className="w-full text-white text-center font-medium text-xs scale-[0.9] transition-all duration-0">
               Click to Start
             </span>
           </div>

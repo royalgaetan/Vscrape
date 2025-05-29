@@ -21,6 +21,7 @@ import { TokenInputType } from "@/lib/workflow_editor/types/w_types";
 const DnDTextInput = ({
   placeholder,
   onTextChange,
+  onKeyDown,
   onBlur,
   inputValue,
   className,
@@ -45,6 +46,7 @@ const DnDTextInput = ({
   reRenderOnInputValueChange?: boolean;
   replaceContentOnDrop?: boolean;
 
+  onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onTextChange?: (text: string | null) => void;
   onElementDropped?: (text: string | null) => void;
   onBlur?: (text?: string) => void;
@@ -371,6 +373,7 @@ const DnDTextInput = ({
           handleDrop(e);
         }}
         onKeyDown={(e) => {
+          onKeyDown && onKeyDown(e);
           if (e.key === "Enter" && !isTextarea) {
             e.preventDefault();
             return;

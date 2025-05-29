@@ -70,46 +70,48 @@ const WorflowEditorWrapper = ({
       />
 
       {/* Overlay: Action Buttons */}
-      <div className="flex flex-1 items-end w-full absolute z-[21] pointer-events-none bottom-0 px-3 pb-3">
-        {/* Info Button */}
-        <div className="flex justify-start items-center w-1/3">
-          <Button
-            variant={"ghost"}
-            className={cn(
-              "flex w-8 transition-all -ml-2 pointer-events-auto -mb-2 duration-300 h-8 justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm"
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-            }}
-          >
-            {/* Icon */}
-            <SidebarIcon
-              defaultIcon={InfoIcon}
-              isExpandable={false}
-              type="icon"
-              isSelected={undefined}
-            />
-          </Button>
+      {!isEditorOnboardingDisplayed && (
+        <div className="flex flex-1 items-end w-full absolute z-[21] pointer-events-none bottom-0 px-3 pb-3">
+          {/* Info Button */}
+          <div className="flex justify-start items-center w-1/3">
+            <Button
+              variant={"ghost"}
+              className={cn(
+                "flex w-8 transition-all -ml-2 pointer-events-auto -mb-2 duration-300 h-8 justify-center items-center gap-2 hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm"
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+            >
+              {/* Icon */}
+              <SidebarIcon
+                defaultIcon={InfoIcon}
+                isExpandable={false}
+                type="icon"
+                isSelected={undefined}
+              />
+            </Button>
+          </div>
+
+          {/* Execution Buttons */}
+          <div className="flex flex-1 gap-2 pointer-events-auto justify-center items-center w-1/3">
+            {isHistory && <RevertVersionButton />}
+
+            {isHistory === undefined && <ToggleChatButton />}
+
+            {isHistory === undefined && <DebugButton />}
+
+            {isHistory === undefined && <UndoRedoButtons />}
+
+            {isHistory === undefined && <ExecuteButton />}
+          </div>
+
+          {/* View Buttons */}
+          <div className="flex flex-1 justify-end pointer-events-auto items-center">
+            <ViewButtons />
+          </div>
         </div>
-
-        {/* Execution Buttons */}
-        <div className="flex flex-1 gap-2 pointer-events-auto justify-center items-center w-1/3">
-          {isHistory && <RevertVersionButton />}
-
-          {isHistory === undefined && <ToggleChatButton />}
-
-          {isHistory === undefined && <DebugButton />}
-
-          {isHistory === undefined && <UndoRedoButtons />}
-
-          {isHistory === undefined && <ExecuteButton />}
-        </div>
-
-        {/* View Buttons */}
-        <div className="flex flex-1 justify-end pointer-events-auto items-center">
-          <ViewButtons />
-        </div>
-      </div>
+      )}
     </div>
   );
 };

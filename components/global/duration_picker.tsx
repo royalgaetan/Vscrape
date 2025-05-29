@@ -154,7 +154,7 @@ const DurationPicker = ({
         }
       }}
     >
-      <PopoverTrigger>{children}</PopoverTrigger>
+      <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent
         onInteractOutside={(e) => {
           e.preventDefault();

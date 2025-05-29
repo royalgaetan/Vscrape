@@ -35,7 +35,7 @@ const DatePicker = ({
         setIsOpen(isOpen);
       }}
     >
-      <PopoverTrigger>{children}</PopoverTrigger>
+      <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"

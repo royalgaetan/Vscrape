@@ -161,15 +161,25 @@ const EditorPanel = () => {
 
                 {currentNode.blockType === "formField" && (
                   <FormFieldsList
-                    onFieldSelect={(fieldBlock) => {
-                      setCurrentBlock(fieldBlock);
-                      setBlockOrigin(fieldBlock);
+                    onFieldEdit={(fieldBlockToEdit) => {
+                      setBlockOrigin(fieldBlockToEdit);
                       setIsEditing(true);
                     }}
-                    onAddField={() => {
+                    onAddNewField={() => {
                       setCurrentBlock(undefined);
                       setBlockOrigin(undefined);
                       setIsEditing(true);
+                    }}
+                    onFieldDelete={(fieldBlockId) => {
+                      const updatedNode = currentNode.removeBlock(fieldBlockId);
+                      updateCurrentNode(updatedNode);
+                    }}
+                    onFieldMove={(fieldBlockId, direction) => {
+                      const updatedNode = currentNode.moveBlock(
+                        fieldBlockId,
+                        direction
+                      );
+                      updateCurrentNode(updatedNode);
                     }}
                   />
                 )}

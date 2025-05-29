@@ -8,6 +8,9 @@ export type Nullable<T> = {
   [P in keyof T]: T[P] | null;
 };
 
+// Remove readonly from T:
+export type DeepWritable<T> = { -readonly [P in keyof T]: DeepWritable<T[P]> };
+
 // -------------------------------------------------------------------------
 
 export type sidebarPathType = {

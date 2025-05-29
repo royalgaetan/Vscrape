@@ -22,33 +22,32 @@ const RadioInput = ({
       defaultValue={selectedValue}
       onValueChange={onSelect}
       key={`radio_${componentId}`}
-      className={cn(
-        "flex flex-wrap justify-start mb-0 mt-2 space-x-3",
-        className
-      )}
+      className={cn("flex flex-col justify-start mb-0 mt-2 gap-y-3", className)}
     >
       {valuesToSelect.length > 0 &&
-        valuesToSelect.map((value) => {
-          return (
-            <div
-              key={value}
-              className="flex items-center space-x-1 hover:opacity-90 transition-all duration-150"
-            >
-              <RadioGroupItem
-                className="data-[state=unchecked]:border-neutral-300 data-[state=checked]:border-neutral-500"
-                circleIndicatorClassname="fill-neutral-500"
-                value={value}
-                id={value}
-              />
-              <Label
-                className="w-full text-start text-xs line-clamp-1 font-normal text-neutral-500 cursor-pointer"
-                htmlFor={value}
+        valuesToSelect
+          .filter((v) => v.length > 0)
+          .map((value) => {
+            return (
+              <div
+                key={value}
+                className="flex items-center space-x-1 hover:opacity-90 transition-all duration-150"
               >
-                {capitalizeFirstLetter(value)}
-              </Label>
-            </div>
-          );
-        })}
+                <RadioGroupItem
+                  className="data-[state=unchecked]:border-neutral-300 data-[state=checked]:border-neutral-500"
+                  circleIndicatorClassname="fill-neutral-500"
+                  value={value}
+                  id={value}
+                />
+                <Label
+                  className="w-full text-start text-xs line-clamp-1 font-normal text-neutral-500 cursor-pointer"
+                  htmlFor={value}
+                >
+                  {capitalizeFirstLetter(value)}
+                </Label>
+              </div>
+            );
+          })}
     </RadioGroup>
   );
 };

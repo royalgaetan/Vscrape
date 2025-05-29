@@ -21,7 +21,7 @@ import {
 } from "../constants/w_constants";
 import { Nullable } from "@/lib/types";
 import { OperationItem } from "../classes/operation_item";
-import { VsFormInputField } from "../classes/form_field_item";
+import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 
 export type WorkflowEditorNode = {
   label: string;
@@ -42,7 +42,7 @@ export type NodeWithOperationBlocks = {
 
 export type NodeWithFormFieldBlocks = {
   blockType: "formField";
-  blocks: VsFormInputField[];
+  blocks: FieldBlockType[];
 };
 
 export type OperationItemType = {
