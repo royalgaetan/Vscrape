@@ -106,8 +106,22 @@ const CronEditorCard = ({
       mainSplit.forEach((val) => {
         // Case 2: Range (-)
         if (val.includes("-")) {
-          const rangeSlit = val.split("-");
-          rangeSlit.forEach((v) => mainVals.push(parseInt(v)));
+          const rangeSplit = val.split("-");
+          const firstElementInRange = rangeSplit.at(0);
+          const lastElementInRange = rangeSplit.at(-1);
+          if (
+            rangeSplit.length > 1 &&
+            lastElementInRange &&
+            firstElementInRange
+          ) {
+            const firstIndex = parseInt(firstElementInRange);
+            const lastIndex = parseInt(lastElementInRange);
+            const indexes = Array.from(
+              { length: lastIndex - firstIndex + 1 },
+              (_, i) => firstIndex + i
+            );
+            indexes.forEach((i) => mainVals.push(i));
+          }
         }
         // Case 3: Specifics (,)
         else {

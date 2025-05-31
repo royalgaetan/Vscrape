@@ -11,9 +11,10 @@ import {
 } from "lucide-react";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import SimpleTooltip from "@/components/global/simple_tooltip";
-import { VsNodeBlockType } from "@/lib/workflow_editor/types/w_types";
+import construe from "cronstrue";
 import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
 import { cn } from "@/lib/utils";
+import { fakeUsers } from "@/lib/fake_data";
 
 const CronBlockList = ({
   onCronEdit,
@@ -75,11 +76,13 @@ const CronBlockList = ({
             <div className="w-full text-base font-semibold text-[#333] line-clamp-1 mb-1">
               Scheduled
             </div>
-            <p className="w-full line-clamp-1 text-muted-foreground text-xs font-light">
+            <p className="w-full line-clamp-1 text-muted-foreground text-xs font-light mb-[2px]">
               Will Trigger the workflow :
             </p>
             <p className="w-full text-wrap text-neutral-500 text-xs">
-              Every day at 2:15AM
+              {construe.toString(cronBlock.cronExp, {
+                use24HourTimeFormat: true,
+              })}
             </p>
           </div>
 

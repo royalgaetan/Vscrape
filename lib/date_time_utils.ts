@@ -293,7 +293,7 @@ export const cronPresets: { label: string; value: string }[] = [
 
   { label: "Every Monday at 9 AM", value: "0 9 * * 1" },
   { label: "Weekdays at 8 AM", value: "0 8 * * 1-5" },
-  { label: "Weekends at 10 AM", value: "0 10 * * 6,0" },
+  { label: "Weekends at 10 AM", value: "0 10 * * 6,7" },
 
   { label: "1st of Every Month at Midnight", value: "0 0 1 * *" },
   { label: "Last Day of the Month at 11 PM", value: "0 23 28-31 * *" }, // depends on extra logic

@@ -13,21 +13,21 @@ import { ObservableMixin } from "./observable_mixin";
 } 
 */
 
-export const getNewCronBlock = () =>
-  new CronBlock({
-    cronExp: "* * * * *",
-    configMinute: "",
-    configHour: "",
-    configDayOfMonth: "*",
-    configMonth: "*",
-    configDayOfWeek: "*",
+export const getNewCronBlock = (cronExpPreset?: string) => {
+  const presetSplit = cronExpPreset?.split(" ") ?? undefined;
+
+  return new CronBlock({
+    configMinute: presetSplit ? presetSplit[0] : "",
+    configHour: presetSplit ? presetSplit[1] : "",
+    configDayOfMonth: presetSplit ? presetSplit[2] : "*",
+    configMonth: presetSplit ? presetSplit[3] : "*",
+    configDayOfWeek: presetSplit ? presetSplit[4] : "*",
     configTimezone: "",
     configStartDate: new Date(Date.now()),
   });
-
+};
 export class CronBlock extends ObservableMixin() {
   private _id: string;
-  private _cronExp: string;
   private _configMinute: string;
   private _configHour: string;
   private _configDayOfMonth: string;
@@ -40,7 +40,6 @@ export class CronBlock extends ObservableMixin() {
   constructor(cron: Omit<VsNodeBlockType, "id">) {
     super();
     this._id = crypto.randomUUID();
-    this._cronExp = cron.cronExp;
     this._configMinute = cron.configMinute;
     this._configHour = cron.configHour;
     this._configDayOfMonth = cron.configDayOfMonth;
@@ -58,11 +57,7 @@ export class CronBlock extends ObservableMixin() {
 
   // Cron Expression: getter + setter
   get cronExp() {
-    return this._cronExp;
-  }
-  set cronExp(value: string) {
-    this._cronExp = value;
-    this.notifyAll();
+    return `${this._configMinute} ${this._configHour} ${this._configDayOfMonth} ${this._configMonth} ${this._configDayOfWeek}`;
   }
 
   // Cron Config/Minute: getter + setter
@@ -114,7 +109,7 @@ export class CronBlock extends ObservableMixin() {
   get configTimezone(): string | undefined {
     return this._configTimezone;
   }
-  set configTimezone(value: string) {
+  set configTimezone(value: string | undefined) {
     this._configTimezone = value;
     this.notifyAll();
   }

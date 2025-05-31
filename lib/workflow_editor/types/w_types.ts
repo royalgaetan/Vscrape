@@ -103,7 +103,6 @@ export type VsFormInputFieldTypeUnion =
 
 export type VsNodeBlockType = {
   id: string;
-  cronExp: string;
   configMinute: string;
   configHour: string;
   configDayOfMonth: string;

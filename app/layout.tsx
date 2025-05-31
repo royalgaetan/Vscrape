@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { AppDialogProvider } from "@/providers/appDialogProvider";
 import { AuthProvider } from "@/providers/authProvider";
 import { PanSidebarProvider } from "@/providers/panSidebarProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -35,6 +36,7 @@ export default function RootLayout({
             <PanSidebarProvider>{children}</PanSidebarProvider>
           </AppDialogProvider>
         </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );
