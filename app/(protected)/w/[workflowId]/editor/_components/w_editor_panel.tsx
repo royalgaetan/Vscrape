@@ -7,13 +7,15 @@ import { NodeBlockType, useWorkflowEditorStore } from "@/stores/workflowStore";
 import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import OperationsList from "@/components/workflow_editor/panel/operations/operations_list";
 import SingleOperationPanel from "@/components/workflow_editor/panel/operations/single_operation_panel";
-import { X } from "lucide-react";
+import { Info, Play, X } from "lucide-react";
 import SingleFormFieldPanel from "@/components/workflow_editor/panel/form_fields/single_form_field_panel";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import FormFieldsList from "@/components/workflow_editor/panel/form_fields/form_field_list";
 import CronBlockList from "@/components/workflow_editor/panel/cron/cron_block_list";
 import SingleCronEditorPanel from "@/components/workflow_editor/panel/cron/single_cron_editor_panel";
 import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
+import { KeyBox } from "@/components/global/duration_picker";
+import ExecuteButton from "@/components/workflow_editor/buttons/execute_button";
 
 const EditorPanel = () => {
   // Store:
@@ -205,6 +207,32 @@ const EditorPanel = () => {
                       currentNode.removeBlock(cronId);
                     }}
                   />
+                )}
+
+                {currentNode.blockType === "manual" && (
+                  <div className="flex flex-col gap-6 mt-[3rem]">
+                    {/* Good To Know */}
+                    <div className="flex flex-1 text-xs gap-2 text-neutral-500">
+                      <div className="w-5">
+                        <Info />
+                      </div>
+                      <div className="inline-block">
+                        This flow won’t run on its own. Use the
+                        <KeyBox
+                          textContent="Execute"
+                          Icon={Play}
+                          boxClassName="w-fit h-4 p-[0.4px] px-1 rounded-[3rem] inline-flex translate-y-[2px]"
+                          textContentClassname="scale-[0.85]"
+                          iconClassName="scale-[0.85]"
+                        />
+                        button (here or from your Workflows page) to test or
+                        trigger it.
+                      </div>
+                    </div>
+
+                    {/* Execute Button */}
+                    <ExecuteButton />
+                  </div>
                 )}
               </div>
             )}

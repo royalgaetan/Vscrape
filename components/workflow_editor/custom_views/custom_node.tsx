@@ -55,6 +55,8 @@ const CustomNode = ({
         return getFullTerm("field");
       case "cron":
         return nodeBlocks instanceof CronBlock ? "Scheduled" : "Not Scheduled";
+      case "manual":
+        return "Trigger";
       default:
         return "";
     }

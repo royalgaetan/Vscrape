@@ -44,6 +44,7 @@ import { WORKFLOW_COLORS } from "@/lib/colors_utils";
 import { deepFreeze } from "@/lib/utils";
 import { OperationBlock } from "../classes/operation_block";
 import { FormFieldBlock } from "../classes/form_field_block";
+import { ManualBlock } from "../classes/manual_block";
 
 export const previousInputData: PreviousInputDataType[] = [
   {
@@ -109,8 +110,8 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] =
       icon: Play,
       tooltip: "Manually start the workflow when needed.",
       sectionName: "Entry Point",
-      blockType: "operation",
-      blocks: [] as OperationBlock[],
+      blockType: "manual",
+      blocks: new ManualBlock(),
     },
     {
       label: "Cron",

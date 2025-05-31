@@ -288,14 +288,18 @@ const SectionPicker = ({
   );
 };
 
-const KeyBox = ({
+export const KeyBox = ({
   Icon,
+  textContent,
+  textContentClassname,
   boxClassName,
   iconClassName,
 }: {
   Icon: LucideIcon;
   boxClassName?: string;
   iconClassName?: string;
+  textContent?: string;
+  textContentClassname?: string;
 }) => {
   return (
     <span
@@ -305,6 +309,7 @@ const KeyBox = ({
       )}
     >
       <Icon className={cn("size-3", iconClassName)} />
+      <span className={cn(textContentClassname)}>{textContent}</span>
     </span>
   );
 };
