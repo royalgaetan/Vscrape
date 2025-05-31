@@ -1,7 +1,7 @@
 import { appLanguages } from "@/lib/constants";
-import { OperationItemType } from "../types/w_types";
+import { VsOperationBlockType } from "../types/w_types";
 
-export const workflowOperations: Omit<OperationItemType, "id">[] = [
+export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   // Webhook Operations
   //
   //

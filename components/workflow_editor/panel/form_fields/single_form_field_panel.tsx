@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
 import { delay } from "@/lib/numbers_utils";
-import { NodeBlockType, useWorkflowEditorStore } from "@/stores/workflowStore";
+import { NodeBlockType } from "@/stores/workflowStore";
 import FieldLabel from "../field_label";
 import PanelHeader from "../panel_header";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
@@ -44,14 +44,9 @@ const SingleFormFieldPanel = ({
   onDelete: (fieldBlockId: string) => void;
   displayBackButton?: boolean;
 }) => {
-  // Store
-  const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-  const currentBlock = useWorkflowEditorStore((s) => s.currentBlock) as
-    | FieldBlockType
-    | undefined;
-  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
-  // End Store
+  const [currentBlock, setCurrentBlock] = useState(fieldBlockOrigin);
 
+  const [isLoadingBlock, setIsLoadingBlock] = useState(false);
   const [isSavingFormFieldBlock, setIsSavingFormFieldBlock] = useState(false);
   const [SavingFormFieldBlockResultIcon, setSavingFormFieldBlockResultIcon] =
     useState<LucideIcon | undefined>(undefined);
@@ -61,7 +56,7 @@ const SingleFormFieldPanel = ({
     setIsSavingFormFieldBlock(true);
     await delay(400);
 
-    if (!currentNode || !currentBlock) {
+    if (!currentBlock) {
       setIsSavingFormFieldBlock(false);
       setSavingFormFieldBlockResultIcon(X);
       await delay(1000);
@@ -139,22 +134,34 @@ const SingleFormFieldPanel = ({
                 ) {
                   setCurrentBlock(undefined);
                 } else {
+                  setIsLoadingBlock(true);
+                  setCurrentBlock(undefined);
                   const newFormFieldBlock =
                     getFormFieldBlockByName(fieldNameSelected);
                   if (!newFormFieldBlock) return;
-                  setCurrentBlock(newFormFieldBlock);
+                  setTimeout(() => {
+                    setCurrentBlock(newFormFieldBlock);
+                    setIsLoadingBlock(false);
+                  }, 300);
                 }
               }}
             />
           </div>
           <Separator className="my-2" />
 
-          {currentBlock && (
+          {/* Loader */}
+          {isLoadingBlock && (
+            <div className="flex justify-center items-center h-44">
+              <Loader2 className="animate-spin text-neutral-500" />
+            </div>
+          )}
+
+          {/* Content */}
+          {currentBlock && !isLoadingBlock && (
             <div className="flex flex-col justify-start items-start">
               {/* Edit Field Block: Parameters List */}
               <div className="flex flex-col gap-5 w-full px-4 pr-4">
                 {/* Field Label */}
-                {JSON.stringify(currentBlock.fieldLabel)}
                 {typeof currentBlock.fieldLabel === "string" &&
                   !currentBlock.isHidden && (
                     <FormFieldBlockCard
@@ -165,8 +172,6 @@ const SingleFormFieldPanel = ({
                       initialValue={currentBlock.fieldLabel}
                       onChange={(newVal) => {
                         currentBlock.fieldLabel = newVal;
-                        setCurrentBlock(currentBlock);
-                        console.log("Entered", currentBlock.fieldLabel);
                       }}
                     />
                   )}
@@ -280,7 +285,6 @@ const SingleFormFieldPanel = ({
               <Separator className="mt-6 mb-[0.5px]" />
 
               {/* Field Block Preview */}
-
               <div className="flex flex-col w-full max-h-fit min-h-28 bg-neutral-200/50 px-4 pr-4 pb-7 editor-background-dots">
                 <Label className="text-xs text-neutral-500 mt-3 mb-4">
                   Field Preview

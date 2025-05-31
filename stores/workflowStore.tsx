@@ -1,15 +1,13 @@
 import { VsNode } from "@/lib/workflow_editor/classes/node";
-import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
+import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import {
   SharedOutputSelectedItem,
   TokenInputType,
 } from "@/lib/workflow_editor/types/w_types";
 import { create } from "zustand";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
-import { getVersion, proxy } from "valtio";
-import { isProxy } from "@/lib/utils";
 
-export type NodeBlockType = OperationItem | FieldBlockType;
+export type NodeBlockType = OperationBlock | FieldBlockType | undefined;
 export type NodeToActOn =
   | {
       nodeId: string;
@@ -25,9 +23,6 @@ interface WorkflowEditorState {
   // Workflow Panel
   isWorkflowPanelOpen: boolean;
   currentNode: VsNode | undefined;
-  updateCurrentNode: (val: VsNode) => void;
-  currentBlock?: NodeBlockType;
-  setCurrentBlock: (block?: NodeBlockType) => void;
   toggleWorkflowPanel: (isOpen: boolean, node?: VsNode) => void;
 
   // Node Actions: Duplicate, Delete
@@ -58,18 +53,10 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
     isWorkflowPanelOpen: false,
     setisWorkflowPanelOpen: (isOpen) => set({ isWorkflowPanelOpen: isOpen }),
     currentNode: undefined,
-    updateCurrentNode: (node) => {
-      set({ currentNode: node });
-    },
-    currentBlock: undefined,
-    setCurrentBlock: (block) => {
-      set({ currentBlock: block });
-    },
     toggleWorkflowPanel: (isOpen, node) => {
       set({
         isWorkflowPanelOpen: isOpen,
         currentNode: node,
-        currentBlock: undefined,
       });
     },
 
@@ -87,11 +74,3 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
       set({ isSharedOutputsDialogOpen: isOpen, inputToken: inputToken }),
   })
 );
-
-const getObjectOrProxy = <T extends object>(obj: T): T => {
-  if (isProxy(obj)) {
-    return obj;
-  } else {
-    return proxy(obj);
-  }
-};

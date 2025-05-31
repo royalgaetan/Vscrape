@@ -4,10 +4,11 @@ import {
   OperationParamItem,
   OperationThroughput,
   OperationFilterType,
-  OperationItemType,
+  VsOperationBlockType,
 } from "../types/w_types";
+import { ObservableMixin } from "./observable_mixin";
 
-export class OperationItem {
+export class OperationBlock extends ObservableMixin() {
   id: string;
   operationName: string;
   operationDescription: string;
@@ -25,7 +26,8 @@ export class OperationItem {
   skipDuplicate?: boolean;
   loopThrough?: "All items" | number | boolean;
 
-  constructor(operation: OperationItemType) {
+  constructor(operation: VsOperationBlockType) {
+    super();
     this.id = operation.id;
     this.operationName = operation.operationName;
     this.operationDescription = operation.operationDescription;
@@ -42,6 +44,7 @@ export class OperationItem {
   addParam(param: OperationParamItem | OperationParamItem[]) {
     if (!this.params) this.params = [];
     this.params.push(param);
+    this.notifyAll();
   }
 
   setOutput(output: OperationThroughput) {

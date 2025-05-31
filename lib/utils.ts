@@ -1,13 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { getVersion } from "valtio";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-export function isProxy(value: any): boolean {
-  return typeof getVersion(value) === "number";
 }
 
 export function isRecord(obj: unknown): obj is Record<string, any> {

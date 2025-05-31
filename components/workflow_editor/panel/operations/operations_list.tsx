@@ -1,7 +1,7 @@
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import React from "react";
 import AddOperationButton from "./add_operation_button";
-import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
+import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronsDownIcon, Coins } from "lucide-react";
@@ -12,13 +12,17 @@ const OperationsList = ({
   onOperationSelect,
 }: {
   onAddOperation: () => void;
-  onOperationSelect: (operation: OperationItem) => void;
+  onOperationSelect: (operation: OperationBlock) => void;
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
   // End Store
 
-  if (!currentNode) {
+  if (
+    currentNode === undefined ||
+    !currentNode.blocks ||
+    !Array.isArray(currentNode.blocks)
+  ) {
     return <div></div>;
   }
 
@@ -30,20 +34,18 @@ const OperationsList = ({
         {currentNode.blocks.length > 1 && "s"}
       </h5>
 
-      {currentNode.blocks.length === 0 ? (
+      {!currentNode.blocks || currentNode.blocks.length === 0 ? (
         <div className="flex flex-col w-full">
           <AddOperationButton onClick={onAddOperation} />
         </div>
       ) : (
         <div className="flex flex-col w-full group/operationsList">
           {currentNode.blocks.map((block, idx) => {
-            const operation = block as OperationItem;
-            const isLast = currentNode.blocks.length === idx + 1;
+            const operation = block as OperationBlock;
+            // const isLast = currentNode.blocks.length === idx + 1;
+            const isLast = true;
             return (
-              <div
-                key={`${currentNode.sectionName}_${operation.operationName}_${idx}`}
-                className="flex flex-col w-full items-center"
-              >
+              <div key={block.id} className="flex flex-col w-full items-center">
                 <Button
                   variant={"outline"}
                   className={cn(

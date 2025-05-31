@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   PossibleFieldBlockType as FieldBlockType,
+  FormFieldFileUpload,
   FormFieldTextInput,
   workflowFormFieldBlocks,
 } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
@@ -39,72 +40,109 @@ import { Textarea } from "@/components/ui/textarea";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import DurationPicker from "@/components/global/duration_picker";
 import { getExtensionNamesJoinned } from "./form_field_block_card";
+import DateInput from "../../inputs/date_input";
+import DurationInput from "../../inputs/duration_input";
 
 const FormFieldBlockPreview = ({
   fieldBlockToPreview,
 }: {
   fieldBlockToPreview: FieldBlockType;
 }) => {
-  const fieldBlock = fieldBlockToPreview;
+  const [fieldLabel, setFieldLabel] = useState(fieldBlockToPreview.fieldLabel);
+  const [, setFieldValue] = useState(fieldBlockToPreview.fieldValue);
+  const [fieldDescription, setFieldDescription] = useState(
+    fieldBlockToPreview.fieldDescription
+  );
+  const [fieldPlaceholder, setFieldPlaceholder] = useState(
+    fieldBlockToPreview.fieldPlaceholder
+  );
+  const [fieldValueToPickFrom, setFieldValueToPickFrom] = useState(
+    fieldBlockToPreview.fieldValueToPickFrom
+  );
+  const [fieldIsOptional, setFieldIsOptional] = useState(
+    fieldBlockToPreview.isOptional
+  );
+
+  // Specifics
+  const [fieldIsMultiline, setFieldIsMultiline] = useState(
+    fieldBlockToPreview instanceof FormFieldTextInput &&
+      fieldBlockToPreview.isMultiline
+  );
+  const [fieldAcceptedExtensions, setFieldAcceptedExtensions] = useState(
+    fieldBlockToPreview instanceof FormFieldFileUpload
+      ? fieldBlockToPreview.acceptedExtensions
+      : []
+  );
 
   useEffect(() => {
-    if (!fieldBlock) return;
-    const unsub = fieldBlock.stream$().subscribe((data) => {
-      console.log("New val", data);
-      setFieldLabel(data.fieldLabel);
+    const sub = fieldBlockToPreview.stream$().subscribe((newData) => {
+      // Field Label Case
+      setFieldLabel(newData.fieldLabel);
+
+      // Field Value Case
+      setFieldValue(newData.fieldValue);
+
+      // Field Description Case
+      setFieldDescription(newData.fieldDescription);
+
+      // Field Placeholder Case
+      setFieldPlaceholder(newData.fieldPlaceholder);
+
+      // Field ValueToPickFrom Case
+      setFieldValueToPickFrom(newData.fieldValueToPickFrom);
+
+      // Field IsOptional Case
+      setFieldIsOptional(newData.isOptional);
+
+      // Field IsMultiline Case: only for TextInput
+      if (newData instanceof FormFieldTextInput) {
+        setFieldIsMultiline(newData.isMultiline);
+      }
+
+      // Field Accepted Extensions Case: only for FileUpload Input
+      if (newData instanceof FormFieldFileUpload) {
+        setFieldAcceptedExtensions(newData.acceptedExtensions);
+      }
     });
 
-    return () => unsub.unsubscribe();
+    return () => sub.unsubscribe();
   }, []);
-  const [fieldLabel, setFieldLabel] = useState("");
-
-  if (!fieldBlock) return <div></div>;
 
   const Icon =
     workflowFormFieldBlocks.find(
-      (field) => field.fieldName === fieldBlock.fieldName
+      (field) => field.fieldName === fieldBlockToPreview.fieldName
     )?.fieldIcon ?? Hash;
 
-  const [enteredValue, setEnteredValue] = useState<any>(fieldBlock.fieldValue);
+  // To Simulate Fake Data Entry
+  const [enteredValue, setEnteredValue] = useState<any>(
+    fieldBlockToPreview.fieldValue
+  );
+
+  // Others States
   const [isDraggingOVer, setIsDraggingOVer] = useState(false);
   const fieldBlockPreviewFileUploadRef = useRef<HTMLInputElement>(null);
   const fieldBlockPreviewFileUploadContainerRef =
     useRef<HTMLButtonElement>(null);
 
-  const getInputType = (): React.HTMLInputTypeAttribute | undefined => {
-    switch (fieldBlock.fieldType) {
-      case "primitive/text":
-        return "text";
-      case "primitive/emailUrl":
-        return "email";
-      case "primitive/tel":
-        return "tel";
-      case "primitive/number":
-        return "number";
+  const narrowedFieldType = fieldBlockToPreview.fieldType.split("/").at(-1);
+  const placeHolderDisplayed = isTrulyEmpty(toStringSafe(fieldPlaceholder))
+    ? fieldBlockToPreview.fieldDefaultPlaceholder
+    : fieldPlaceholder;
 
-      default:
-        return undefined;
-    }
-  };
-  const isTextareaEnabled =
-    fieldBlockToPreview instanceof FormFieldTextInput &&
-    fieldBlockToPreview.isMultiline;
-
-  const placeHolderDisplayed = isTrulyEmpty(
-    toStringSafe(fieldBlock.fieldPlaceholder)
-  )
-    ? fieldBlock.fieldDefaultPlaceholder
-    : fieldBlock.fieldPlaceholder;
+  const descriptionDisplayed = isTrulyEmpty(toStringSafe(fieldDescription))
+    ? fieldBlockToPreview.fieldDefaultDescription
+    : fieldDescription;
 
   const onKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement> | undefined
   ) => {
     if (!e) return;
+
     const isAllowedControl = allowedNumberControlKeys.includes(e.key);
     const ctrlOrMeta = e.ctrlKey || e.metaKey;
     if (ctrlOrMeta || isAllowedControl) return;
 
-    if (getInputType() === "number") {
+    if (narrowedFieldType === "number") {
       // Allow digits (0–9) or .
       const isDigit = /^\d$/.test(e.key) || e.key === ".";
 
@@ -114,7 +152,7 @@ const FormFieldBlockPreview = ({
       }
     }
 
-    if (getInputType() === "tel") {
+    if (narrowedFieldType === "tel") {
       // Allow digits, space, hyphen, parentheses, plus
       const isTelChar = /^[\d\s\-()+]$/.test(e.key);
       if (!isTelChar) {
@@ -122,21 +160,13 @@ const FormFieldBlockPreview = ({
       }
     }
 
-    if (getInputType() === "email") {
+    if (narrowedFieldType === "email") {
       // Allow alphanumeric, basic special chars, @, .
       const isEmailChar = /^[a-zA-Z0-9@._\-+]$/.test(e.key);
       if (!isEmailChar) {
         e.preventDefault();
       }
     }
-
-    // if (getInputType() === "url") {
-    //   // Allow URL-safe characters
-    //   const isUrlChar = /^[a-zA-Z0-9/:?&=._\-#]$/.test(e.key);
-    //   if (!isUrlChar) {
-    //     e.preventDefault();
-    //   }
-    // }
   };
 
   return (
@@ -149,14 +179,12 @@ const FormFieldBlockPreview = ({
           {!isTrulyEmpty(toStringSafe(fieldLabel)) && (
             <Label className="flex flex-1 items-center text-wrap text-xs text-neutral-500 mb-1">
               <Icon className="size-4 mr-1 stroke-neutral-600" /> {fieldLabel}{" "}
-              {!fieldBlock.isOptional && "*"}
+              {!fieldIsOptional && "*"}
             </Label>
           )}
-          {fieldBlock.fieldDescription && (
+          {descriptionDisplayed && (
             <p className="text-xs text-muted-foreground font-light mb-2">
-              {!isTrulyEmpty(toStringSafe(fieldBlock.fieldDescription))
-                ? fieldBlock.fieldDescription
-                : fieldBlock.fieldDefaultDescription}
+              {descriptionDisplayed}
             </p>
           )}
         </div>
@@ -168,7 +196,7 @@ const FormFieldBlockPreview = ({
         <div className="w-full">
           {/* Dropdown: Selection */}
           {fieldBlockToPreview.fieldType === "primitive/text" &&
-            fieldBlock.fieldValueToPickFrom && (
+            fieldValueToPickFrom && (
               <div>
                 <Select
                   onValueChange={(val) =>
@@ -181,8 +209,8 @@ const FormFieldBlockPreview = ({
                   </SelectTrigger>
 
                   <SelectContent className="max-h-64 w-full">
-                    {fieldBlock.fieldValueToPickFrom.length > 0 &&
-                      fieldBlock.fieldValueToPickFrom
+                    {fieldValueToPickFrom.length > 0 &&
+                      fieldValueToPickFrom
                         .map((val) => extractTextFromHTML(toStringSafe(val)))
                         .filter((v) => v.length > 0)
                         .map((choice) => {
@@ -203,12 +231,12 @@ const FormFieldBlockPreview = ({
 
           {/* Text Input Type */}
           {(fieldBlockToPreview.fieldType === "primitive/text" &&
-            !fieldBlock.fieldValueToPickFrom) ||
+            !fieldValueToPickFrom) ||
           fieldBlockToPreview.fieldType === "primitive/emailUrl" ||
           fieldBlockToPreview.fieldType === "primitive/tel" ||
           fieldBlockToPreview.fieldType === "primitive/number" ? (
             <div className="flex flex-1 w-full">
-              {isTextareaEnabled && (
+              {fieldIsMultiline && (
                 <Textarea
                   defaultValue={undefined}
                   className="bg-white mb-0 resize-none w-full !h-20"
@@ -217,9 +245,9 @@ const FormFieldBlockPreview = ({
                   maxLength={2000}
                 />
               )}
-              {!isTextareaEnabled && (
+              {!fieldIsMultiline && (
                 <Input
-                  type={getInputType()}
+                  type={narrowedFieldType}
                   defaultValue={undefined}
                   className="h-7 bg-white w-[100%]"
                   placeholder={placeHolderDisplayed}
@@ -234,11 +262,11 @@ const FormFieldBlockPreview = ({
           {/* Radio: Selection */}
           {fieldBlockToPreview.fieldType === "primitive/radio" && (
             <div className="ml-1">
-              {fieldBlock.fieldValueToPickFrom && (
+              {fieldValueToPickFrom && (
                 <RadioInput
                   onSelect={(val) => setEnteredValue(extractTextFromHTML(val))}
                   selectedValue={enteredValue}
-                  valuesToSelect={fieldBlock.fieldValueToPickFrom.map((v) =>
+                  valuesToSelect={fieldValueToPickFrom.map((v) =>
                     extractTextFromHTML(toStringSafe(v))
                   )}
                 />
@@ -249,13 +277,13 @@ const FormFieldBlockPreview = ({
           {/* Checkbox: Selection */}
           {fieldBlockToPreview.fieldType === "primitive/checkbox" && (
             <div className="ml-1">
-              {fieldBlock.fieldValueToPickFrom && (
+              {fieldValueToPickFrom && (
                 <CheckboxInput
                   onSelect={(val) =>
                     setEnteredValue(val.map((v) => extractTextFromHTML(v)))
                   }
                   selectedValues={enteredValue}
-                  valuesToSelect={fieldBlock.fieldValueToPickFrom.map((v) =>
+                  valuesToSelect={fieldValueToPickFrom.map((v) =>
                     extractTextFromHTML(toStringSafe(v))
                   )}
                 />
@@ -265,101 +293,39 @@ const FormFieldBlockPreview = ({
 
           {/* Date Picker */}
           {fieldBlockToPreview.fieldType === "primitive/dateTime" && (
-            <div className="!w-36 !h-7 relative group/dateInput">
-              <Input
-                readOnly
-                value={
+            <div className="w-28">
+              <DateInput
+                hasError={false}
+                initialValue={
                   enteredValue !== undefined &&
                   isValidISODateString(enteredValue)
                     ? formatDate(new Date(enteredValue), "MMM dd, yyyy")
                     : ""
                 }
-                className="h-7 bg-white"
-                placeholder={
-                  isTrulyEmpty(toStringSafe(fieldBlock.fieldPlaceholder))
-                    ? fieldBlock.fieldDefaultPlaceholder
-                    : fieldBlock.fieldPlaceholder
-                }
+                placeholder={placeHolderDisplayed}
+                disabledDnd
+                onSave={(date) => setEnteredValue(date)}
+                isDisabled={false}
               />
-              {/* Clear Date: Button */}
-              {!isTrulyEmpty(toStringSafe(enteredValue)) && (
-                <button
-                  className={cn(
-                    "group-hover/dateInput:inline hidden group/clearDateButton absolute !w-[1.5rem] !h-[1.5rem] top-[2px] right-2 !px-[0.6rem] transition-all duration-300 justify-center items-center rounded-l-none bg-gradient-to-l from-white from-30% to-transparent cursor-pointer trans"
-                  )}
-                  onClick={() => {
-                    setEnteredValue(undefined);
-                  }}
-                >
-                  <X className="size-4 stroke-neutral-600 group-hover/clearDateButton:opacity-80 group-active/clearDateButton:scale-[0.97]" />
-                </button>
-              )}
-              {/* Date Picker: Button */}
-              <DatePicker
-                selectedDate={enteredValue as Date}
-                onSelect={(selectedDate) => {
-                  setEnteredValue(selectedDate ?? "");
-                }}
-              >
-                <Button
-                  className={cn(
-                    "absolute top-[2px] right-[1px] hidden !w-[1.5rem] !h-[1.5rem] !px-[0.6rem] transition-all duration-300 justify-center items-center gap-2 hover:opacity-80 hover:bg-white bg-white-300 cursor-pointer",
-                    isTrulyEmpty(toStringSafe(enteredValue)) ? "flex" : ""
-                  )}
-                >
-                  <CalendarDaysIcon className="stroke-neutral-600" />
-                </Button>
-              </DatePicker>
             </div>
           )}
 
           {/* Time Picker */}
           {fieldBlockToPreview.fieldType === "primitive/milliseconds" && (
-            <div className="!w-28 !h-[1.7rem] relative group/timePicker">
-              <Input
-                readOnly
-                value={
+            <div className="w-28">
+              <DurationInput
+                hasError={false}
+                isTimePicker
+                initialValue={
                   enteredValue !== undefined && !isNaN(enteredValue)
                     ? formatDurationMs(enteredValue, ["hours", "minutes"])
                     : ""
                 }
-                className="h-7 bg-white"
-                placeholder={
-                  isTrulyEmpty(toStringSafe(fieldBlock.fieldPlaceholder))
-                    ? fieldBlock.fieldDefaultPlaceholder
-                    : fieldBlock.fieldPlaceholder
-                }
+                placeholder={placeHolderDisplayed}
+                disabledDnd
+                onSave={(timePicked) => setEnteredValue(timePicked)}
+                isDisabled={false}
               />
-              {/* Clear Time: Button */}
-              {!isTrulyEmpty(toStringSafe(enteredValue)) && (
-                <button
-                  className={cn(
-                    "group-hover/timePicker:inline hidden group/clearDateButton absolute !w-[1.5rem] !h-[1.5rem] top-[2px] right-2 !px-[0.6rem] transition-all duration-300 justify-center items-center rounded-l-none bg-gradient-to-l from-white from-30% to-transparent cursor-pointer trans"
-                  )}
-                  onClick={() => {
-                    setEnteredValue(undefined);
-                  }}
-                >
-                  <X className="size-4 stroke-neutral-600 group-hover/clearDateButton:opacity-80 group-active/clearDateButton:scale-[0.97]" />
-                </button>
-              )}
-              {/* Time Picker: Button */}
-              <DurationPicker
-                initialDurationMs={enteredValue}
-                isTimePicker
-                onSelect={(selectedTimeMs) => {
-                  setEnteredValue(selectedTimeMs);
-                }}
-              >
-                <Button
-                  className={cn(
-                    "absolute top-[2px] right-[1px] hidden !w-[1.5rem] !h-[1.5rem] !px-[0.6rem] transition-all duration-300 justify-center items-center gap-2 hover:opacity-80 hover:bg-white bg-white-300 cursor-pointer",
-                    isTrulyEmpty(toStringSafe(enteredValue)) ? "flex" : ""
-                  )}
-                >
-                  <Clock className="stroke-neutral-600" />
-                </Button>
-              </DurationPicker>
             </div>
           )}
 
@@ -452,11 +418,7 @@ const FormFieldBlockPreview = ({
                 </div>
               ) : (
                 <div className="w-[70%]  scale-[0.9]">
-                  <span>
-                    {isTrulyEmpty(toStringSafe(fieldBlock.fieldPlaceholder))
-                      ? fieldBlock.fieldDefaultPlaceholder
-                      : fieldBlock.fieldPlaceholder}
-                  </span>
+                  <span>{placeHolderDisplayed}</span>
                 </div>
               )}
               <input
@@ -464,9 +426,7 @@ const FormFieldBlockPreview = ({
                 type="file"
                 id="field_block_preview_file_upload"
                 className="hidden"
-                accept={getExtensionNamesJoinned(
-                  (fieldBlockToPreview as any).acceptedExtensions
-                )}
+                accept={getExtensionNamesJoinned(fieldAcceptedExtensions)}
                 onChange={(e) => {
                   if (!e.target.files || e.target.files.length === 0) return;
                   const file = e.target.files[0];

@@ -1,9 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import { WorkflowEditorNode } from "@/lib/workflow_editor/types/w_types";
+import { VsNodeType } from "@/lib/workflow_editor/types/w_types";
 import { cn } from "@/lib/utils";
 
-const TabNodeItem = ({ node }: { node: WorkflowEditorNode }) => {
+const TabNodeItem = ({ node }: { node: VsNodeType }) => {
   const Icon = node.icon;
   return (
     <div

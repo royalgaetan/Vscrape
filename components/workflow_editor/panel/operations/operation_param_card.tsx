@@ -1,32 +1,26 @@
 import ParamInput from "@/components/workflow_editor/param_inputs";
 import { cn } from "@/lib/utils";
-import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
+import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
-import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { useState } from "react";
 
 const OperationParamCard = ({
+  currentOperationBlock,
   paramData,
   className,
   inputClassName,
   labelClassName,
   isWithinAGroup,
 }: {
+  currentOperationBlock: OperationBlock;
   paramData: OperationParamItem;
   className?: string;
   inputClassName?: string;
   labelClassName?: string;
   isWithinAGroup: boolean;
 }) => {
-  // Store
-  const currentBlock = useWorkflowEditorStore(
-    (s) => s.currentBlock
-  ) as OperationItem;
-  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
-  // End Store
-
   const getParam = (): OperationParamItem | undefined => {
-    return currentBlock?.params
+    return currentOperationBlock?.params
       ?.flatMap((p) => p)
       .find((p) => p.paramName === paramData.paramName);
   };
@@ -41,9 +35,9 @@ const OperationParamCard = ({
   const onValueChange = (newValue: any) => {
     setInternalValue(newValue);
 
-    if (!currentBlock || !currentBlock.params) return;
+    if (!currentOperationBlock || !currentOperationBlock.params) return;
 
-    const updatedOperationParams = currentBlock.params.map((param) => {
+    const updatedOperationParams = currentOperationBlock.params.map((param) => {
       if (Array.isArray(param)) {
         return param.map((subParam) => {
           if (subParam.paramName === paramData.paramName) {
@@ -58,10 +52,10 @@ const OperationParamCard = ({
         return param;
       }
     });
-    currentBlock.params = updatedOperationParams;
-    setCurrentBlock(currentBlock);
+    currentOperationBlock.params = updatedOperationParams;
+
     // console.log("@debug", "Internal Value", internalValue);
-    // console.log("@debug", "(provider) currentBlock", currentBlock);
+    // console.log("@debug", "(provider) currentOperationBlock", currentOperationBlock);
   };
 
   return (

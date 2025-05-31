@@ -22,7 +22,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
+import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 
 const SingleOperationPanel = ({
@@ -34,7 +34,7 @@ const SingleOperationPanel = ({
   displayBackButton,
 }: {
   nodeOrigin: VsNode;
-  operationOrigin?: OperationItem;
+  operationOrigin?: OperationBlock;
   onBack?: () => void;
   onSave: (block?: NodeBlockType) => void;
   onDelete: (operationId: string) => void;
@@ -44,14 +44,7 @@ const SingleOperationPanel = ({
     operationOrigin?.id ?? crypto.randomUUID()
   );
 
-  // Store
-  const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-  const currentBlock = useWorkflowEditorStore(
-    (s) => s.currentBlock
-  ) as OperationItem;
-  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
-  // End Store
-
+  const [currentBlock, setCurrentBlock] = useState(operationOrigin);
   const availableOperations = workflowOperations.filter(
     (operation) => operation.nodeName === nodeOrigin.label
   );
@@ -66,7 +59,7 @@ const SingleOperationPanel = ({
     setIsSavingOperation(true);
     await delay(400);
 
-    if (!currentNode || !currentBlock) {
+    if (!currentBlock) {
       setIsSavingOperation(false);
       setSavingOperationResultIcon(X);
       await delay(1000);
@@ -89,7 +82,7 @@ const SingleOperationPanel = ({
     }
   };
 
-  //   if (!(currentBlock instanceof OperationItem)) return;
+  //   if (!(currentBlock instanceof OperationBlock)) return;
 
   return (
     <div>
@@ -151,14 +144,14 @@ const SingleOperationPanel = ({
                     const operation = workflowOperations.find(
                       (op) =>
                         op.operationName === opSelected &&
-                        op.nodeName === currentNode?.label
+                        op.nodeName === nodeOrigin?.label
                     );
                     if (!operation) return;
                     setCurrentBlock(
                       structuredClone({
                         id: operationId.current,
                         ...operation,
-                      } as OperationItem)
+                      } as OperationBlock)
                     );
                   }
                 }}
@@ -168,60 +161,63 @@ const SingleOperationPanel = ({
 
             {/* Parameters List */}
             <div className="flex flex-col justify-start items-start">
-              {currentBlock?.params!.length > 0 && (
-                <div className="flex flex-col w-full gap-4">
-                  {currentBlock?.params?.map((params, id) => {
-                    // If Params is an Array: meaning it contains "nested" params
-                    // => Display all of them in the same line
-                    // Else Params is a Param: Display it in the 1 line
-                    return (
-                      <div key={`${generateHexRandomString(20)}_param_${id}`}>
-                        {Array.isArray(params) ? (
-                          <div className="flex flex-1 !w-full justify-start gap-0 px-4 pr-4 mt-2 mb-2">
-                            {params.map((param, idx) => (
-                              <div
-                                key={`${generateHexRandomString(
-                                  20
-                                )}_param_inline_${idx}`}
-                                className="flex flex-1 pl-2 pr-1 mr-2 first:pl-0"
-                                style={{
-                                  maxWidth: `${90 / params.length}%`,
-                                }}
-                              >
-                                <OperationParamCard
-                                  isWithinAGroup={true}
-                                  paramData={param}
-                                  labelClassName={
-                                    param.type
-                                      .toLocaleLowerCase()
-                                      .includes("switch")
-                                      ? "text-center"
-                                      : undefined
-                                  }
-                                  inputClassName="justify-center"
-                                />
-                                {params.length === idx + 1 ? (
-                                  <></>
-                                ) : (
-                                  <div className="h-full w-[0.5px] ml-2 bg-border"></div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="flex flex-1 w-full px-4 pr-4">
-                            <OperationParamCard
-                              paramData={params}
-                              isWithinAGroup={false}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                  <Separator className="my-2" />
-                </div>
-              )}
+              {Array.isArray(currentBlock) &&
+                currentBlock.params!.length > 0 && (
+                  <div className="flex flex-col w-full gap-4">
+                    {currentBlock?.params?.map((params, id) => {
+                      // If Params is an Array: meaning it contains "nested" params
+                      // => Display all of them in the same line
+                      // Else Params is a Param: Display it in the 1 line
+                      return (
+                        <div key={`${generateHexRandomString(20)}_param_${id}`}>
+                          {Array.isArray(params) ? (
+                            <div className="flex flex-1 !w-full justify-start gap-0 px-4 pr-4 mt-2 mb-2">
+                              {params.map((param, idx) => (
+                                <div
+                                  key={`${generateHexRandomString(
+                                    20
+                                  )}_param_inline_${idx}`}
+                                  className="flex flex-1 pl-2 pr-1 mr-2 first:pl-0"
+                                  style={{
+                                    maxWidth: `${90 / params.length}%`,
+                                  }}
+                                >
+                                  <OperationParamCard
+                                    currentOperationBlock={currentBlock}
+                                    isWithinAGroup={true}
+                                    paramData={param}
+                                    labelClassName={
+                                      param.type
+                                        .toLocaleLowerCase()
+                                        .includes("switch")
+                                        ? "text-center"
+                                        : undefined
+                                    }
+                                    inputClassName="justify-center"
+                                  />
+                                  {params.length === idx + 1 ? (
+                                    <></>
+                                  ) : (
+                                    <div className="h-full w-[0.5px] ml-2 bg-border"></div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="flex flex-1 w-full px-4 pr-4">
+                              <OperationParamCard
+                                currentOperationBlock={currentBlock}
+                                paramData={params}
+                                isWithinAGroup={false}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    <Separator className="my-2" />
+                  </div>
+                )}
             </div>
 
             {/* More Options List: Detect Duplicate, Enable Loop */}

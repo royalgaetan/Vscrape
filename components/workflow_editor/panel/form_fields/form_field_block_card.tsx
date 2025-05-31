@@ -26,9 +26,9 @@ const FormFieldBlockCard = ({
   initialValue: any;
   onChange: (newVal: any) => void;
 }) => {
-  const [currentValue, setcurrentValue] = useState(initialValue);
+  const [currentValue, setCurrentValue] = useState(initialValue);
   const onValueChange = (newVal: any) => {
-    setcurrentValue(newVal);
+    setCurrentValue(newVal);
     onChange(newVal);
   };
 

@@ -10,6 +10,8 @@ import { hexToRgba } from "@/lib/colors_utils";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
+import { capitalizeFirstLetter } from "@/lib/string_utils";
+import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
 
 const CustomNode = ({
   data: node,
@@ -21,26 +23,42 @@ const CustomNode = ({
   const Icon = node.icon as LucideIcon;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [nodeBlocksLength, setNodeBlocksLength] = useState<number>(
-    node.blocks ? node.blocks.length : 0
+  const [nodeBlocks, setNodeBlocks] = useState(
+    node ? (node.blocks as any) : undefined
   );
+
   // Store
   const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
   // End Store
 
   useEffect(() => {
-    // Listen to Node Changes
-    const unsub = useWorkflowEditorStore.subscribe((state, prev) => {
-      if (!state.currentNode) return;
-      if (state.currentNode.id !== node.id) return;
-      const newlength = state.currentNode.blocks
-        ? state.currentNode.blocks.length
-        : 0;
-      setNodeBlocksLength(newlength);
+    const sub = node.stream$().subscribe((newData) => {
+      setNodeBlocks(newData.blocks);
     });
 
-    return () => unsub();
+    return () => sub.unsubscribe();
   }, []);
+
+  const getNodeTerminology = () => {
+    const getFullTerm = (term: string) => {
+      const areBlocksArray = Array.isArray(nodeBlocks);
+      const blocksLength = areBlocksArray ? nodeBlocks.length : 0;
+
+      return `${blocksLength} ${capitalizeFirstLetter(term)}${
+        blocksLength > 1 ? "s" : ""
+      }`;
+    };
+    switch (node.blockType) {
+      case "operation":
+        return getFullTerm("operation");
+      case "formField":
+        return getFullTerm("field");
+      case "cron":
+        return nodeBlocks instanceof CronBlock ? "Scheduled" : "Not Scheduled";
+      default:
+        return "";
+    }
+  };
 
   return (
     <button
@@ -144,8 +162,7 @@ const CustomNode = ({
           {/* Rests... */}
           <div className="flex flex-1 items-center justify-center gap-1 pointer-events-none">
             <p className="w-full text-center line-clamp-1 font-normal text-neutral-500 text-sm">
-              {nodeBlocksLength} Operation
-              {nodeBlocksLength > 1 && "s"}
+              {getNodeTerminology()}
             </p>
             {/* Button: Duplicate */}
             <SimpleTooltip tooltipText="Duplicate" side="bottom">

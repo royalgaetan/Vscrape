@@ -5,14 +5,14 @@ import SimpleSwitchInput from "./inputs/simple_switch_input";
 import { LucideIcon } from "lucide-react";
 import FilterInput from "./inputs/filter_input";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
-import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
+import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 
 const getInitialOptionValues = ({
   optionType,
   currentBlock,
 }: {
   optionType: OperationMoreOptionType;
-  currentBlock?: OperationItem;
+  currentBlock?: OperationBlock;
 }): any => {
   if (!currentBlock) return;
   switch (optionType) {
@@ -35,7 +35,7 @@ const MoreOptionInput = ({ optionType }: Props) => {
   // Store
   const currentBlock = useWorkflowEditorStore(
     (s) => s.currentBlock
-  ) as OperationItem;
+  ) as OperationBlock;
   const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
   // End Store
 

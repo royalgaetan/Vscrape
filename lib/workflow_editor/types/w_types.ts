@@ -20,10 +20,11 @@ import {
   workflowEditorSections,
 } from "../constants/w_constants";
 import { Nullable } from "@/lib/types";
-import { OperationItem } from "../classes/operation_item";
+import { OperationBlock } from "../classes/operation_block";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
+import { CronBlock } from "../classes/cron_block";
 
-export type WorkflowEditorNode = {
+export type VsNodeType = {
   label: string;
   iconColor: string;
   icon?: LucideIcon;
@@ -32,20 +33,30 @@ export type WorkflowEditorNode = {
   isDisabled?: boolean;
   isSpecialNode?: boolean;
   sectionName: keyof typeof workflowEditorSections;
-} & (NodeWithOperationBlocks | NodeWithFormFieldBlocks);
-export type NodeBlockStringType = "operation" | "formField";
+} & (NodeWithOperationBlocks | NodeWithFormFieldBlocks | NodeWithCronBlock);
+export const nodeBlockTypeNames = ["operation", "formField", "cron"] as const;
 
 export type NodeWithOperationBlocks = {
-  blockType: "operation";
-  blocks: OperationItem[];
+  blockType: (typeof nodeBlockTypeNames)["0"];
+  blocks: OperationBlock[];
 };
 
 export type NodeWithFormFieldBlocks = {
-  blockType: "formField";
+  blockType: (typeof nodeBlockTypeNames)["1"];
   blocks: FieldBlockType[];
 };
 
-export type OperationItemType = {
+export type NodeWithCronBlock = {
+  blockType: (typeof nodeBlockTypeNames)["2"];
+  blocks: CronBlock | undefined;
+};
+
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+
+export type VsOperationBlockType = {
   id: string;
   operationName: string;
   operationDescription: string;
@@ -90,6 +101,24 @@ export type VsFormInputFieldTypeUnion =
   | vsHidden
   | vsAnyRawTypes;
 
+export type VsNodeBlockType = {
+  id: string;
+  cronExp: string;
+  configMinute: string;
+  configHour: string;
+  configDayOfMonth: string;
+  configMonth: string;
+  configDayOfWeek: string;
+  configTimezone?: string;
+  configStartDate?: Date;
+  configEndDate?: Date;
+};
+
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+
 export type OperationThroughput = vsStructuredData;
 
 export type OperationParamItem = {
@@ -107,7 +136,6 @@ export type DroppedToolItem = {
   position?: nodeDropPosition;
 };
 
-// --------------------------------------------------------
 export type SharedOutputSelectedItem = {
   fullPath: string;
   type: (vsAnyPrimitives | vsAnyRawTypes)["type"];

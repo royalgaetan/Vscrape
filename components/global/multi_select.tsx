@@ -28,10 +28,13 @@ const MultiSelect = ({
   popoverAlignment,
   popoverSide,
   popoverClassName,
+  popoverTriggerClassName,
   selectionMode = "multi",
   isTriggerDisabled,
   itemTooltipClassname,
   dismissPopoverOnItemClick,
+  dismissChevron,
+  triggerInline,
 }: {
   data: SettingItemSelectDataType;
   selectionMode?: "single" | "multi";
@@ -39,7 +42,10 @@ const MultiSelect = ({
   selectedValues?: string[];
   label: string;
   triggerClassName?: string;
+  popoverTriggerClassName?: string;
   isTriggerDisabled?: boolean;
+  triggerInline?: boolean;
+  dismissChevron?: boolean;
   dismissPopoverOnItemClick?: boolean;
   popoverClassName?: string;
   popoverAlignment?: "end" | "center" | "start";
@@ -50,22 +56,34 @@ const MultiSelect = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger disabled={isTriggerDisabled}>
-        <Button
-          disabled={isTriggerDisabled}
-          variant="outline"
-          role="button"
-          aria-expanded={open}
-          className={cn(
-            "h-8 w-44 truncate pl-2 pr-1 flex flex-1 gap-1",
-            triggerClassName
-          )}
-        >
-          <div className="font-normal w-full text-start truncate">{label}</div>
-          <div className="">
-            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-          </div>
-        </Button>
+      <PopoverTrigger
+        className={cn("w-px", popoverTriggerClassName)}
+        asChild
+        disabled={isTriggerDisabled}
+      >
+        {triggerInline ? (
+          <div className={cn(triggerClassName)}>{label}</div>
+        ) : (
+          <Button
+            disabled={isTriggerDisabled}
+            variant="outline"
+            role="button"
+            aria-expanded={open}
+            className={cn(
+              "h-8 truncate flex flex-1 !px-3 gap-1",
+              triggerClassName
+            )}
+          >
+            <div className="font-normal w-full text-start truncate">
+              {label}
+            </div>
+            {!dismissChevron && (
+              <div className="w-4">
+                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+              </div>
+            )}
+          </Button>
+        )}
       </PopoverTrigger>
       <PopoverContent
         className={cn("w-64 truncate p-0 shadow-lg", popoverClassName)}
@@ -90,6 +108,7 @@ const MultiSelect = ({
                       <CommandItem
                         key={option.value}
                         value={option.value}
+                        keywords={[option.label]}
                         onSelect={(value) => {
                           handleSelect(value);
 

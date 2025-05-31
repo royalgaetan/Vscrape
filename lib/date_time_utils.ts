@@ -217,3 +217,89 @@ export const formatLargeNumber = (num: number): string => {
 
   return `${parseFloat(formattedNum.toFixed(1))}${units[unitIndex]}`;
 };
+
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+
+//  Minute labels (0 minute, 1 minute, 2 minutes, ...)
+export const minuteLabels: string[] = Array.from(
+  { length: 60 },
+  (_, i) => `${i}`
+);
+
+// Hour labels (11AM, 12PM, 1PM, ..., 10PM)
+export const hourLabels: string[] = Array.from({ length: 24 }, (_, i) => {
+  const hour12 = i % 12 || 12; // Convert to 12-hour format (1 - 12)
+  const period = i < 12 ? "AM" : "PM"; // AM for hours 0-11, PM for hours 12-23
+  return `${hour12} ${period}`;
+});
+
+// Day of the Month labels (1st, 2nd, 3rd, ..., 31st)
+export const DayOfMonthLabels: string[] = Array.from({ length: 31 }, (_, i) => {
+  const day = i + 1;
+  const suffix =
+    day === 1 || day === 21 || day === 31
+      ? "st"
+      : day === 2 || day === 22
+      ? "nd"
+      : day === 3 || day === 23
+      ? "rd"
+      : "th";
+  return `${day}${suffix}`;
+});
+
+// Month labels (January, February, ...)
+export const monthLabels: string[] = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+// 5. Day of the Week labels (Monday, Tuesday, ...)
+export const dayOfWeekLabels: string[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+export const cronPresets: { label: string; value: string }[] = [
+  { label: "Every Minute", value: "* * * * *" },
+  { label: "Every 5 Minutes", value: "*/5 * * * *" },
+  { label: "Every 15 Minutes", value: "*/15 * * * *" },
+  { label: "Every 30 Minutes", value: "*/30 * * * *" },
+
+  { label: "Hourly", value: "0 * * * *" },
+  { label: "Every 2 Hours", value: "0 */2 * * *" },
+  { label: "Every 6 Hours", value: "0 */6 * * *" },
+
+  { label: "At 9 AM Daily", value: "0 9 * * *" },
+  { label: "At 6 PM Daily", value: "0 18 * * *" },
+  { label: "At 11:30 PM Daily", value: "30 23 * * *" },
+
+  { label: "Every Monday at 9 AM", value: "0 9 * * 1" },
+  { label: "Weekdays at 8 AM", value: "0 8 * * 1-5" },
+  { label: "Weekends at 10 AM", value: "0 10 * * 6,0" },
+
+  { label: "1st of Every Month at Midnight", value: "0 0 1 * *" },
+  { label: "Last Day of the Month at 11 PM", value: "0 23 28-31 * *" }, // depends on extra logic
+  {
+    label: "Quarterly (1st Jan/Apr/Jul/Oct) at 6 AM",
+    value: "0 6 1 1,4,7,10 *",
+  },
+  { label: "Yearly (Jan 1st at Midnight)", value: "0 0 1 1 *" },
+];

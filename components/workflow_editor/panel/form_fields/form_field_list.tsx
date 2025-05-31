@@ -1,5 +1,5 @@
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, PenLineIcon, Trash2 } from "lucide-react";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
@@ -22,10 +22,24 @@ const FormFieldsList = ({
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  // End Store
+  const [nodeBlocks, setNodeBlocks] = useState(
+    currentNode ? (currentNode.blocks as FieldBlockType[]) : undefined
+  );
+
+  useEffect(() => {
+    if (!currentNode) return;
+    const sub = currentNode.stream$().subscribe((newData) => {
+      setNodeBlocks(newData.blocks as FieldBlockType[]);
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
+
   if (!currentNode) {
     return <div></div>;
   }
-  // End Store
+  console.log("currentNode", currentNode);
 
   return (
     // Here Blocks represents: Form Fields
@@ -34,8 +48,8 @@ const FormFieldsList = ({
         Form Preview
       </h5>
       <p className="text-xs text-muted-foreground line-clamp-1 mb-3">
-        {currentNode.blocks.length ?? 0} Field
-        {currentNode.blocks.length > 1 && "s"}
+        {Array.isArray(nodeBlocks) ? nodeBlocks.length : 0} Field
+        {Array.isArray(nodeBlocks) && nodeBlocks.length > 1 && "s"}
       </p>
 
       <div className="flex flex-col w-full mb-20 group/formFieldsList border border-border overflow-clip rounded-md bg-neutral-100/20">
@@ -43,85 +57,86 @@ const FormFieldsList = ({
           Form
         </h5>
 
-        <div className="flex flex-col">
-          {Object.entries(currentNode.blocks).map(([key, fieldBlock], idx) => {
-            return (
-              <div
-                key={`${currentNode.sectionName}_${fieldBlock.fieldName}_${idx}`}
-                className="group/fieldItem flex flex-col w-full mb-1 px-3 py-1 hover:bg-neutral-200/20 transition-all duration-200"
-              >
-                <FormFieldBlockPreview fieldBlockToPreview={fieldBlock} />
-                {/* Action Buttons: Edit | Delete | Move Up | Move Down */}
-                <div className="!h-5">
-                  <div className="group-hover/fieldItem:flex hidden flex-1 gap-2 justify-start items-center pt-1">
-                    {/* Edit */}
-                    <SimpleTooltip tooltipText="Edit Field">
-                      <Button
-                        variant={"ghost"}
-                        className={cn(
-                          "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
-                        )}
-                        onClick={() => {
-                          // const obj: DeepWritable<typeof fieldBlock> =
-                          //   deepClone(fieldBlock);
-                          onFieldEdit(fieldBlock);
-                        }}
-                      >
-                        <PenLineIcon className="!size-3" />
-                      </Button>
-                    </SimpleTooltip>
+        {Array.isArray(nodeBlocks) && nodeBlocks.length > 0 && (
+          <div className="flex flex-col">
+            {nodeBlocks.map((fieldBlock: FieldBlockType, idx) => {
+              return (
+                <div
+                  key={fieldBlock.id}
+                  className="group/fieldItem flex flex-col w-full mb-1 px-3 py-1 hover:bg-neutral-200/20 transition-all duration-200"
+                >
+                  <FormFieldBlockPreview fieldBlockToPreview={fieldBlock} />
+                  {/* Action Buttons: Edit | Delete | Move Up | Move Down */}
+                  <div className="!h-5">
+                    <div className="group-hover/fieldItem:flex hidden flex-1 gap-2 justify-start items-center pt-1">
+                      {/* Edit */}
+                      <SimpleTooltip tooltipText="Edit Field">
+                        <Button
+                          variant={"ghost"}
+                          className={cn(
+                            "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
+                          )}
+                          onClick={() => {
+                            onFieldEdit(fieldBlock);
+                          }}
+                        >
+                          <PenLineIcon className="!size-3" />
+                        </Button>
+                      </SimpleTooltip>
 
-                    {/* Delete */}
-                    <SimpleTooltip tooltipText="Delete Field">
-                      <Button
-                        variant={"ghost"}
-                        className={cn(
-                          "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
-                        )}
-                        onClick={() => onFieldDelete(fieldBlock.id)}
-                      >
-                        <Trash2 className="!size-3" />
-                      </Button>
-                    </SimpleTooltip>
+                      {/* Delete */}
+                      <SimpleTooltip tooltipText="Delete Field">
+                        <Button
+                          variant={"ghost"}
+                          className={cn(
+                            "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
+                          )}
+                          onClick={() => onFieldDelete(fieldBlock.id)}
+                        >
+                          <Trash2 className="!size-3" />
+                        </Button>
+                      </SimpleTooltip>
 
-                    {/* Move Up */}
-                    <SimpleTooltip tooltipText="Move Field Up">
-                      <Button
-                        disabled={idx === 0}
-                        variant={"ghost"}
-                        className={cn(
-                          "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
-                        )}
-                        onClick={() => onFieldMove(fieldBlock.id, "Up")}
-                      >
-                        <ChevronUp />
-                      </Button>
-                    </SimpleTooltip>
+                      {/* Move Up */}
+                      <SimpleTooltip tooltipText="Move Field Up">
+                        <Button
+                          disabled={idx === 0}
+                          variant={"ghost"}
+                          className={cn(
+                            "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
+                          )}
+                          onClick={() => onFieldMove(fieldBlock.id, "Up")}
+                        >
+                          <ChevronUp />
+                        </Button>
+                      </SimpleTooltip>
 
-                    {/* Move Down */}
-                    <SimpleTooltip tooltipText="Move Field Down">
-                      <Button
-                        disabled={
-                          idx === Object.entries(currentNode.blocks).length - 1
-                        }
-                        variant={"ghost"}
-                        className={cn(
-                          "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
-                        )}
-                        onClick={() => onFieldMove(fieldBlock.id, "Down")}
-                      >
-                        <ChevronDown />
-                      </Button>
-                    </SimpleTooltip>
+                      {/* Move Down */}
+                      <SimpleTooltip tooltipText="Move Field Down">
+                        <Button
+                          disabled={
+                            Array.isArray(currentNode.blocks) &&
+                            idx === currentNode.blocks.length - 1
+                          }
+                          variant={"ghost"}
+                          className={cn(
+                            "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
+                          )}
+                          onClick={() => onFieldMove(fieldBlock.id, "Down")}
+                        >
+                          <ChevronDown />
+                        </Button>
+                      </SimpleTooltip>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Add another Field Block */}
-        <div className="flex flex-col w-full px-3 mb-3 mt-2 items-center gap-2">
+        <div className="flex flex-col w-full px-3 mb-3 items-center gap-2">
           <AddFieldBlockButton onClick={onAddNewField} />
         </div>
 

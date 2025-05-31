@@ -2,7 +2,7 @@ import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DnDTextInput from "./dnd_text_input";
 import { RecordArray } from "@/lib/workflow_editor/types/w_types";
 import { generateHexRandomString } from "@/lib/numbers_utils";
@@ -21,7 +21,7 @@ const ArrayInput = ({
       className="flex flex-col"
       role="button"
       tabIndex={1}
-      // onMouseLeave={() => onChange && onChange(localArray)}
+      // onBlur={() => onChange && onChange(localArray)}
     >
       {localArray.map((arrItem, idx) => {
         const isLast = localArray.length === idx + 1;

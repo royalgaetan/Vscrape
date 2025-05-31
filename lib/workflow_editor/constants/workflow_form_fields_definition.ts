@@ -1,8 +1,3 @@
-import { BehaviorSubject } from "rxjs";
-import {
-  VsFormInputFieldType,
-  VsFormInputFieldTypeUnion,
-} from "../types/w_types";
 import {
   AtSign,
   CalendarDays,
@@ -18,139 +13,14 @@ import {
   ToggleRight,
   Upload,
 } from "lucide-react";
+import { FormFieldBlock } from "../classes/form_field_block";
 
-export class FormFieldBlock {
-  protected stream: BehaviorSubject<FormFieldBlock>;
-
-  private _id: string;
-  private _fieldName: string;
-  private _fieldLabel: string;
-  private _fieldDescription?: string;
-  private _fieldPlaceholder?: string;
-  private _fieldDefaultPlaceholder?: string;
-  private _fieldDefaultDescription?: string;
-  private _fieldValueToPickFrom?: string[];
-  private _isOptional?: boolean;
-  private _isHidden?: boolean;
-  private _fieldValue: any;
-  private _fieldType: VsFormInputFieldTypeUnion["type"];
-
-  constructor(formField: Omit<VsFormInputFieldType, "id">) {
-    this._id = crypto.randomUUID();
-    this._fieldName = formField.fieldName;
-    this._fieldLabel = formField.fieldLabel;
-    this._fieldType = formField.type;
-    this._fieldValue = formField.value;
-    this._fieldDescription = formField.fieldDescription;
-    this._fieldPlaceholder = formField.fieldPlaceholder;
-    this._fieldDefaultPlaceholder = formField.fieldDefaultPlaceholder;
-    this._fieldDefaultDescription = formField.fieldDefaultDescription;
-    this._fieldValueToPickFrom = formField.fieldValueToPickFrom;
-    this._isOptional = formField.isOptional;
-    this._isHidden = formField.isHidden;
-
-    this.stream = new BehaviorSubject<FormFieldBlock>(this);
-  }
-
-  // Return the latest class instance's data in readonly
-  stream$() {
-    return this.stream.asObservable();
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get fieldName() {
-    return this._fieldName;
-  }
-
-  set fieldLabel(value: string) {
-    this._fieldLabel = value;
-    // Notify all subscribers
-    this.stream.next(this);
-  }
-
-  get fieldLabel() {
-    return this._fieldLabel;
-  }
-
-  get fieldType() {
-    return this._fieldType;
-  }
-
-  set fieldDescription(value: string) {
-    this._fieldDescription = value;
-    // Notify all subscribers
-    this.stream.next(this);
-  }
-  get fieldDescription(): string | undefined {
-    return this._fieldDescription;
-  }
-
-  get fieldDefaultDescription(): string | undefined {
-    return this._fieldDefaultDescription;
-  }
-
-  set fieldPlaceholder(value: string) {
-    this._fieldPlaceholder = value;
-    // Notify all subscribers
-    this.stream.next(this);
-  }
-  get fieldPlaceholder(): string | undefined {
-    return this._fieldPlaceholder;
-  }
-  get fieldDefaultPlaceholder(): string | undefined {
-    return this._fieldDefaultPlaceholder;
-  }
-
-  set fieldValueToPickFrom(value: string[]) {
-    this._fieldValueToPickFrom = value;
-    // Notify all subscribers
-    this.stream.next(this);
-  }
-
-  get fieldValueToPickFrom(): string[] | undefined {
-    return this._fieldValueToPickFrom;
-  }
-
-  set isOptional(value: boolean) {
-    this._isOptional = value;
-    // Notify all subscribers
-    this.stream.next(this);
-  }
-
-  get isOptional(): boolean | undefined {
-    return this._isOptional;
-  }
-
-  set isHidden(value: boolean) {
-    this._isHidden = value;
-    // Notify all subscribers
-    this.stream.next(this);
-  }
-
-  get isHidden(): boolean | undefined {
-    return this._isHidden;
-  }
-
-  set fieldValue(value: any) {
-    this._fieldValue = value;
-    // Notify all subscribers
-    this.stream.next(this);
-  }
-
-  get fieldValue(): any {
-    return this._fieldValue;
-  }
-}
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-
 export class FormFieldTextInput extends FormFieldBlock {
-  public _isTextArea?: boolean;
+  private _isMultiline?: boolean; // Enable Textarea if true
   constructor({ isMultiline }: { isMultiline?: boolean }) {
     super({
       fieldName: "Text Field",
@@ -164,15 +34,16 @@ export class FormFieldTextInput extends FormFieldBlock {
       value: "",
       isOptional: false,
     });
-    this._isTextArea = isMultiline;
+    this._isMultiline = isMultiline;
   }
 
-  set isMultiline(isMultiline: boolean) {
-    this._isTextArea = isMultiline;
-    this.stream.next(this);
-  }
+  // Field IsMultiline: getter + setter
   get isMultiline(): boolean | undefined {
-    return this._isTextArea;
+    return this._isMultiline;
+  }
+  set isMultiline(isMultiline: boolean) {
+    this._isMultiline = isMultiline;
+    this.notifyAll();
   }
 }
 
@@ -227,8 +98,8 @@ export class FormFieldSelect extends FormFieldBlock {
       fieldName: "Dropdown",
       fieldLabel: "Select an option",
       fieldPlaceholder: undefined,
-      fieldDescription: "",
-      fieldDefaultDescription: "Choose from a list of options",
+      fieldDescription: "Choose from a list of options",
+      fieldDefaultDescription: "",
       type: "primitive/text",
       fieldValueToPickFrom: ["Option A", "Option B", "Option C"],
       value: "",
@@ -243,8 +114,8 @@ export class FormFieldRadioButtons extends FormFieldBlock {
       fieldName: "Radio Buttons",
       fieldLabel: "Radio Buttons",
       fieldPlaceholder: undefined,
-      fieldDescription: "",
-      fieldDefaultDescription: "Choose one option",
+      fieldDescription: "Choose one option",
+      fieldDefaultDescription: "",
       type: "primitive/radio",
       fieldValueToPickFrom: ["Option A", "Option B"],
       value: "",
@@ -259,8 +130,8 @@ export class FormFieldCheckboxes extends FormFieldBlock {
       fieldName: "Checkboxes",
       fieldLabel: "Checkboxes",
       fieldPlaceholder: undefined,
-      fieldDescription: "",
-      fieldDefaultDescription: "Select one or more options",
+      fieldDescription: "Select one or more options",
+      fieldDefaultDescription: "",
       type: "primitive/checkbox",
       fieldValueToPickFrom: ["Option A", "Option B", "Option C"],
       value: [""],
@@ -305,8 +176,8 @@ export class FormFieldYesNoToggle extends FormFieldBlock {
       fieldName: "Yes/No Toggle",
       fieldLabel: "Toggle to select",
       fieldPlaceholder: undefined,
-      fieldDescription: "",
-      fieldDefaultDescription: "Toggle between yes or no",
+      fieldDescription: "Toggle between yes or no",
+      fieldDefaultDescription: "",
       type: "primitive/switch",
       value: false,
       isOptional: true,
@@ -329,7 +200,7 @@ export class FormFieldHidden extends FormFieldBlock {
 }
 
 export class FormFieldFileUpload extends FormFieldBlock {
-  public _acceptedExtensions: string[] = [];
+  private _acceptedExtensions: string[] = [];
   constructor() {
     super({
       fieldName: "File Upload",
@@ -343,13 +214,13 @@ export class FormFieldFileUpload extends FormFieldBlock {
     });
   }
 
-  set acceptedExtensions(extensionsList: string[]) {
-    this._acceptedExtensions = extensionsList;
-    this.stream.next(this);
-  }
-
+  // Field Accepted Extensions: getter + setter
   get acceptedExtensions(): string[] {
     return this._acceptedExtensions;
+  }
+  set acceptedExtensions(extensionsList: string[]) {
+    this._acceptedExtensions = extensionsList;
+    this.notifyAll();
   }
 }
 

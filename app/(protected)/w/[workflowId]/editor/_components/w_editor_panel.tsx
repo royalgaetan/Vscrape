@@ -4,19 +4,20 @@ import { Button } from "@/components/ui/button";
 import NodeActionButtons from "@/components/workflow_editor/panel/node_action_buttons";
 import PanelHeader from "@/components/workflow_editor/panel/panel_header";
 import { NodeBlockType, useWorkflowEditorStore } from "@/stores/workflowStore";
-import { OperationItem } from "@/lib/workflow_editor/classes/operation_item";
+import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import OperationsList from "@/components/workflow_editor/panel/operations/operations_list";
 import SingleOperationPanel from "@/components/workflow_editor/panel/operations/single_operation_panel";
 import { X } from "lucide-react";
 import SingleFormFieldPanel from "@/components/workflow_editor/panel/form_fields/single_form_field_panel";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import FormFieldsList from "@/components/workflow_editor/panel/form_fields/form_field_list";
+import CronBlockList from "@/components/workflow_editor/panel/cron/cron_block_list";
+import SingleCronEditorPanel from "@/components/workflow_editor/panel/cron/single_cron_editor_panel";
+import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
 
 const EditorPanel = () => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-  const updateCurrentNode = useWorkflowEditorStore((s) => s.updateCurrentNode);
-  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
   const toggleWorkflowPanel = useWorkflowEditorStore(
     (s) => s.toggleWorkflowPanel
   );
@@ -26,7 +27,7 @@ const EditorPanel = () => {
 
   // End Store
   const [isEditing, setIsEditing] = useState(false);
-  const [blockOrigin, setBlockOrigin] = useState<NodeBlockType>();
+  const [blockOrigin, setBlockOrigin] = useState<any>();
 
   useEffect(() => {
     // When the Workflow Panel changes: set EditingMode to false
@@ -88,19 +89,17 @@ const EditorPanel = () => {
                 {currentNode.blockType === "operation" && (
                   <SingleOperationPanel
                     nodeOrigin={currentNode}
-                    operationOrigin={blockOrigin as OperationItem | undefined}
+                    operationOrigin={blockOrigin as OperationBlock | undefined}
                     displayBackButton={isEditing}
                     onDelete={(operationId) => {
                       setIsEditing(false);
-                      const updatedNode = currentNode.removeBlock(operationId);
-                      updateCurrentNode(updatedNode);
+                      currentNode.removeBlock(operationId);
                     }}
                     onSave={(operation) => {
                       setIsEditing(false);
                       if (!operation) return;
                       console.log("operation saved", operation);
-                      const updatedNode = currentNode.upsertBlock(operation);
-                      updateCurrentNode(updatedNode);
+                      currentNode.upsertBlock(operation);
                     }}
                     onBack={() => {
                       setIsEditing(false);
@@ -116,21 +115,41 @@ const EditorPanel = () => {
                     displayBackButton={isEditing}
                     onDelete={(fieldBlockId) => {
                       setIsEditing(false);
-                      const updatedNode = currentNode.removeBlock(fieldBlockId);
-                      updateCurrentNode(updatedNode);
+                      currentNode.removeBlock(fieldBlockId);
                     }}
                     onSave={(fieldBlock) => {
                       setIsEditing(false);
                       if (!fieldBlock) return;
-                      console.log("Field Block saved", fieldBlock);
-                      const updatedNode = currentNode.upsertBlock(fieldBlock);
-                      updateCurrentNode(updatedNode);
+                      currentNode.upsertBlock(fieldBlock);
                     }}
                     onBack={() => {
                       setIsEditing(false);
                     }}
                   />
                 )}
+
+                {/* Cron Block Panel: "Cron Editor" */}
+                {currentNode.blockType === "cron" && (
+                  <SingleCronEditorPanel
+                    nodeOrigin={currentNode}
+                    cronBlockOrigin={blockOrigin as CronBlock | undefined}
+                    displayBackButton={isEditing}
+                    onDelete={(cronId) => {
+                      setIsEditing(false);
+                      currentNode.removeBlock(cronId);
+                    }}
+                    onSave={(cron) => {
+                      setIsEditing(false);
+                      if (!cron) return;
+                      currentNode.upsertBlock(cron);
+                    }}
+                    onBack={() => {
+                      setIsEditing(false);
+                    }}
+                  />
+                )}
+
+                {/*  */}
               </>
             )}
 
@@ -147,12 +166,10 @@ const EditorPanel = () => {
                 {currentNode.blockType === "operation" && (
                   <OperationsList
                     onOperationSelect={(operation) => {
-                      setCurrentBlock(operation);
                       setBlockOrigin(operation);
                       setIsEditing(true);
                     }}
                     onAddOperation={() => {
-                      setCurrentBlock(undefined);
                       setBlockOrigin(undefined);
                       setIsEditing(true);
                     }}
@@ -166,20 +183,26 @@ const EditorPanel = () => {
                       setIsEditing(true);
                     }}
                     onAddNewField={() => {
-                      setCurrentBlock(undefined);
                       setBlockOrigin(undefined);
                       setIsEditing(true);
                     }}
                     onFieldDelete={(fieldBlockId) => {
-                      const updatedNode = currentNode.removeBlock(fieldBlockId);
-                      updateCurrentNode(updatedNode);
+                      currentNode.removeBlock(fieldBlockId);
                     }}
                     onFieldMove={(fieldBlockId, direction) => {
-                      const updatedNode = currentNode.moveBlock(
-                        fieldBlockId,
-                        direction
-                      );
-                      updateCurrentNode(updatedNode);
+                      currentNode.moveBlock(fieldBlockId, direction);
+                    }}
+                  />
+                )}
+
+                {currentNode.blockType === "cron" && (
+                  <CronBlockList
+                    onCronEdit={(cron) => {
+                      setBlockOrigin(cron);
+                      setIsEditing(true);
+                    }}
+                    onCronDelete={(cronId) => {
+                      currentNode.removeBlock(cronId);
                     }}
                   />
                 )}

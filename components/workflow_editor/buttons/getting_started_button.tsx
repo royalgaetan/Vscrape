@@ -29,12 +29,12 @@ const EditorGettingStartedButton = ({
         >
           <div
             className={cn(
-              "w-32 h-8 ring-4 absolute z-[8] ring-primary/70 rounded-full",
+              "w-32 h-7 ring-4 absolute z-[8] ring-primary/70 transition-all duration-1000 rounded-full",
               displayEntryNodes ? "animate-none" : "animate-pulse"
             )}
           ></div>
 
-          <div className="w-32 h-8 px-7 py-2 absolute z-[9] bg-primary flex justify-center items-center rounded-full">
+          <div className="w-32 h-7 px-7 py-2 absolute z-[9] bg-primary flex justify-center items-center rounded-full">
             <span className="w-full text-white text-center font-medium text-xs scale-[0.9] transition-all duration-0">
               Click to Start
             </span>
