@@ -3,7 +3,7 @@ import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import NodeActionButtons from "@/components/workflow_editor/panel/node_action_buttons";
 import PanelHeader from "@/components/workflow_editor/panel/panel_header";
-import { NodeBlockType, useWorkflowEditorStore } from "@/stores/workflowStore";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import OperationsList from "@/components/workflow_editor/panel/operations/operations_list";
 import SingleOperationPanel from "@/components/workflow_editor/panel/operations/single_operation_panel";
@@ -16,6 +16,9 @@ import SingleCronEditorPanel from "@/components/workflow_editor/panel/cron/singl
 import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
 import { KeyBox } from "@/components/global/duration_picker";
 import ExecuteButton from "@/components/workflow_editor/buttons/execute_button";
+import WebhookBlockList from "@/components/workflow_editor/panel/webhook/webhook_block_list";
+import SingleWebhookEditorPanel from "@/components/workflow_editor/panel/webhook/single_webhook_editor_panel";
+import { WebhookBlock } from "@/lib/workflow_editor/classes/webhook_block";
 
 const EditorPanel = () => {
   // Store:
@@ -115,14 +118,14 @@ const EditorPanel = () => {
                     nodeOrigin={currentNode}
                     fieldBlockOrigin={blockOrigin as FieldBlockType | undefined}
                     displayBackButton={isEditing}
-                    onDelete={(fieldBlockId) => {
-                      setIsEditing(false);
-                      currentNode.removeBlock(fieldBlockId);
-                    }}
                     onSave={(fieldBlock) => {
                       setIsEditing(false);
                       if (!fieldBlock) return;
                       currentNode.upsertBlock(fieldBlock);
+                    }}
+                    onDelete={(fieldBlockId) => {
+                      setIsEditing(false);
+                      currentNode.removeBlock(fieldBlockId);
                     }}
                     onBack={() => {
                       setIsEditing(false);
@@ -144,6 +147,23 @@ const EditorPanel = () => {
                       setIsEditing(false);
                       if (!cron) return;
                       currentNode.upsertBlock(cron);
+                    }}
+                    onBack={() => {
+                      setIsEditing(false);
+                    }}
+                  />
+                )}
+
+                {/* Webhook Block Panel: "Webhook Editor" */}
+                {currentNode.blockType === "webhook" && (
+                  <SingleWebhookEditorPanel
+                    nodeOrigin={currentNode}
+                    webhookBlockOrigin={blockOrigin as WebhookBlock}
+                    displayBackButton={isEditing}
+                    onSave={(webhook) => {
+                      setIsEditing(false);
+                      if (!webhook) return;
+                      currentNode.upsertBlock(webhook);
                     }}
                     onBack={() => {
                       setIsEditing(false);
@@ -217,7 +237,7 @@ const EditorPanel = () => {
                         <Info />
                       </div>
                       <div className="inline-block">
-                        This flow won’t run on its own. Use the
+                        This workflow won’t run on its own. Use the
                         <KeyBox
                           textContent="Execute"
                           Icon={Play}
@@ -233,6 +253,15 @@ const EditorPanel = () => {
                     {/* Execute Button */}
                     <ExecuteButton />
                   </div>
+                )}
+
+                {currentNode.blockType === "webhook" && (
+                  <WebhookBlockList
+                    onWebhookEdit={(webhook) => {
+                      setBlockOrigin(webhook);
+                      setIsEditing(true);
+                    }}
+                  />
                 )}
               </div>
             )}

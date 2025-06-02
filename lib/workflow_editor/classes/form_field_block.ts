@@ -11,10 +11,13 @@ export class FormFieldBlock extends ObservableMixin() {
   private _fieldValue: any;
   private _fieldDescription?: string;
   private _fieldPlaceholder?: string;
+
   private _fieldDefaultPlaceholder?: string;
   private _fieldDefaultDescription?: string;
+
   private _fieldValueToPickFrom?: string[];
   private _isOptional?: boolean;
+
   private _isHidden?: boolean;
   private _fieldType: VsFormInputFieldTypeUnion["type"];
 
@@ -34,9 +37,13 @@ export class FormFieldBlock extends ObservableMixin() {
     this._isHidden = formField.isHidden;
   }
 
-  // Field Id: getter
+  // Field Id: getter + setter
   get id() {
     return this._id;
+  }
+  set updateId(value: string) {
+    this._id = value;
+    this.notifyAll();
   }
 
   // Field Name: getter

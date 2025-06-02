@@ -10,15 +10,21 @@ import { generateHexRandomString } from "@/lib/numbers_utils";
 const ArrayInput = ({
   initialArray,
   onChange,
+  hasError,
 }: {
   initialArray: RecordArray;
   onChange?: (newArray: any[]) => void;
+  hasError?: boolean;
 }) => {
   const [localArray, setLocalArray] = useState<any[]>(initialArray);
 
   return (
     <div
-      className="flex flex-col"
+      className={cn(
+        "flex flex-col",
+        hasError &&
+          "border-destructive/70 rounded-sm ring-2 ring-offset-2 ring-destructive/60 transition-all duration-300"
+      )}
       role="button"
       tabIndex={1}
       // onBlur={() => onChange && onChange(localArray)}

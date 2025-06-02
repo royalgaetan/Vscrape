@@ -42,81 +42,48 @@ import DurationPicker from "@/components/global/duration_picker";
 import { getExtensionNamesJoinned } from "./form_field_block_card";
 import DateInput from "../../inputs/date_input";
 import DurationInput from "../../inputs/duration_input";
+import { VsFormInputFieldTypeUnion } from "@/lib/workflow_editor/types/w_types";
+
+export const isAFile = (fieldType: string) =>
+  isImageMimeType(fieldType) ||
+  isVideoMimeType(fieldType) ||
+  isAudioMimeType(fieldType) ||
+  isDocumentMimeType(fieldType);
 
 const FormFieldBlockPreview = ({
-  fieldBlockToPreview,
+  fieldName,
+  fieldLabel,
+  fieldValue,
+  fieldDescription,
+  fieldPlaceholder,
+  fieldDefaultPlaceholder,
+  fieldDefaultDescription,
+  fieldValueToPickFrom,
+  fieldIsOptional,
+  fieldType,
+  fieldIsMultiline,
+  fieldAcceptedExtensions,
 }: {
-  fieldBlockToPreview: FieldBlockType;
+  fieldName: string;
+  fieldLabel: string;
+  fieldValue: any;
+  fieldDescription?: string;
+  fieldPlaceholder?: string;
+  fieldDefaultPlaceholder?: string;
+  fieldDefaultDescription?: string;
+  fieldValueToPickFrom?: string[];
+  fieldIsOptional?: boolean;
+  fieldType: VsFormInputFieldTypeUnion["type"];
+
+  fieldIsMultiline?: boolean;
+  fieldAcceptedExtensions: string[];
 }) => {
-  const [fieldLabel, setFieldLabel] = useState(fieldBlockToPreview.fieldLabel);
-  const [, setFieldValue] = useState(fieldBlockToPreview.fieldValue);
-  const [fieldDescription, setFieldDescription] = useState(
-    fieldBlockToPreview.fieldDescription
-  );
-  const [fieldPlaceholder, setFieldPlaceholder] = useState(
-    fieldBlockToPreview.fieldPlaceholder
-  );
-  const [fieldValueToPickFrom, setFieldValueToPickFrom] = useState(
-    fieldBlockToPreview.fieldValueToPickFrom
-  );
-  const [fieldIsOptional, setFieldIsOptional] = useState(
-    fieldBlockToPreview.isOptional
-  );
-
-  // Specifics
-  const [fieldIsMultiline, setFieldIsMultiline] = useState(
-    fieldBlockToPreview instanceof FormFieldTextInput &&
-      fieldBlockToPreview.isMultiline
-  );
-  const [fieldAcceptedExtensions, setFieldAcceptedExtensions] = useState(
-    fieldBlockToPreview instanceof FormFieldFileUpload
-      ? fieldBlockToPreview.acceptedExtensions
-      : []
-  );
-
-  useEffect(() => {
-    const sub = fieldBlockToPreview.stream$().subscribe((newData) => {
-      // Field Label Case
-      setFieldLabel(newData.fieldLabel);
-
-      // Field Value Case
-      setFieldValue(newData.fieldValue);
-
-      // Field Description Case
-      setFieldDescription(newData.fieldDescription);
-
-      // Field Placeholder Case
-      setFieldPlaceholder(newData.fieldPlaceholder);
-
-      // Field ValueToPickFrom Case
-      setFieldValueToPickFrom(newData.fieldValueToPickFrom);
-
-      // Field IsOptional Case
-      setFieldIsOptional(newData.isOptional);
-
-      // Field IsMultiline Case: only for TextInput
-      if (newData instanceof FormFieldTextInput) {
-        setFieldIsMultiline(newData.isMultiline);
-      }
-
-      // Field Accepted Extensions Case: only for FileUpload Input
-      if (newData instanceof FormFieldFileUpload) {
-        setFieldAcceptedExtensions(newData.acceptedExtensions);
-      }
-    });
-
-    return () => sub.unsubscribe();
-  }, []);
-
   const Icon =
-    workflowFormFieldBlocks.find(
-      (field) => field.fieldName === fieldBlockToPreview.fieldName
-    )?.fieldIcon ?? Hash;
+    workflowFormFieldBlocks.find((field) => field.fieldName === fieldName)
+      ?.fieldIcon ?? Hash;
 
   // To Simulate Fake Data Entry
-  const [enteredValue, setEnteredValue] = useState<any>(
-    fieldBlockToPreview.fieldValue
-  );
+  const [enteredValue, setEnteredValue] = useState<any>(fieldValue);
 
   // Others States
   const [isDraggingOVer, setIsDraggingOVer] = useState(false);
@@ -124,13 +91,13 @@ const FormFieldBlockPreview = ({
   const fieldBlockPreviewFileUploadContainerRef =
     useRef<HTMLButtonElement>(null);
 
-  const narrowedFieldType = fieldBlockToPreview.fieldType.split("/").at(-1);
+  const narrowedFieldType = fieldType.split("/").at(-1);
   const placeHolderDisplayed = isTrulyEmpty(toStringSafe(fieldPlaceholder))
-    ? fieldBlockToPreview.fieldDefaultPlaceholder
+    ? fieldDefaultPlaceholder
     : fieldPlaceholder;
 
   const descriptionDisplayed = isTrulyEmpty(toStringSafe(fieldDescription))
-    ? fieldBlockToPreview.fieldDefaultDescription
+    ? fieldDefaultDescription
     : fieldDescription;
 
   const onKeyDown = (
@@ -195,46 +162,44 @@ const FormFieldBlockPreview = ({
         {/* Input Preview (+ Placeholder | + Description) */}
         <div className="w-full">
           {/* Dropdown: Selection */}
-          {fieldBlockToPreview.fieldType === "primitive/text" &&
-            fieldValueToPickFrom && (
-              <div>
-                <Select
-                  onValueChange={(val) =>
-                    setEnteredValue(extractTextFromHTML(val))
-                  }
-                  value={enteredValue}
-                >
-                  <SelectTrigger className="h-[1.9rem] w-full !bg-white">
-                    <SelectValue className="text-xs" placeholder="Select..." />
-                  </SelectTrigger>
+          {fieldType === "primitive/text" && fieldValueToPickFrom && (
+            <div>
+              <Select
+                onValueChange={(val) =>
+                  setEnteredValue(extractTextFromHTML(val))
+                }
+                value={enteredValue}
+              >
+                <SelectTrigger className="h-[1.9rem] w-full !bg-white">
+                  <SelectValue className="text-xs" placeholder="Select..." />
+                </SelectTrigger>
 
-                  <SelectContent className="max-h-64 w-full">
-                    {fieldValueToPickFrom.length > 0 &&
-                      fieldValueToPickFrom
-                        .map((val) => extractTextFromHTML(toStringSafe(val)))
-                        .filter((v) => v.length > 0)
-                        .map((choice) => {
-                          return (
-                            <SelectItem
-                              className="text-xs"
-                              key={choice}
-                              value={choice}
-                            >
-                              {capitalizeFirstLetter(choice)}
-                            </SelectItem>
-                          );
-                        })}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+                <SelectContent className="max-h-64 w-full">
+                  {fieldValueToPickFrom.length > 0 &&
+                    fieldValueToPickFrom
+                      .map((val) => extractTextFromHTML(toStringSafe(val)))
+                      .filter((v) => v.length > 0)
+                      .map((choice) => {
+                        return (
+                          <SelectItem
+                            className="text-xs"
+                            key={choice}
+                            value={choice}
+                          >
+                            {capitalizeFirstLetter(choice)}
+                          </SelectItem>
+                        );
+                      })}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Text Input Type */}
-          {(fieldBlockToPreview.fieldType === "primitive/text" &&
-            !fieldValueToPickFrom) ||
-          fieldBlockToPreview.fieldType === "primitive/emailUrl" ||
-          fieldBlockToPreview.fieldType === "primitive/tel" ||
-          fieldBlockToPreview.fieldType === "primitive/number" ? (
+          {(fieldType === "primitive/text" && !fieldValueToPickFrom) ||
+          fieldType === "primitive/emailUrl" ||
+          fieldType === "primitive/tel" ||
+          fieldType === "primitive/number" ? (
             <div className="flex flex-1 w-full">
               {fieldIsMultiline && (
                 <Textarea
@@ -260,7 +225,7 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Radio: Selection */}
-          {fieldBlockToPreview.fieldType === "primitive/radio" && (
+          {fieldType === "primitive/radio" && (
             <div className="ml-1">
               {fieldValueToPickFrom && (
                 <RadioInput
@@ -275,8 +240,8 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Checkbox: Selection */}
-          {fieldBlockToPreview.fieldType === "primitive/checkbox" && (
-            <div className="ml-1">
+          {fieldType === "primitive/checkbox" && (
+            <div className="ml-1 -mt-2">
               {fieldValueToPickFrom && (
                 <CheckboxInput
                   onSelect={(val) =>
@@ -292,7 +257,7 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Date Picker */}
-          {fieldBlockToPreview.fieldType === "primitive/dateTime" && (
+          {fieldType === "primitive/dateTime" && (
             <div className="w-28">
               <DateInput
                 hasError={false}
@@ -311,7 +276,7 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Time Picker */}
-          {fieldBlockToPreview.fieldType === "primitive/milliseconds" && (
+          {fieldType === "primitive/milliseconds" && (
             <div className="w-28">
               <DurationInput
                 hasError={false}
@@ -330,7 +295,7 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Yes/No Toggle */}
-          {fieldBlockToPreview.fieldType === "primitive/switch" && (
+          {fieldType === "primitive/switch" && (
             <div>
               <SimpleSwitchInput
                 isChecked={!!enteredValue}
@@ -340,17 +305,14 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Hidden Field */}
-          {fieldBlockToPreview.fieldType === "primitive/hidden" && (
+          {fieldType === "primitive/hidden" && (
             <div className="text-xs text-neutral-500 h-6 flex justify-start items-center">
               This field won't appear on the form.
             </div>
           )}
 
           {/* File Upload */}
-          {isImageMimeType(fieldBlockToPreview.fieldType) ||
-          isVideoMimeType(fieldBlockToPreview.fieldType) ||
-          isAudioMimeType(fieldBlockToPreview.fieldType) ||
-          isDocumentMimeType(fieldBlockToPreview.fieldType) ? (
+          {isAFile(fieldType) ? (
             <button
               ref={fieldBlockPreviewFileUploadContainerRef}
               onDragOver={(e) => {

@@ -1,4 +1,11 @@
-import { millisecondsToDuration } from "./date_time_utils";
+export const toCleanUrl = (input: string): string => {
+  return input
+    .toLowerCase() // lowercase everything
+    .trim() // remove leading/trailing spaces
+    .replace(/[^a-z0-9\s-]/g, "") // remove non-alphanumeric except space and hyphen
+    .replace(/\s+/g, "-") // replace spaces with hyphens
+    .replace(/-+/g, "-"); // collapse multiple hyphens
+};
 
 export const formatNumber = (n: number) => Intl.NumberFormat("en-US").format(n);
 

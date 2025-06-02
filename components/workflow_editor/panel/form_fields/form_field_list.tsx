@@ -2,7 +2,11 @@ import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, PenLineIcon, Trash2 } from "lucide-react";
-import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
+import {
+  PossibleFieldBlockType as FieldBlockType,
+  FormFieldFileUpload,
+  FormFieldTextInput,
+} from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import AddFieldBlockButton from "./add_field_block_button";
 import FormFieldBlockPreview from "./form_field_block_preview";
 import SimpleTooltip from "@/components/global/simple_tooltip";
@@ -39,7 +43,6 @@ const FormFieldsList = ({
   if (!currentNode) {
     return <div></div>;
   }
-  console.log("currentNode", currentNode);
 
   return (
     // Here Blocks represents: Form Fields
@@ -60,12 +63,34 @@ const FormFieldsList = ({
         {Array.isArray(nodeBlocks) && nodeBlocks.length > 0 && (
           <div className="flex flex-col">
             {nodeBlocks.map((fieldBlock: FieldBlockType, idx) => {
+              console.log("LIST n°", idx, fieldBlock);
               return (
                 <div
                   key={fieldBlock.id}
                   className="group/fieldItem flex flex-col w-full mb-1 px-3 py-1 hover:bg-neutral-200/20 transition-all duration-200"
                 >
-                  <FormFieldBlockPreview fieldBlockToPreview={fieldBlock} />
+                  <FormFieldBlockPreview
+                    key={fieldBlock.id}
+                    fieldName={fieldBlock.fieldName}
+                    fieldLabel={fieldBlock.fieldLabel}
+                    fieldValue={fieldBlock.fieldValue}
+                    fieldDescription={fieldBlock.fieldDescription}
+                    fieldPlaceholder={fieldBlock.fieldPlaceholder}
+                    fieldDefaultPlaceholder={fieldBlock.fieldDefaultPlaceholder}
+                    fieldDefaultDescription={fieldBlock.fieldDefaultDescription}
+                    fieldValueToPickFrom={fieldBlock.fieldValueToPickFrom}
+                    fieldIsOptional={fieldBlock.isOptional}
+                    fieldType={fieldBlock.fieldType}
+                    fieldIsMultiline={
+                      fieldBlock instanceof FormFieldTextInput &&
+                      fieldBlock.isMultiline
+                    }
+                    fieldAcceptedExtensions={
+                      fieldBlock instanceof FormFieldFileUpload
+                        ? fieldBlock.acceptedExtensions
+                        : []
+                    }
+                  />
                   {/* Action Buttons: Edit | Delete | Move Up | Move Down */}
                   <div className="!h-5">
                     <div className="group-hover/fieldItem:flex hidden flex-1 gap-2 justify-start items-center pt-1">

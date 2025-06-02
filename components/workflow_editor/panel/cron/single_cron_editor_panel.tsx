@@ -32,43 +32,75 @@ const SingleCronEditorPanel = ({
   cronBlockOrigin?: CronBlock;
   onBack?: () => void;
   onSave: (block?: CronBlock) => void;
-  onDelete: (fieldBlockId: string) => void;
+  onDelete: (cronBlockId: string) => void;
   displayBackButton?: boolean;
 }) => {
   const [currentBlock, setCurrentBlock] = useState<CronBlock | undefined>(
     cronBlockOrigin ?? getNewCronBlock()
   );
   const [isLoadingBlock, setIsLoadingBlock] = useState(false);
+  const [errorFields, setErrorFields] = useState<string[]>([]);
 
   // State Values:
-  const [currentBlockCronExp, setCurrentBlockCronExp] = useState("");
-  const selectedPreset = cronPresets.find(
-    (p) => p.value === currentBlockCronExp
+  const [configMinute, setConfigMinute] = useState(currentBlock?.configMinute);
+  const [configHour, setConfigHour] = useState(currentBlock?.configHour);
+  const [configDayOfMonth, setConfigDayOfMonth] = useState(
+    currentBlock?.configDayOfMonth
+  );
+  const [configMonth, setConfigMonth] = useState(currentBlock?.configMonth);
+  const [configDayOfWeek, setConfigDayOfWeek] = useState(
+    currentBlock?.configDayOfWeek
   );
 
-  const [configStartDate, setConfigStartDate] = useState<Date | undefined>();
-  const [configEndDate, setConfigEndDate] = useState<Date | undefined>();
-  const [configTimezone, setConfigTimezone] = useState<string>();
+  const [configStartDate, setConfigStartDate] = useState(
+    currentBlock?.configStartDate
+  );
+  const [configEndDate, setConfigEndDate] = useState(
+    currentBlock?.configEndDate
+  );
+  const [configTimezone, setConfigTimezone] = useState(
+    currentBlock?.configTimezone
+  );
 
-  const [isSavingFormFieldBlock, setIsSavingFormFieldBlock] = useState(false);
-  const [SavingFormFieldBlockResultIcon, setSavingFormFieldBlockResultIcon] =
-    useState<LucideIcon | undefined>(undefined);
+  // Cron Expression + Presets
+  const localCronExpression = `${configMinute} ${configHour} ${configDayOfMonth} ${configMonth} ${configDayOfWeek}`;
+
+  const selectedPreset = cronPresets.find(
+    (p) => p.value === localCronExpression
+  );
+
+  const [isSavingBlock, setIsSavingBlock] = useState(false);
+  const [SavingBlockResultIcon, setSavingBlockResultIcon] = useState<
+    LucideIcon | undefined
+  >(undefined);
 
   const saveCronBlock = async () => {
-    setSavingFormFieldBlockResultIcon(undefined);
-    setIsSavingFormFieldBlock(true);
+    setSavingBlockResultIcon(undefined);
+    setIsSavingBlock(true);
     await delay(400);
 
     try {
-      // Cron Validation
       if (!currentBlock) throw new Error("No Cron found");
+
+      // Save Entered Values to Original Block
+      if (configMinute) currentBlock.configMinute = configMinute;
+      if (configHour) currentBlock.configHour = configHour;
+      if (configDayOfWeek) currentBlock.configDayOfWeek = configDayOfWeek;
+      if (configDayOfMonth) currentBlock.configDayOfMonth = configDayOfMonth;
+      if (configMonth) currentBlock.configMonth = configMonth;
+
+      if (configStartDate) currentBlock.configStartDate = configStartDate;
+      if (configEndDate) currentBlock.configEndDate = configEndDate;
+      if (configTimezone) currentBlock.configTimezone = configTimezone;
+
+      // Cron Validation
       if (!isValidCron(currentBlock.cronExp, { allowSevenAsSunday: true }))
         throw new Error("Invalid Cron");
 
-      setIsSavingFormFieldBlock(false);
-      setSavingFormFieldBlockResultIcon(Check);
+      setIsSavingBlock(false);
+      setSavingBlockResultIcon(Check);
       await delay(150);
-      setSavingFormFieldBlockResultIcon(undefined);
+      setSavingBlockResultIcon(undefined);
 
       onSave(currentBlock);
     } catch (e) {
@@ -77,24 +109,13 @@ const SingleCronEditorPanel = ({
         richColors: true,
       });
       console.log("Err", e);
-      setIsSavingFormFieldBlock(false);
-      setSavingFormFieldBlockResultIcon(X);
+      setIsSavingBlock(false);
+      setSavingBlockResultIcon(X);
       await delay(1000);
-      setSavingFormFieldBlockResultIcon(undefined);
+      setSavingBlockResultIcon(undefined);
       return;
     }
   };
-
-  useEffect(() => {
-    if (!currentBlock) return;
-    const sub = currentBlock.stream$().subscribe((newData) => {
-      setCurrentBlockCronExp((newData as CronBlock).cronExp);
-      setConfigStartDate((newData as CronBlock).configStartDate);
-      setConfigEndDate((newData as CronBlock).configEndDate);
-      setConfigTimezone((newData as CronBlock).configTimezone);
-    });
-    return () => sub.unsubscribe();
-  }, [currentBlock]);
 
   return (
     <div className="flex flex-col w-full max-h-full relative">
@@ -135,9 +156,23 @@ const SingleCronEditorPanel = ({
             selectedValues={[""]}
             handleSelect={(presetSelected) => {
               setIsLoadingBlock(true);
-              setCurrentBlock(undefined);
+
+              // Flush Values 1st
+              setConfigMinute(undefined);
+              setConfigHour(undefined);
+              setConfigDayOfMonth(undefined);
+              setConfigMonth(undefined);
+              setConfigDayOfWeek(undefined);
+
               setTimeout(() => {
-                setCurrentBlock(getNewCronBlock(presetSelected));
+                const newBlock = getNewCronBlock(presetSelected);
+                // Updating Values
+                setConfigMinute(newBlock.configMinute);
+                setConfigHour(newBlock.configHour);
+                setConfigDayOfMonth(newBlock.configDayOfMonth);
+                setConfigMonth(newBlock.configMonth);
+                setConfigDayOfWeek(newBlock.configDayOfWeek);
+
                 setIsLoadingBlock(false);
               }, 300);
             }}
@@ -158,18 +193,18 @@ const SingleCronEditorPanel = ({
             {/* Config: Minute */}
             <CronEditorCard
               cronSection="Minute"
-              initialValue={currentBlock.configMinute}
+              initialValue={configMinute}
               onChange={(value) => {
-                currentBlock.configMinute = value;
+                setConfigMinute(value);
               }}
             />
 
             {/* Config: Hour */}
             <CronEditorCard
               cronSection="Hour"
-              initialValue={currentBlock.configHour}
+              initialValue={configHour}
               onChange={(value) => {
-                currentBlock.configHour = value;
+                setConfigHour(value);
               }}
             />
 
@@ -178,27 +213,27 @@ const SingleCronEditorPanel = ({
             {/* Config: Day Of Week */}
             <CronEditorCard
               cronSection="Day of Week"
-              initialValue={currentBlock.configDayOfWeek}
+              initialValue={configDayOfWeek}
               onChange={(value) => {
-                currentBlock.configDayOfWeek = value;
+                setConfigDayOfWeek(value);
               }}
             />
 
             {/* Config: Day Of Month */}
             <CronEditorCard
               cronSection="Day of Month"
-              initialValue={currentBlock.configDayOfMonth}
+              initialValue={configDayOfMonth}
               onChange={(value) => {
-                currentBlock.configDayOfMonth = value;
+                setConfigDayOfMonth(value);
               }}
             />
 
             {/* Config: Month */}
             <CronEditorCard
               cronSection="Month"
-              initialValue={currentBlock.configMonth}
+              initialValue={configMonth}
               onChange={(value) => {
-                currentBlock.configMonth = value;
+                setConfigMonth(value);
               }}
             />
 
@@ -219,7 +254,7 @@ const SingleCronEditorPanel = ({
                   placeholder={"Start At"}
                   isDisabled={false}
                   onSave={(value) => {
-                    currentBlock.configStartDate = value;
+                    setConfigStartDate(value);
                   }}
                 />
 
@@ -231,7 +266,7 @@ const SingleCronEditorPanel = ({
                   placeholder={"End At"}
                   isDisabled={false}
                   onSave={(value) => {
-                    currentBlock.configEndDate = value;
+                    setConfigEndDate(value);
                   }}
                 />
               </div>
@@ -260,9 +295,9 @@ const SingleCronEditorPanel = ({
                     }
                     handleSelect={(value) => {
                       if (currentBlock.configTimezone === value) {
-                        currentBlock.configTimezone = undefined;
+                        setConfigTimezone(undefined);
                       } else {
-                        currentBlock.configTimezone = value;
+                        setConfigTimezone(value);
                       }
                     }}
                   />
@@ -303,23 +338,21 @@ const SingleCronEditorPanel = ({
 
           <Button
             variant={"default"}
-            disabled={isSavingFormFieldBlock}
+            disabled={isSavingBlock}
             className="rounded-2xl h-7 text-xs gap-1 px-3 duration-150"
             onClick={() => saveCronBlock()}
             // disabled={!onboardingForm.formState.isValid}
           >
-            {isSavingFormFieldBlock &&
-              SavingFormFieldBlockResultIcon === undefined && (
-                <Loader2 className="animate-spin stroke-white" />
-              )}
-            {SavingFormFieldBlockResultIcon && !isSavingFormFieldBlock && (
-              <SavingFormFieldBlockResultIcon className="stroke-white" />
+            {isSavingBlock && SavingBlockResultIcon === undefined && (
+              <Loader2 className="animate-spin stroke-white" />
+            )}
+            {SavingBlockResultIcon && !isSavingBlock && (
+              <SavingBlockResultIcon className="stroke-white" />
             )}
 
-            {!isSavingFormFieldBlock &&
-              SavingFormFieldBlockResultIcon === undefined && (
-                <Save className="stroke-white" />
-              )}
+            {!isSavingBlock && SavingBlockResultIcon === undefined && (
+              <Save className="stroke-white" />
+            )}
             <span className="">Save Cron</span>
           </Button>
         </div>

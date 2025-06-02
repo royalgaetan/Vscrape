@@ -8,12 +8,13 @@ import { OperationBlock } from "./operation_block";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import { CronBlock } from "./cron_block";
 import { ObservableMixin } from "./observable_mixin";
-import { FormFieldBlock } from "./form_field_block";
+import { WebhookBlock } from "./webhook_block";
 
 export type VsNodeBlockType =
   | OperationBlock[]
   | FieldBlockType[]
   | CronBlock
+  | WebhookBlock
   | undefined;
 export type VsNodeInputsType = (typeof VsNode.prototype)["inputs"];
 export type VsNodeOutputsType = (typeof VsNode.prototype)["outputs"];
@@ -46,6 +47,7 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
     this._isSpecialNode = node.isSpecialNode;
     this._sectionName = node.sectionName;
     this._blockType = node.blockType;
+    this._blocks = node.blocks as any;
 
     const anySocket = new VsSocket("any", this._iconColor);
     this.addInput("input", new VsInput(anySocket));
@@ -94,8 +96,10 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
     this.notifyAll();
   }
 
-  upsertBlock(block: OperationBlock | FieldBlockType | CronBlock) {
-    if (block instanceof CronBlock) {
+  upsertBlock(
+    block: OperationBlock | FieldBlockType | CronBlock | WebhookBlock
+  ) {
+    if (block instanceof CronBlock || block instanceof WebhookBlock) {
       this._blocks = block as any;
     } else if (
       this._blockType === "formField" ||

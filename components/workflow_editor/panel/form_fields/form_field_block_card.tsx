@@ -11,6 +11,7 @@ import {
   VideoMIMETypes,
 } from "@/lib/workflow_editor/types/mime_types";
 import { toStringSafe } from "@/lib/string_utils";
+import { cn } from "@/lib/utils";
 
 export type FieldAttrType = "text" | "switch" | "array" | "fileExtensions";
 const FormFieldBlockCard = ({
@@ -18,12 +19,14 @@ const FormFieldBlockCard = ({
   fieldAttrPlaceholder,
   fieldAttrType,
   initialValue,
+  hasError,
   onChange,
 }: {
   fieldAttrName: string;
   fieldAttrPlaceholder?: string;
   fieldAttrType: FieldAttrType;
   initialValue: any;
+  hasError: boolean;
   onChange: (newVal: any) => void;
 }) => {
   const [currentValue, setCurrentValue] = useState(initialValue);
@@ -42,7 +45,10 @@ const FormFieldBlockCard = ({
           <Input
             onChange={(e) => onValueChange(e.target.value)}
             defaultValue={currentValue}
-            className="h-7"
+            className={cn(
+              "h-7",
+              hasError && "border-destructive/70 ring-2 ring-destructive/60"
+            )}
             placeholder={fieldAttrPlaceholder}
           />
         </div>
@@ -57,6 +63,7 @@ const FormFieldBlockCard = ({
 
           <SimpleSwitchInput
             className="ml-1"
+            hasError={hasError}
             isChecked={!!currentValue}
             onCheckedChange={(isChecked) => onValueChange(isChecked)}
           />
@@ -70,6 +77,7 @@ const FormFieldBlockCard = ({
             <Label className="text-xs text-neutral-500">{fieldAttrName}</Label>
           )}
           <ArrayInput
+            hasError={hasError}
             initialArray={currentValue}
             onChange={(newArray) => {
               onValueChange(newArray);
@@ -86,7 +94,9 @@ const FormFieldBlockCard = ({
           )}
 
           <MultiSelect
-            triggerClassName="h-[1.9rem] w-[15.9rem] flex flex-1 mb-1"
+            triggerClassName={`h-[1.9rem] w-[15.9rem] flex flex-1 mb-1 ${
+              hasError && "border-destructive/70 ring-2 ring-destructive/60"
+            }`}
             popoverAlignment="center"
             selectionMode="multi"
             popoverClassName="max-h-60 min-h-fit w-[15.7rem]"

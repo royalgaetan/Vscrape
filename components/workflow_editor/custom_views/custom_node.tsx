@@ -57,6 +57,8 @@ const CustomNode = ({
         return nodeBlocks instanceof CronBlock ? "Scheduled" : "Not Scheduled";
       case "manual":
         return "Trigger";
+      case "webhook":
+        return "Listening...";
       default:
         return "";
     }

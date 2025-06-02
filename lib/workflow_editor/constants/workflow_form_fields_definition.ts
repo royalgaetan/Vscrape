@@ -20,7 +20,7 @@ import { FormFieldBlock } from "../classes/form_field_block";
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 export class FormFieldTextInput extends FormFieldBlock {
-  private _isMultiline?: boolean; // Enable Textarea if true
+  private _isMultiline: boolean; // Enable Textarea if true
   constructor({ isMultiline }: { isMultiline?: boolean }) {
     super({
       fieldName: "Text Field",
@@ -34,11 +34,11 @@ export class FormFieldTextInput extends FormFieldBlock {
       value: "",
       isOptional: false,
     });
-    this._isMultiline = isMultiline;
+    this._isMultiline = isMultiline ?? false;
   }
 
   // Field IsMultiline: getter + setter
-  get isMultiline(): boolean | undefined {
+  get isMultiline(): boolean {
     return this._isMultiline;
   }
   set isMultiline(isMultiline: boolean) {

@@ -24,6 +24,7 @@ import { OperationBlock } from "../classes/operation_block";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import { CronBlock } from "../classes/cron_block";
 import { ManualBlock } from "../classes/manual_block";
+import { WebhookBlock } from "../classes/webhook_block";
 
 export type VsNodeType = {
   label: string;
@@ -39,12 +40,14 @@ export type VsNodeType = {
   | NodeWithFormFieldBlocks
   | NodeWithCronBlock
   | NodeWithManualBlock
+  | NodeWithWebhookBlock
 );
 export const nodeBlockTypeNames = [
   "operation",
   "formField",
   "cron",
   "manual",
+  "webhook",
 ] as const;
 
 export type NodeWithOperationBlocks = {
@@ -64,7 +67,12 @@ export type NodeWithCronBlock = {
 
 export type NodeWithManualBlock = {
   blockType: (typeof nodeBlockTypeNames)["3"];
-  blocks: ManualBlock | undefined;
+  blocks: ManualBlock;
+};
+
+export type NodeWithWebhookBlock = {
+  blockType: (typeof nodeBlockTypeNames)["4"];
+  blocks: WebhookBlock;
 };
 
 // ---------------------------------------------------------

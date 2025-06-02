@@ -6,15 +6,22 @@ const CustomSwitchInput = ({
   valuesToPickFrom,
   selectedValue,
   onValueChange,
+  hasError,
 }: {
   valuesToPickFrom?: OperationValuesToPickFromType;
   selectedValue: any;
+  hasError?: boolean;
   onValueChange: (val: any) => void;
 }) => {
   const componentId = useId();
 
   return (
-    <div className="rounded-lg flex w-[60%] items-center px-1 py-1 gap-2 h-[2rem] bg-transparent border border-neutral-200 transition-all duration-300">
+    <div
+      className={cn(
+        "rounded-lg flex w-[60%] items-center px-1 py-1 gap-2 h-[2rem] bg-transparent border border-neutral-200 transition-all duration-300",
+        hasError && "ring-2 ring-destructive/50 border-destructive/60"
+      )}
+    >
       {valuesToPickFrom ? (
         valuesToPickFrom?.map((value, idx) => (
           <button

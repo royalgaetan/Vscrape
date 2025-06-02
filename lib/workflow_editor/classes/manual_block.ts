@@ -1,4 +1,3 @@
-import { VsNodeBlockType } from "../types/w_types";
 import { ObservableMixin } from "./observable_mixin";
 
 export class ManualBlock extends ObservableMixin() {
@@ -9,7 +8,7 @@ export class ManualBlock extends ObservableMixin() {
     this._id = crypto.randomUUID();
   }
 
-  // Cron Id: getter
+  // Manual Trigger Id: getter
   get id() {
     return this._id;
   }

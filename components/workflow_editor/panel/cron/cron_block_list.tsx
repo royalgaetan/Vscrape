@@ -44,7 +44,7 @@ const CronBlockList = ({
   }
 
   return (
-    // Here Blocks represents: Form Fields
+    // Here Blocks represents: Cron
     <div>
       {!cronBlock || !(cronBlock instanceof CronBlock) ? (
         // Enmpty
