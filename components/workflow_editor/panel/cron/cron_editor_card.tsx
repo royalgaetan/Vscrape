@@ -17,6 +17,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export const cronSectionList = [
   "Hour",
@@ -30,108 +31,28 @@ const CronEditorCard = ({
   initialValue,
   cronSection,
   onChange,
+  mainValuesHaveError,
+  stepValueHasError,
+  cleanMainValuesErrors,
+  cleanStepValueError,
 }: {
   cronSection: (typeof cronSectionList)[number];
   initialValue?: string;
   onChange: (cronSectionExp: string) => void;
+  mainValuesHaveError?: boolean;
+  stepValueHasError?: boolean;
+  cleanMainValuesErrors?: () => void;
+  cleanStepValueError?: () => void;
 }) => {
   const [mainValues, setMainValues] = useState<number[]>([]);
   const [stepValue, setStepValue] = useState<number>(0);
 
   useEffect(() => {
-    if (initialValue) setCronExpToValues(initialValue);
+    if (initialValue) {
+      setMainValues(getValuesFromCronExp(cronSection, initialValue).main);
+      setStepValue(getValuesFromCronExp(cronSection, initialValue).step);
+    }
   }, [initialValue]);
-
-  const valuesToCronExp = (main: number[], step: number): string => {
-    let chain = "";
-
-    // Handle All Values:
-    if (main.length === getCronSectionValues(cronSection).length) {
-      chain = "*";
-    }
-
-    // Handle: Main values
-    else {
-      const mainSorted = main.toSorted((a, b) => a - b);
-      mainSorted.length > 0 &&
-        mainSorted.forEach((number, idx) => {
-          const prevNumber = mainSorted[idx - 1];
-          const nextNumber = mainSorted[idx + 1];
-          if (idx === 0) {
-            chain = `${number}`;
-          } else if (idx !== 0 && number !== undefined) {
-            if (prevNumber + 1 === number) {
-              if (nextNumber === undefined || number + 1 !== nextNumber) {
-                chain = chain.concat(`-${number}`);
-              }
-            } else if (prevNumber + 1 !== number) {
-              chain = chain.concat(`,${number}`);
-            }
-          }
-        });
-    }
-
-    // Handle: Step Values
-    if (step !== 0 && main.length > 0) {
-      chain = chain.concat(`/${step}`);
-    }
-
-    return chain.replaceAll(/^[,-]+|(?:NaN|undefined),?/g, "");
-  };
-
-  const setCronExpToValues = (cronExp: string) => {
-    let mainVals: number[] = [];
-    let main = "";
-
-    // Handle Step Value: /
-    if (cronExp.includes("/")) {
-      const cronExpSplit = cronExp.split("/");
-      const stepPart = cronExpSplit.at(-1);
-      if (stepPart) setStepValue(parseInt(stepPart));
-
-      const mainPart = cronExpSplit.at(0);
-      if (mainPart) main = mainPart;
-    } else {
-      main = cronExp;
-    }
-
-    // Handle Main Values: 1-2,5,7,10 or */2
-    // Case 1: All Values (*)
-    if (main === "*") {
-      mainVals = getCronSectionValues(cronSection).map((r) =>
-        parseInt(Object.keys(r)[0])
-      );
-    } else {
-      const mainSplit = main.split(",");
-      mainSplit.forEach((val) => {
-        // Case 2: Range (-)
-        if (val.includes("-")) {
-          const rangeSplit = val.split("-");
-          const firstElementInRange = rangeSplit.at(0);
-          const lastElementInRange = rangeSplit.at(-1);
-          if (
-            rangeSplit.length > 1 &&
-            lastElementInRange &&
-            firstElementInRange
-          ) {
-            const firstIndex = parseInt(firstElementInRange);
-            const lastIndex = parseInt(lastElementInRange);
-            const indexes = Array.from(
-              { length: lastIndex - firstIndex + 1 },
-              (_, i) => firstIndex + i
-            );
-            indexes.forEach((i) => mainVals.push(i));
-          }
-        }
-        // Case 3: Specifics (,)
-        else {
-          mainVals.push(parseInt(val));
-        }
-      });
-    }
-
-    setMainValues(mainVals);
-  };
 
   const getLabelAndIcon = (): { label: string; icon: LucideIcon } => {
     switch (cronSection) {
@@ -206,34 +127,36 @@ const CronEditorCard = ({
           <InlineSelector
             cronSection={cronSection}
             initialValue={mainValues}
+            hasError={mainValuesHaveError}
             onSelect={(range) => {
+              cleanMainValuesErrors && cleanMainValuesErrors();
               // Handle Range Values: 5-10 | 6,7,8
               if (!Array.isArray(range)) return;
               setMainValues(range);
-              onChange(valuesToCronExp(range, stepValue));
+              onChange(getCronExpFromValues(cronSection, range, stepValue));
             }}
             type="Multi"
           />
         </div>
-        <div className="flex flex-1 max-w-full h-5">
-          {mainValues.length > 0 && (
-            <>
-              With
-              <InlineSelector
-                cronSection={cronSection}
-                initialValue={stepValue}
-                type="Number"
-                onSelect={(step) => {
-                  // Handle Step Values: */5
-                  if (typeof step !== "number") return;
-                  setStepValue(step);
-                  onChange(valuesToCronExp(mainValues, step));
-                }}
-              />
-              of interval.
-            </>
-          )}
-        </div>
+        {mainValues.length > 0 && (
+          <div className="flex flex-1 max-w-full">
+            With
+            <InlineSelector
+              cronSection={cronSection}
+              initialValue={stepValue}
+              hasError={stepValueHasError}
+              type="Number"
+              onSelect={(step) => {
+                cleanStepValueError && cleanStepValueError();
+                // Handle Step Values: */5
+                if (typeof step !== "number") return;
+                setStepValue(step);
+                onChange(getCronExpFromValues(cronSection, mainValues, step));
+              }}
+            />
+            of interval.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -246,11 +169,13 @@ const InlineSelector = ({
   cronSection,
   onSelect,
   initialValue,
+  hasError,
 }: {
   type: "Multi" | "Number";
   cronSection: (typeof cronSectionList)[number];
   initialValue: number | number[];
   onSelect: (val: number | number[]) => void;
+  hasError?: boolean;
 }) => {
   const [localValue, setLocalValue] = useState<number[] | number>(initialValue);
 
@@ -322,7 +247,7 @@ const InlineSelector = ({
               cronSection === "Month" || cronSection === "Day of Week"
                 ? "min-w-[8rem]"
                 : "min-w-[4rem]"
-            } line-clamp-1`}
+            } line-clamp-1 ${hasError && "ring-[2px] ring-destructive/60"}`}
             triggerInline={true}
             dismissChevron={true}
             popoverAlignment="center"
@@ -358,6 +283,7 @@ const InlineSelector = ({
           <Input
             onChange={(e) => {
               const valueEntered = parseInt(e.target.value);
+
               if (valueEntered > numberInputMax) return;
               setLocalValue(valueEntered);
               onSelect(valueEntered);
@@ -365,10 +291,13 @@ const InlineSelector = ({
             onKeyDown={(e) => e.preventDefault()}
             onPaste={(e) => e.preventDefault()}
             type="number"
-            value={localValue}
+            defaultValue={localValue}
             min={0}
             max={numberInputMax}
-            className="inline h-[1.2rem] w-[2.5rem] text-end !px-0 rounded-none bg-transparent border-0 ring-0 outline-none border-b border-border focus:outline-none focus:ring-0 active:outline-none active:ring-0"
+            className={cn(
+              "inline h-[1.2rem] w-[2.5rem] text-end !px-0 rounded-none bg-transparent border-0 ring-0 outline-none border-b border-border focus:outline-none focus:ring-0 active:outline-none active:ring-0 transition-all duration-300",
+              hasError && "ring-[2px] ring-destructive/60 rounded-[6px]"
+            )}
           />
         )}
       </div>
@@ -394,4 +323,139 @@ export const getCronSectionValues = (
     default:
       return [];
   }
+};
+
+export const isValidCronSection = (
+  value: string,
+  cronSection: (typeof cronSectionList)[number],
+  part: "main" | "step"
+): boolean => {
+  // Main Values: Verification
+  switch (part) {
+    case "main":
+      const filtered = getValuesFromCronExp(cronSection, value).main.filter(
+        (n) => Number(n) < Number(getCronSectionValues(cronSection).length)
+      );
+      if (filtered.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    // Step Value: Verification
+    case "step":
+      if (
+        Number(getValuesFromCronExp(cronSection, value).step) < 0 ||
+        Number(getValuesFromCronExp(cronSection, value).step) >
+          Number(getCronSectionValues(cronSection).length)
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+
+    default:
+      return false;
+  }
+};
+
+const getCronExpFromValues = (
+  cronSection: (typeof cronSectionList)[number],
+  main: number[],
+  step: number
+): string => {
+  let chain = "";
+
+  // Handle All Values:
+  if (main.length === getCronSectionValues(cronSection).length) {
+    chain = "*";
+  }
+
+  // Handle: Main values
+  else {
+    const mainSorted = main.toSorted((a, b) => a - b);
+    mainSorted.length > 0 &&
+      mainSorted.forEach((number, idx) => {
+        const prevNumber = mainSorted[idx - 1];
+        const nextNumber = mainSorted[idx + 1];
+        if (idx === 0) {
+          chain = `${number}`;
+        } else if (idx !== 0 && number !== undefined) {
+          if (prevNumber + 1 === number) {
+            if (nextNumber === undefined || number + 1 !== nextNumber) {
+              chain = chain.concat(`-${number}`);
+            }
+          } else if (prevNumber + 1 !== number) {
+            chain = chain.concat(`,${number}`);
+          }
+        }
+      });
+  }
+
+  // Handle: Step Values
+  if (step !== 0 && main.length > 0) {
+    chain = chain.concat(`/${step}`);
+  }
+
+  return chain.replaceAll(/^[,-]+|(?:NaN|undefined),?/g, "");
+};
+
+export const getValuesFromCronExp = (
+  cronSection: (typeof cronSectionList)[number],
+  cronExp: string
+): { main: number[]; step: number } => {
+  let stepVal: number = 0;
+  let mainVals: number[] = [];
+  let main = "";
+
+  // Handle Step Value: /
+  if (cronExp.includes("/")) {
+    const cronExpSplit = cronExp.split("/");
+    const stepPart = cronExpSplit.at(-1);
+    if (stepPart) stepVal = parseInt(stepPart);
+
+    const mainPart = cronExpSplit.at(0);
+    if (mainPart) main = mainPart;
+  } else {
+    main = cronExp;
+  }
+
+  // Handle Main Values: 1-2,5,7,10 or */2
+  // Case 1: All Values (*)
+  if (main === "*") {
+    mainVals = getCronSectionValues(cronSection).map((r) =>
+      parseInt(Object.keys(r)[0])
+    );
+  } else {
+    const mainSplit = main.split(",");
+    mainSplit.forEach((val) => {
+      // Case 2: Ranges (-)
+      if (val.includes("-")) {
+        const rangeSplit = val.split("-");
+        const firstElementInRange = rangeSplit.at(0);
+        const lastElementInRange = rangeSplit.at(-1);
+        if (
+          rangeSplit.length > 1 &&
+          lastElementInRange &&
+          firstElementInRange
+        ) {
+          const firstIndex = parseInt(firstElementInRange);
+          const lastIndex = parseInt(lastElementInRange);
+          const indexes = Array.from(
+            { length: lastIndex - firstIndex + 1 },
+            (_, i) => firstIndex + i
+          );
+          indexes.forEach((i) => mainVals.push(i));
+        }
+      }
+      // Case 3: Specifics (,)
+      else {
+        mainVals.push(parseInt(val));
+      }
+    });
+  }
+
+  return {
+    main: mainVals,
+    step: stepVal,
+  };
 };

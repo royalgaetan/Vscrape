@@ -6,7 +6,7 @@ import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import { Check, Loader2, LucideIcon, Save, Trash2, X } from "lucide-react";
 import PanelHeader from "../panel_header";
-import CronEditorCard from "./cron_editor_card";
+import CronEditorCard, { isValidCronSection } from "./cron_editor_card";
 import {
   CronBlock,
   getNewCronBlock,
@@ -80,7 +80,10 @@ const SingleCronEditorPanel = ({
     await delay(400);
 
     try {
-      if (!currentBlock) throw new Error("No Cron found");
+      if (!currentBlock) throw new Error("Can't save this Cron! Try again.");
+
+      // Errors Checking
+      errorChecker();
 
       // Save Entered Values to Original Block
       if (configMinute) currentBlock.configMinute = configMinute;
@@ -95,7 +98,7 @@ const SingleCronEditorPanel = ({
 
       // Cron Validation
       if (!isValidCron(currentBlock.cronExp, { allowSevenAsSunday: true }))
-        throw new Error("Invalid Cron");
+        throw new Error("Invalid Cron!");
 
       setIsSavingBlock(false);
       setSavingBlockResultIcon(Check);
@@ -114,6 +117,65 @@ const SingleCronEditorPanel = ({
       await delay(1000);
       setSavingBlockResultIcon(undefined);
       return;
+    }
+  };
+
+  const errorChecker = () => {
+    const errFields: string[] = [];
+
+    // Minute
+    if (isValidCronSection(configMinute ?? "", "Minute", "main") === false) {
+      errFields.push("configMinuteMain");
+    }
+    if (isValidCronSection(configMinute ?? "", "Minute", "step") === false) {
+      errFields.push("configMinuteStep");
+    }
+    // Hour
+    if (isValidCronSection(configHour ?? "", "Hour", "main") === false) {
+      errFields.push("configHourMain");
+    }
+    if (isValidCronSection(configHour ?? "", "Hour", "step") === false) {
+      errFields.push("configHourStep");
+    }
+
+    // Day Of Month
+    if (
+      isValidCronSection(configDayOfMonth ?? "", "Day of Month", "main") ===
+      false
+    ) {
+      errFields.push("configDayOfMonthMain");
+    }
+    if (
+      isValidCronSection(configDayOfMonth ?? "", "Day of Month", "step") ===
+      false
+    ) {
+      errFields.push("configDayOfMonthStep");
+    }
+
+    // Month
+    if (isValidCronSection(configMonth ?? "", "Month", "main") === false) {
+      errFields.push("configMonthMain");
+    }
+    if (isValidCronSection(configMonth ?? "", "Month", "step") === false) {
+      errFields.push("configMonthStep");
+    }
+
+    // Day Of Week
+    if (
+      isValidCronSection(configDayOfWeek ?? "", "Day of Week", "main") === false
+    ) {
+      errFields.push("configDayOfWeekMain");
+    }
+    if (
+      isValidCronSection(configDayOfWeek ?? "", "Day of Week", "step") === false
+    ) {
+      errFields.push("configDayOfWeekStep");
+    }
+
+    if (errFields.length > 0) {
+      setErrorFields(errFields);
+      console.log("errFields", errFields);
+      throw new Error("Invalid Cron!");
     }
   };
 
@@ -193,6 +255,18 @@ const SingleCronEditorPanel = ({
             {/* Config: Minute */}
             <CronEditorCard
               cronSection="Minute"
+              mainValuesHaveError={errorFields.includes("configMinuteMain")}
+              stepValueHasError={errorFields.includes("configMinuteStep")}
+              cleanMainValuesErrors={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configMinuteMain")
+                )
+              }
+              cleanStepValueError={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configMinuteStep")
+                )
+              }
               initialValue={configMinute}
               onChange={(value) => {
                 setConfigMinute(value);
@@ -202,6 +276,18 @@ const SingleCronEditorPanel = ({
             {/* Config: Hour */}
             <CronEditorCard
               cronSection="Hour"
+              mainValuesHaveError={errorFields.includes("configHourMain")}
+              stepValueHasError={errorFields.includes("configHourStep")}
+              cleanMainValuesErrors={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configHourMain")
+                )
+              }
+              cleanStepValueError={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configHourStep")
+                )
+              }
               initialValue={configHour}
               onChange={(value) => {
                 setConfigHour(value);
@@ -214,6 +300,18 @@ const SingleCronEditorPanel = ({
             <CronEditorCard
               cronSection="Day of Week"
               initialValue={configDayOfWeek}
+              mainValuesHaveError={errorFields.includes("configDayOfWeekMain")}
+              stepValueHasError={errorFields.includes("configDayOfWeekStep")}
+              cleanMainValuesErrors={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configDayOfWeekMain")
+                )
+              }
+              cleanStepValueError={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configDayOfWeekStep")
+                )
+              }
               onChange={(value) => {
                 setConfigDayOfWeek(value);
               }}
@@ -223,6 +321,18 @@ const SingleCronEditorPanel = ({
             <CronEditorCard
               cronSection="Day of Month"
               initialValue={configDayOfMonth}
+              mainValuesHaveError={errorFields.includes("configDayOfMonthMain")}
+              stepValueHasError={errorFields.includes("configDayOfMonthStep")}
+              cleanMainValuesErrors={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configDayOfMonthMain")
+                )
+              }
+              cleanStepValueError={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configDayOfMonthStep")
+                )
+              }
               onChange={(value) => {
                 setConfigDayOfMonth(value);
               }}
@@ -232,6 +342,18 @@ const SingleCronEditorPanel = ({
             <CronEditorCard
               cronSection="Month"
               initialValue={configMonth}
+              mainValuesHaveError={errorFields.includes("configMonthMain")}
+              stepValueHasError={errorFields.includes("configMonthStep")}
+              cleanMainValuesErrors={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configMonthMain")
+                )
+              }
+              cleanStepValueError={() =>
+                setErrorFields((prev) =>
+                  prev.filter((f) => f !== "configMonthStep")
+                )
+              }
               onChange={(value) => {
                 setConfigMonth(value);
               }}

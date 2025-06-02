@@ -35,11 +35,6 @@ const WebhookBlockList = ({
     return () => sub.unsubscribe();
   }, []);
 
-  console.log(
-    "\nwebhookBlock",
-    currentNode ? (currentNode.blocks as WebhookBlock) : "Not found"
-  );
-
   if (
     !currentNode ||
     !webhookBlock ||
@@ -83,7 +78,7 @@ const WebhookBlockList = ({
               }}
               disabled={isEndpointUrlBeingCopied}
             >
-              <div className="inline-block  line-clamp-1 truncate max-w-[75%]">
+              <div className="inline-block text-left !line-clamp-1 max-w-[10.5rem]">
                 {`webhooks/${webhookBlock.endpointUrl}`}
               </div>
               <div className="flex -translate-y-[2.5px] !size-[0.97rem]">
@@ -129,8 +124,8 @@ const WebhookBlockList = ({
               }
             >
               {"*".repeat(
-                webhookBlock.authToken.length > 10
-                  ? 10
+                webhookBlock.authToken.length > 16
+                  ? 16
                   : webhookBlock.authToken.length
               )}
             </div>

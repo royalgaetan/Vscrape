@@ -63,7 +63,6 @@ const FormFieldsList = ({
         {Array.isArray(nodeBlocks) && nodeBlocks.length > 0 && (
           <div className="flex flex-col">
             {nodeBlocks.map((fieldBlock: FieldBlockType, idx) => {
-              console.log("LIST n°", idx, fieldBlock);
               return (
                 <div
                   key={fieldBlock.id}

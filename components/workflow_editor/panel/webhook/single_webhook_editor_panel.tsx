@@ -124,6 +124,9 @@ const SingleWebhookEditorPanel = ({
 
           <Input
             onChange={(e) => {
+              // Clean Error
+              setErrorFields((prev) => prev.filter((f) => f !== "endpointURL"));
+              //  Save Changes
               setEndpointURL(toCleanUrl(e.target.value));
             }}
             defaultValue={endpointURL}
@@ -145,6 +148,9 @@ const SingleWebhookEditorPanel = ({
             selectedValue={httpMethod}
             valuesToPickFrom={httpMethodsList.map((s) => s.toString())}
             onValueChange={(val) => {
+              // Clean Error
+              setErrorFields((prev) => prev.filter((f) => f !== "httpMethod"));
+              //  Save Changes
               if (httpMethodsList.includes(val)) setHttpMethod(val);
             }}
           />
