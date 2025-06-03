@@ -3,18 +3,26 @@ import { LucideIcon } from "lucide-react";
 import { VsInput, VsOutput, VsSocket } from "./sockets";
 import { deepClone } from "@/lib/utils";
 import { workflowEditorSections } from "../constants/w_constants";
-import { nodeBlockTypeNames, VsNodeType } from "../types/w_types";
+import {
+  nodeBlockTypeNames,
+  SingleVariableAssignation,
+  VsNodeType,
+} from "../types/w_types";
 import { OperationBlock } from "./operation_block";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import { CronBlock } from "./cron_block";
 import { ObservableMixin } from "./observable_mixin";
 import { WebhookBlock } from "./webhook_block";
+import { WaitBlock } from "./wait_block";
+import { SetVariablesBlock } from "./setVariables_block";
 
 export type VsNodeBlockType =
   | OperationBlock[]
   | FieldBlockType[]
   | CronBlock
   | WebhookBlock
+  | WaitBlock
+  | SetVariablesBlock
   | undefined;
 export type VsNodeInputsType = (typeof VsNode.prototype)["inputs"];
 export type VsNodeOutputsType = (typeof VsNode.prototype)["outputs"];
@@ -97,9 +105,20 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
   }
 
   upsertBlock(
-    block: OperationBlock | FieldBlockType | CronBlock | WebhookBlock
+    block:
+      | OperationBlock
+      | FieldBlockType
+      | CronBlock
+      | WebhookBlock
+      | WaitBlock
+      | SetVariablesBlock
   ) {
-    if (block instanceof CronBlock || block instanceof WebhookBlock) {
+    if (
+      block instanceof CronBlock ||
+      block instanceof WebhookBlock ||
+      block instanceof SetVariablesBlock ||
+      block instanceof WaitBlock
+    ) {
       this._blocks = block as any;
     } else if (
       this._blockType === "formField" ||

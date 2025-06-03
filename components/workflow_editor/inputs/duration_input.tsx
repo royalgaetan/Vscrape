@@ -15,6 +15,7 @@ const DurationInput = ({
   disabledDnd,
   isTimePicker,
   placeholder,
+  className,
 }: {
   initialValue: any;
   onSave: (val: any) => void;
@@ -23,11 +24,12 @@ const DurationInput = ({
   isTimePicker?: boolean;
   hasError: boolean;
   placeholder?: string;
+  className?: string;
 }) => {
   const [openDurationPicker, setOpenDurationPicker] = useState(false);
 
   return (
-    <div className="relative group/durationInput !h-[1.75rem]">
+    <div className={cn("relative group/durationInput !h-[1.75rem]", className)}>
       <DnDTextInput
         onClick={() => {
           disabledDnd && setOpenDurationPicker(true);
@@ -35,7 +37,12 @@ const DurationInput = ({
         placeholder={placeholder ?? `${isTimePicker ? "00:00" : "00:00:00"}`}
         inputValue={
           typeof initialValue === "number"
-            ? formatDurationMs(initialValue, ["hours", "minutes", "seconds"])
+            ? formatDurationMs(
+                initialValue,
+                isTimePicker
+                  ? ["minutes", "seconds"]
+                  : ["hours", "minutes", "seconds"]
+              )
             : toStringSafe(initialValue)
         }
         reRenderOnInputValueChange={true}

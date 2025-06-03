@@ -25,6 +25,8 @@ import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/
 import { CronBlock } from "../classes/cron_block";
 import { ManualBlock } from "../classes/manual_block";
 import { WebhookBlock } from "../classes/webhook_block";
+import { WaitBlock } from "../classes/wait_block";
+import { SetVariablesBlock } from "../classes/setVariables_block";
 
 export type VsNodeType = {
   label: string;
@@ -41,6 +43,8 @@ export type VsNodeType = {
   | NodeWithCronBlock
   | NodeWithManualBlock
   | NodeWithWebhookBlock
+  | NodeWithWaitBlock
+  | NodeWithSetVarialbesBlock
 );
 export const nodeBlockTypeNames = [
   "operation",
@@ -48,6 +52,8 @@ export const nodeBlockTypeNames = [
   "cron",
   "manual",
   "webhook",
+  "wait",
+  "setVariables",
 ] as const;
 
 export type NodeWithOperationBlocks = {
@@ -73,6 +79,15 @@ export type NodeWithManualBlock = {
 export type NodeWithWebhookBlock = {
   blockType: (typeof nodeBlockTypeNames)["4"];
   blocks: WebhookBlock;
+};
+
+export type NodeWithWaitBlock = {
+  blockType: (typeof nodeBlockTypeNames)["5"];
+  blocks: WaitBlock;
+};
+export type NodeWithSetVarialbesBlock = {
+  blockType: (typeof nodeBlockTypeNames)["6"];
+  blocks: SetVariablesBlock;
 };
 
 // ---------------------------------------------------------
@@ -151,6 +166,8 @@ export type OperationParamItem = {
   valuesToPickFrom?: number[] | string[] | boolean[];
   isOptional?: boolean;
 } & (vsAnyRawTypes | vsAnyPrimitives);
+
+export type SingleVariableAssignation = { varName: string; varValue: any };
 
 // Workflow Editor Types
 export type nodeDropPosition = { x: number; y: number } | "center";

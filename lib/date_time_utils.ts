@@ -7,13 +7,13 @@ import {
 } from "date-fns";
 import { twoDigits } from "./string_utils";
 
-const MS_PER_SECOND = 1000;
-const MS_PER_MINUTE = MS_PER_SECOND * 60;
-const MS_PER_HOUR = MS_PER_MINUTE * 60;
-const MS_PER_DAY = MS_PER_HOUR * 24;
-const MS_PER_WEEK = MS_PER_DAY * 7;
-const MS_PER_MONTH = MS_PER_DAY * 30.44; // Average month length
-const MS_PER_YEAR = MS_PER_DAY * 365.25; // Average year length with leap years
+export const MS_PER_SECOND = 1000;
+export const MS_PER_MINUTE = MS_PER_SECOND * 60;
+export const MS_PER_HOUR = MS_PER_MINUTE * 60;
+export const MS_PER_DAY = MS_PER_HOUR * 24;
+export const MS_PER_WEEK = MS_PER_DAY * 7;
+export const MS_PER_MONTH = MS_PER_DAY * 30.44; // Average month length
+export const MS_PER_YEAR = MS_PER_DAY * 365.25; // Average year length with leap years
 
 export const getDurationLabel = (unit: DurationUnit) => {
   switch (unit) {
@@ -168,28 +168,35 @@ export const isValidDateString = (input: string): boolean => {
 };
 
 export const formatDurationFromMs = (ms: number): string => {
+  function formatNumber(value: number) {
+    return Number.isInteger(value) ? value : value.toFixed(1);
+  }
+
   if (ms < 1000) return `${ms} ms`;
 
   const seconds = ms / 1000;
-  if (seconds < 60) return `${seconds.toFixed(1)} sec`;
+  if (seconds < 60)
+    return `${formatNumber(seconds)} sec${seconds > 1 ? "s" : ""}`;
 
   const minutes = seconds / 60;
-  if (minutes < 60) return `${minutes.toFixed(1)} min`;
+  if (minutes < 60)
+    return `${formatNumber(minutes)} min${minutes > 1 ? "s" : ""}`;
 
   const hours = minutes / 60;
-  if (hours < 24) return `${hours.toFixed(1)} hr`;
+  if (hours < 24) return `${formatNumber(hours)} hr${hours > 1 ? "s" : ""}`;
 
   const days = hours / 24;
-  if (days < 7) return `${days.toFixed(1)} days`;
+  if (days < 7) return `${formatNumber(days)} day${days > 1 ? "s" : ""}`;
 
   const weeks = days / 7;
-  if (weeks < 4) return `${weeks.toFixed(1)} weeks`;
+  if (weeks < 4) return `${formatNumber(weeks)} week${weeks > 1 ? "s" : ""}`;
 
   const months = days / 30;
-  if (months < 12) return `${months.toFixed(1)} months`;
+  if (months < 12)
+    return `${formatNumber(months)} month${months > 1 ? "s" : ""}`;
 
   const years = days / 365;
-  return `${years.toFixed(1)} years`;
+  return `${formatNumber(years)} year${years > 1 ? "s" : ""}`;
 };
 
 export const getTimeAgoWithLimit = (date: Date, suffix?: boolean) => {

@@ -12,6 +12,12 @@ import { Button } from "@/components/ui/button";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { capitalizeFirstLetter } from "@/lib/string_utils";
 import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
+import { WaitBlock } from "@/lib/workflow_editor/classes/wait_block";
+import { formatDurationFromMs } from "@/lib/date_time_utils";
+import {
+  SetVariablesBlock,
+  SingleVariableAssignation,
+} from "@/lib/workflow_editor/classes/setVariables_block";
 
 const CustomNode = ({
   data: node,
@@ -26,6 +32,16 @@ const CustomNode = ({
   const [nodeBlocks, setNodeBlocks] = useState(
     node ? (node.blocks as any) : undefined
   );
+  // Special to Wait Block
+  const [nodeBlockDuration, setNodeBlockDuration] = useState(
+    nodeBlocks instanceof WaitBlock ? nodeBlocks.durationMs : undefined
+  );
+  // Special to SetVariables Block
+  const [variablesAssignations, setVariablesAssignations] = useState(
+    nodeBlocks instanceof SetVariablesBlock
+      ? nodeBlocks.variableAssignations
+      : []
+  );
 
   // Store
   const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
@@ -34,6 +50,17 @@ const CustomNode = ({
   useEffect(() => {
     const sub = node.stream$().subscribe((newData) => {
       setNodeBlocks(newData.blocks);
+
+      // Update Node DurationMs if it's a WaitBlock
+      if (nodeBlocks instanceof WaitBlock)
+        setNodeBlockDuration(nodeBlocks.durationMs);
+
+      // Update Node Variable Assignations if it's a SetVariablesBlock
+      if (newData.blocks instanceof SetVariablesBlock) {
+        setVariablesAssignations(
+          (newData.blocks as SetVariablesBlock).variableAssignations
+        );
+      }
     });
 
     return () => sub.unsubscribe();
@@ -59,6 +86,14 @@ const CustomNode = ({
         return "Trigger";
       case "webhook":
         return "Listening...";
+      case "wait":
+        return nodeBlockDuration
+          ? `Wait ${formatDurationFromMs(nodeBlockDuration)}`
+          : "Not set";
+      case "setVariables":
+        return `${variablesAssignations.length} set${
+          variablesAssignations.length > 1 ? "s" : ""
+        }`;
       default:
         return "";
     }

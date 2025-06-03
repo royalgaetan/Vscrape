@@ -47,7 +47,7 @@ const CronBlockList = ({
     // Here Blocks represents: Cron
     <div>
       {!cronBlock || !(cronBlock instanceof CronBlock) ? (
-        // Enmpty
+        // Empty
         <div className="flex flex-1 ">
           <Button
             variant={"ghost"}

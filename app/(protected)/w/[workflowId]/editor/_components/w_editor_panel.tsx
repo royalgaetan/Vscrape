@@ -7,7 +7,7 @@ import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import OperationsList from "@/components/workflow_editor/panel/operations/operations_list";
 import SingleOperationPanel from "@/components/workflow_editor/panel/operations/single_operation_panel";
-import { Info, Play, X } from "lucide-react";
+import { AlarmCheckIcon, Info, Play, X } from "lucide-react";
 import SingleFormFieldPanel from "@/components/workflow_editor/panel/form_fields/single_form_field_panel";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import FormFieldsList from "@/components/workflow_editor/panel/form_fields/form_field_list";
@@ -19,6 +19,9 @@ import ExecuteButton from "@/components/workflow_editor/buttons/execute_button";
 import WebhookBlockList from "@/components/workflow_editor/panel/webhook/webhook_block_list";
 import SingleWebhookEditorPanel from "@/components/workflow_editor/panel/webhook/single_webhook_editor_panel";
 import { WebhookBlock } from "@/lib/workflow_editor/classes/webhook_block";
+import DurationInput from "@/components/workflow_editor/inputs/duration_input";
+import WaitBlockList from "@/components/workflow_editor/panel/wait/wait_block_list";
+import SetVariablesBlockList from "@/components/workflow_editor/panel/setVariables/setVariables_block_list";
 
 const EditorPanel = () => {
   // Store:
@@ -260,6 +263,24 @@ const EditorPanel = () => {
                     onWebhookEdit={(webhook) => {
                       setBlockOrigin(webhook);
                       setIsEditing(true);
+                    }}
+                  />
+                )}
+
+                {currentNode.blockType === "wait" && (
+                  <WaitBlockList
+                    onSave={(waitBlock) => {
+                      if (!waitBlock) return;
+                      currentNode.upsertBlock(waitBlock);
+                    }}
+                  />
+                )}
+
+                {currentNode.blockType === "setVariables" && (
+                  <SetVariablesBlockList
+                    onSave={(setVariablesBlock) => {
+                      if (!setVariablesBlock) return;
+                      currentNode.upsertBlock(setVariablesBlock);
                     }}
                   />
                 )}

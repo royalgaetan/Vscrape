@@ -172,7 +172,6 @@ const SingleWebhookEditorPanel = ({
       </div>
 
       {/* Fixed Bottom Bar */}
-
       <div className="flex flex-col w-[var(--workflowPanelWidth)] !h-10 bg-white z-10 fixed bottom-[7vh]">
         {/* Action Buttons: Delete | Save Webhook */}
         <div className="flex flex-1 justify-end items-center py-1 px-3 border-t">

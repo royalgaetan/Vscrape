@@ -46,6 +46,8 @@ import { OperationBlock } from "../classes/operation_block";
 import { FormFieldBlock } from "../classes/form_field_block";
 import { ManualBlock } from "../classes/manual_block";
 import { WebhookBlock } from "../classes/webhook_block";
+import { WaitBlock } from "../classes/wait_block";
+import { SetVariablesBlock } from "../classes/setVariables_block";
 
 export const previousInputData: PreviousInputDataType[] = [
   {
@@ -183,16 +185,16 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: Clock,
     tooltip: "Add a delay before moving to the next step",
     sectionName: "Core",
-    blockType: "operation",
-    blocks: [] as OperationBlock[],
+    blockType: "wait",
+    blocks: new WaitBlock(),
   },
   {
     label: "Set Variables",
     icon: Variable,
     tooltip: "Add/Remove Global Variables",
     sectionName: "Core",
-    blockType: "operation",
-    blocks: [] as OperationBlock[],
+    blockType: "setVariables",
+    blocks: new SetVariablesBlock(),
   },
 
   {

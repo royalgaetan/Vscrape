@@ -81,7 +81,7 @@ const DurationPicker = ({
 
     // Increase Hours
     else if (unit === "hours") {
-      const hourLimitMax = isTimePicker ? 23 : 99;
+      const hourLimitMax = 23;
       if (typeof _duration.hours !== "undefined" && !isNaN(_duration.hours)) {
         if (_duration.hours < hourLimitMax) {
           _duration.hours += 1;
