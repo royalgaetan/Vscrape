@@ -1,10 +1,9 @@
 import { cn } from "@/lib/utils";
 import { OperationMoreOptionType } from "@/lib/workflow_editor/types/w_types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SimpleSwitchInput from "./inputs/simple_switch_input";
 import { LucideIcon } from "lucide-react";
 import FilterInput from "./inputs/filter_input";
-import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 
 const getInitialOptionValues = ({
@@ -29,16 +28,10 @@ const getInitialOptionValues = ({
 
 type Props = {
   optionType: OperationMoreOptionType;
+  currentBlock: OperationBlock;
 };
 
-const MoreOptionInput = ({ optionType }: Props) => {
-  // Store
-  const currentBlock = useWorkflowEditorStore(
-    (s) => s.currentBlock
-  ) as OperationBlock;
-  const setCurrentBlock = useWorkflowEditorStore((s) => s.setCurrentBlock);
-  // End Store
-
+const MoreOptionInput = ({ optionType, currentBlock }: Props) => {
   const [internalValue, setInternalValue] = useState<any>(
     getInitialOptionValues({
       optionType: optionType,
@@ -47,20 +40,17 @@ const MoreOptionInput = ({ optionType }: Props) => {
   );
 
   const updateValue = (newValue: any) => {
-    setInternalValue(newValue);
     if (!currentBlock) return;
+    setInternalValue(newValue);
     switch (optionType) {
       case "skipDuplicate":
         currentBlock.skipDuplicate = newValue;
-        setCurrentBlock(currentBlock);
         break;
       case "loopThrough":
         currentBlock.loopThrough = newValue;
-        setCurrentBlock(currentBlock);
         break;
       case "filters":
         currentBlock.inputFilters = newValue;
-        setCurrentBlock(currentBlock);
         break;
       default:
         break;

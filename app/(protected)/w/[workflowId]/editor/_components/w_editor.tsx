@@ -19,6 +19,7 @@ import CustomNode from "@/components/workflow_editor/custom_views/custom_node";
 import CustomSocket from "@/components/workflow_editor/custom_views/custom_socket";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { VsSelector } from "@/lib/workflow_editor/classes/selector";
+import CustomBranchNode from "@/components/workflow_editor/custom_views/custom_branch_node";
 
 export type Schemes = GetSchemes<VsNode, VsConnection<VsNode>>;
 export type AreaExtra = ReactArea2D<Schemes>;
@@ -144,8 +145,9 @@ const WorkflowEditor = ({
     render.addPreset(
       Presets.classic.setup({
         customize: {
-          node() {
-            return CustomNode;
+          node(data) {
+            if (data.payload.blockType === "branches") return CustomBranchNode;
+            else return CustomNode;
           },
           connection() {
             return CustomConnection;

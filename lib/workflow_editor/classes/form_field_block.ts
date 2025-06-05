@@ -2,7 +2,7 @@ import {
   VsFormInputFieldType,
   VsFormInputFieldTypeUnion,
 } from "../types/w_types";
-import { ObservableMixin } from "./observable_mixin";
+import { ObservableMixin } from "./mixins";
 
 export class FormFieldBlock extends ObservableMixin() {
   private _id: string;

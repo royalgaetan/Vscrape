@@ -1,5 +1,5 @@
 import ShortUniqueId from "short-unique-id";
-import { ObservableMixin } from "./observable_mixin";
+import { ObservableMixin } from "./mixins";
 
 const { randomUUID } = new ShortUniqueId({ length: 15 });
 export const httpMethodsList = ["GET", "POST"] as const;

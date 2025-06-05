@@ -27,14 +27,14 @@ const WaitBlockList = ({
     return () => sub.unsubscribe();
   }, []);
 
-  if (!currentNode || !waitBlockDurationMs) {
+  if (!currentNode) {
     return <div></div>;
   }
 
   return (
     // Here Blocks represents: Wait
     <DurationPicker
-      initialDurationMs={waitBlockDurationMs}
+      initialDurationMs={waitBlockDurationMs ?? 0}
       onSelect={(timePicked) => {
         if (
           typeof timePicked !== "number" ||
@@ -53,9 +53,13 @@ const WaitBlockList = ({
 
         {/* Duration Input */}
         <div className="flex flex-col w-full items-center">
-          <div className="text-xs text-muted-foreground">Will wait for</div>
-          <div className="mt-2 text-center font-semibold text-neutral-700 text-base break-words w-[80%]">
-            {formatDuration(millisecondsToDuration(waitBlockDurationMs))}
+          {waitBlockDurationMs !== undefined && waitBlockDurationMs !== 0 && (
+            <div className="text-xs text-muted-foreground">Will wait for</div>
+          )}
+          <div className="mt-0 text-center font-semibold text-neutral-700 text-base break-words w-[80%]">
+            {waitBlockDurationMs
+              ? formatDuration(millisecondsToDuration(waitBlockDurationMs))
+              : "Click to choose time"}
           </div>
         </div>
       </div>

@@ -106,6 +106,7 @@ const MultiSelect = ({
                     const Icon = option.icon;
                     return (
                       <CommandItem
+                        disabled={option.disabled}
                         key={option.value}
                         value={option.value}
                         keywords={[option.label]}

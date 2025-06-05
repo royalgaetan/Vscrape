@@ -6,10 +6,12 @@ const PanelHeader = ({
   nodeOrigin,
   displayBackButton,
   onBack,
+  description,
 }: {
   nodeOrigin: VsNode;
   displayBackButton?: boolean;
   onBack?: () => void;
+  description?: string;
 }) => {
   const Icon = nodeOrigin?.icon;
 
@@ -48,7 +50,7 @@ const PanelHeader = ({
 
       {nodeOrigin.tooltip && (
         <p className="mt-1 text-xs font-normal text-neutral-500 line-clamp-2">
-          {nodeOrigin.tooltip}
+          {description ?? nodeOrigin.tooltip}
         </p>
       )}
     </div>

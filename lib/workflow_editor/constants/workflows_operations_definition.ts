@@ -1,4 +1,4 @@
-import { appLanguages } from "@/lib/constants";
+import { appLanguages, appVoices } from "@/lib/constants";
 import { VsOperationBlockType } from "../types/w_types";
 
 export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
@@ -492,16 +492,341 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   //
   // Call Workflow Operations
+  {
+    operationName: "Call a specific workflow",
+    nodeName: "Call Workflow",
+    operationDescription: "Call a specific workflow by its name",
+    params: [
+      {
+        paramName: "Workflows",
+        paramInputPlaceholder: "The Workflow Name",
+        valuesToPickFrom: ["Workflow A", "Workflow B", "Workflow C"],
+        paramDescription: "The na of the workflow to call.",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Input Payload (JSON)",
+        paramDescription: "(if mode is line-based)",
+        type: "primitive/text",
+        isTextarea: true,
+        isOptional: true,
+        paramInputPlaceholder:
+          "Optional input data to pass to the called workflow (JSON format).",
+        value: "" as any,
+      },
+      {
+        paramName: "Await Result",
+        paramDescription:
+          "Wait for the called workflow to finish and return data?",
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
   //
   // Call API Operations
+  {
+    operationName: "Basic API Call",
+    nodeName: "Call API",
+    operationDescription:
+      "Make a standard HTTP request (GET, POST, PUT, PATCH, DELETE) with full control over URL, headers, body, and method.",
+    params: [
+      {
+        paramName: "API URL",
+        paramInputPlaceholder: "e.g., https://api.example.com/resource",
+        paramDescription: "Full URL of the API endpoint.",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Method",
+        type: "primitive/text",
+        valuesToPickFrom: ["GET", "POST", "PUT/PATCH", "DELETE"],
+        paramDescription: "HTTP method to use (GET, POST, PUT, PATCH, DELETE).",
+        value: "GET",
+      },
+      {
+        paramName: "Headers",
+        type: "primitive/record",
+        paramDescription: "Headers to send with the request",
+        value: [
+          {
+            key: "",
+            value: "",
+          },
+        ],
+      },
+      {
+        paramName: "Body",
+        type: "primitive/record",
+        paramDescription: "Form body for POST, PUT, or PATCH requests.",
+        value: [
+          {
+            key: "",
+            value: "",
+          },
+        ],
+      },
+      {
+        paramName: "Retry on Fail",
+        type: "primitive/switch",
+        paramDescription: "Whether to retry the request on failure.",
+        value: true,
+      },
+
+      [
+        {
+          paramName: "Timeout (Ms)",
+          type: "primitive/number",
+          paramInputPlaceholder: "e.g., 10000",
+          paramDescription:
+            "Max time (ms) to wait for the request before failing.",
+          value: "" as any,
+        },
+        {
+          paramName: "Retry Attempts",
+          type: "primitive/number",
+          paramInputPlaceholder: "e.g., 3",
+          paramDescription: "Number of times to retry the request.",
+          value: "" as any,
+        },
+      ],
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
   //
   // Send Operations
+  {
+    operationName: "Send Email",
+    nodeName: "Send",
+    operationDescription: "Deliver a custom email to one or more recipients.",
+    params: [
+      {
+        paramName: "From",
+        paramInputPlaceholder: "e.g., noreply@yourapp.com",
+        paramDescription: "Sender email address.",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "To",
+        paramInputPlaceholder: "e.g., user@example.com",
+        paramDescription: "Recipient email address.",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "CC",
+        paramInputPlaceholder: "e.g., cc@example.com",
+        paramDescription: "Optional CC recipient(s).",
+        isOptional: true,
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "BCC",
+        paramInputPlaceholder: "e.g., bcc@example.com",
+        paramDescription: "Optional BCC recipient(s).",
+        isOptional: true,
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Subject",
+        type: "primitive/text",
+        paramInputPlaceholder: "Your Receipt",
+        paramDescription: "Email subject line.",
+        value: "",
+      },
+      {
+        paramName: "Body",
+        type: "primitive/text",
+        paramInputPlaceholder: "Hello, here is your info...",
+        paramDescription: "Email body (HTML or text).",
+        isTextarea: true,
+        value: "",
+      },
+      {
+        paramName: "Attachments (files)",
+        type: "primitive/array",
+        isOptional: true,
+        paramDescription: "List of attachments (file URLs).",
+        value: [""],
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
+  {
+    operationName: "Send SMS",
+    nodeName: "Send",
+    operationDescription: "Instantly send a text message to a phone number.",
+    params: [
+      {
+        paramName: "Phone Number",
+        paramInputPlaceholder: "e.g., +123456789",
+        paramDescription: "Recipient phone number.",
+        type: "primitive/tel",
+        value: "" as any,
+      },
+      {
+        paramName: "Message",
+        paramInputPlaceholder: "e.g., Hi there!",
+        isTextarea: true,
+        paramDescription: "Text message to send.",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Sender ID (Optional)",
+        isOptional: true,
+        paramInputPlaceholder: "e.g., MyApp",
+        paramDescription: "Optional sender name or ID.",
+        type: "primitive/text",
+        value: "",
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
+  {
+    operationName: "Send Chat Message",
+    nodeName: "Send",
+    operationDescription: "Post a message inside the chat bot",
+    params: [
+      {
+        paramName: "Message",
+        paramInputPlaceholder: "e.g., Hi there!",
+        isTextarea: true,
+        paramDescription: "Text message to send.",
+        type: "primitive/text",
+        value: "",
+      },
+    ],
+    isDisabled: true,
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
+  {
+    operationName: "Initiate Phone Call",
+    nodeName: "Send",
+    operationDescription: "Trigger an automated phone call to a user.",
+    params: [
+      {
+        paramName: "Phone Number",
+        paramInputPlaceholder: "e.g., +123456789",
+        paramDescription: "Phone number to call.",
+        type: "primitive/tel",
+        value: "" as any,
+      },
+      {
+        paramName: "Message",
+        paramInputPlaceholder: "e.g., This is an automated call from...",
+        isTextarea: true,
+        paramDescription: "Voice message (Text-to-Speech).",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Voice",
+        isOptional: true,
+        paramDescription: "Voice type (male, female, neutral).",
+        type: "primitive/text",
+        valuesToPickFrom: Object.values(appVoices)[0].map((lang) => lang.label),
+        value: "",
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
+  {
+    operationName: "Send Voice Message (TTS)",
+    nodeName: "Send",
+    operationDescription: "Send an audio message using synthesized speech.",
+    params: [
+      {
+        paramName: "Recipient Phone",
+        paramInputPlaceholder: "e.g., +1234567890",
+        paramDescription:
+          "Phone number to send the voice message to (international format).",
+        type: "primitive/tel",
+        value: "" as any,
+      },
+      {
+        paramName: "Message",
+        paramInputPlaceholder: "e.g., Your appointment is tomorrow at 10 AM.",
+        isTextarea: true,
+        paramDescription:
+          "The text to convert into spoken audio and deliver as a voice message.",
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Voice",
+        isOptional: true,
+        paramDescription:
+          "Voice style to use for speech synthesis (e.g., en-US-JennyNeural, en-GB-Ryan).",
+        type: "primitive/text",
+        valuesToPickFrom: Object.values(appVoices)[0].map((lang) => lang.label),
+        value: "",
+      },
+      {
+        paramName: "Language",
+        paramDescription:
+          "Language/locale of the spoken message (for correct pronunciation).",
+        valuesToPickFrom: Object.values(appLanguages)[0].map(
+          (lang) => lang.label
+        ),
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Speed",
+        valuesToPickFrom: ["1.0 (normal)", "0.8 (slower)", "1.2 (faster)"],
+        paramDescription: "Controls the playback speed of the speech.",
+        type: "primitive/text",
+        value: "",
+      },
+      [
+        {
+          paramName: "Repeat Count (Optional)",
+          isOptional: true,
+          type: "primitive/number",
+          paramInputPlaceholder: "e.g., 2",
+          paramDescription:
+            "Number of times to repeat the voice message during the call.",
+          value: "" as any,
+        },
+        {
+          paramName: "Retry on Fail (Optional)",
+          isOptional: true,
+          type: "primitive/switch",
+          paramDescription:
+            "Retry sending the message if the first attempt fails (e.g., unreachable line).",
+          value: true,
+        },
+      ],
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
@@ -1640,7 +1965,7 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
       },
       {
         paramName: "Voice Type",
-        valuesToPickFrom: ["Male", "Female", "Neutral", "Robot"],
+        valuesToPickFrom: Object.values(appVoices)[0].map((lang) => lang.label),
         paramDescription: "The desired voice style or persona.",
         type: "primitive/text",
         value: "",

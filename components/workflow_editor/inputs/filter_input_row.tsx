@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FilterIcon, Trash2 } from "lucide-react";
+import { FilterIcon, PenLineIcon, Trash2 } from "lucide-react";
 import MultiSelect from "@/components/global/multi_select";
 import {
   capitalizeFirstLetter,
@@ -26,22 +26,35 @@ import {
   vsAnyRawTypes,
 } from "@/lib/workflow_editor/types/data_types";
 import { Button } from "@/components/ui/button";
+import SimpleTooltip from "@/components/global/simple_tooltip";
 
 type SingleFilterRowProps = {
   initialFilter: ExtendedOperationFilterType;
   onSave: (newFilterValue: ExtendedOperationFilterType) => void;
   onDelete: () => void;
   index: number;
+  //
+  initialIsEditing?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  isCondition?: boolean;
+  titleContent?: string;
+  onEdit?: () => void;
 };
 
 const SingleFilterRow = ({
   initialFilter,
-  onDelete,
+  initialIsEditing,
+  canEdit,
+  canDelete,
   onSave,
+  onDelete,
+  onEdit,
+  isCondition,
+  titleContent,
   index,
 }: SingleFilterRowProps) => {
-  const [isFilterContainerSelected, setIsFilterContainerSelected] =
-    useState<boolean>(true);
+  const [isEditing, setIsEditing] = useState<boolean>(initialIsEditing ?? true);
 
   const [filterObj, setFilterObj] =
     useState<ExtendedOperationFilterType>(initialFilter);
@@ -264,39 +277,97 @@ const SingleFilterRow = ({
     <div
       role="button"
       tabIndex={1}
-      className="[--input-height:1.7rem] flex flex-col w-full border-t last:border-b-0 first:border-t-0 first:mt-2 px-4 py-1 hover:bg-neutral-400/10 rounded-none transition-all duration-100 cursor-pointer"
+      className={cn(
+        "[--input-height:1.7rem] flex flex-col w-full first:mt-2 px-2 py-2 hover:bg-neutral-400/10 rounded-sm transition-all duration-100 cursor-pointer",
+        !isCondition && "rounded-none"
+      )}
     >
-      {!isFilterContainerSelected ? (
+      {!isEditing ? (
         // If filter input is NOT select: shrink it to display on its summary
-        <button
-          onClick={() => setIsFilterContainerSelected((prev) => !prev)}
-          className="flex flex-col items-start justify-start gap-1 w-full py-2 pl-1"
+        <div
+          className={cn(
+            "group/filterItem px-4 flex flex-col items-start justify-start gap-1 w-full",
+            isCondition && "px-0"
+          )}
         >
-          <div className="text-sm font-semibold flex gap-1 items-center">
-            <FilterIcon className="size-3 translate-y-[1.9px] stroke-neutral-700" />
-            Filter {index + 1}
+          <div className="flex flex-1 line-clamp-1 w-full">
+            {/* Title + Icon */}
+            <div className="flex !flex-1 gap-2 items-center font-medium text-sm text-neutral-700">
+              {isCondition ? (
+                <div className="size-5 flex justify-center items-center border border-border rounded-full">
+                  {index + 1}
+                </div>
+              ) : (
+                <FilterIcon className="size-3 translate-y-[1.9px] stroke-neutral-700" />
+              )}
+              {titleContent ?? ` Filter ${index + 1}`}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-0 h-[var(--input-height)]">
+              {/* Edit Button */}
+              {canEdit && (
+                <SimpleTooltip tooltipText="Edit Condition">
+                  <Button
+                    variant={"ghost"}
+                    className={cn(
+                      "!w-7 !h-7 px-0 group-hover/filterItem:flex hidden items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
+                    )}
+                    onClick={() => {
+                      setIsEditing(true);
+                      onEdit && onEdit();
+                    }}
+                  >
+                    <PenLineIcon />
+                  </Button>
+                </SimpleTooltip>
+              )}
+
+              {/* Delete Button */}
+              {canDelete && (
+                <SimpleTooltip tooltipText="Delete Condition">
+                  <Button
+                    variant={"ghost"}
+                    className={cn(
+                      "!w-7 !h-7 px-0 group-hover/filterItem:flex hidden items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
+                    )}
+                    onClick={() => {
+                      onDelete();
+                    }}
+                  >
+                    <Trash2 />
+                  </Button>
+                </SimpleTooltip>
+              )}
+            </div>
           </div>
-          <div className="w-full line-clamp-2 text-xs text-start">
+
+          <div
+            className={cn(
+              "w-[15rem] line-clamp-2 text-xs text-start break-words",
+              isCondition && "ml-7"
+            )}
+          >
             {!filterObj.filterCriteria &&
             filterObj.filterValue !== null &&
             filterObj.filterValue[0] === null &&
             !filterObj.inputID ? (
               "Empty"
             ) : (
-              <span>
+              <>
                 <TextWithSeparator content={filterObj.inputID} separator="" />
                 <TextWithSeparator content={filterObj.filterCriteria} isBold />
                 <TextWithSeparator content={filterObj.filterValue} />
-              </span>
+              </>
             )}
           </div>
-        </button>
+        </div>
       ) : (
-        // If filter input is select: expand it to allow user to add changes
+        // Editing Mode: If filter input is select, expand it to allow user to add changes
         <>
           <div className="flex flex-1 items-start gap-2 group/filterItem h-7 mt-1 mb-2">
             {/* Input ID: let user add the input from which filter will be applied to */}
-            <div className="flex flex-1 min-w-[30%]">
+            <div className="flex !w-1/3 max-w-[5rem]">
               <DnDTextInput
                 placeholder={"Input ID..."}
                 inputType="text"
@@ -316,13 +387,13 @@ const SingleFilterRow = ({
             </div>
 
             {/* Select a Criteria */}
-            <div className="flex flex-1 min-w-[30%]">
+            <div className="flex !w-1/3  max-w-[5rem]">
               <MultiSelect
                 isTriggerDisabled={
                   !filterObj?.inputID || !getInputType(filterObj?.inputID)
                 }
                 triggerClassName={cn(
-                  "max-w-[4.7rem] min-w-[4.7rem] !h-[var(--input-height)] bg-slate-100/40 flex flex-1 mb-1",
+                  "!h-[var(--input-height)] bg-slate-100/40 flex flex-1 mb-1",
                   errorCriteria && inputErrorClassName
                 )}
                 popoverAlignment="center"
@@ -367,47 +438,45 @@ const SingleFilterRow = ({
             </div>
 
             {/* Filter Value Inputs: value(s) to compare against */}
-            <div className="flex flex-1 w-fit min-w-0 max-w-[30%]">
-              <div className="flex flex-col gap-2">
-                {valueInputsSchema.map((inputSchema, idx) => {
-                  return (
-                    <FilterValueInput
-                      initialValue={
-                        Array.isArray(filterObj.filterValue)
-                          ? filterObj.filterValue[idx]
-                          : null
-                      }
-                      hasError={
-                        filterObj.filterCriteria !== null &&
-                        errorInputIndexes.includes(idx)
-                      }
-                      onSave={(inputValue) => {
-                        let arr = filterObj.filterValue;
+            <div className="!w-1/3 max-w-[5rem] flex-col gap-2">
+              {valueInputsSchema.map((inputSchema, idx) => {
+                return (
+                  <FilterValueInput
+                    initialValue={
+                      Array.isArray(filterObj.filterValue)
+                        ? filterObj.filterValue[idx]
+                        : null
+                    }
+                    hasError={
+                      filterObj.filterCriteria !== null &&
+                      errorInputIndexes.includes(idx)
+                    }
+                    onSave={(inputValue) => {
+                      let arr = filterObj.filterValue;
 
-                        if (arr && arr instanceof Array) {
-                          arr[idx] = inputValue;
-                        } else {
-                          arr = [inputValue];
-                        }
+                      if (arr && arr instanceof Array) {
+                        arr[idx] = inputValue;
+                      } else {
+                        arr = [inputValue];
+                      }
 
-                        setFilterObj((prev) => ({
-                          ...prev,
-                          filterCriteria: filterObj.filterCriteria as any,
-                          filterValue: arr as any,
-                        }));
-                        // Clear Error at Input Index
-                        const updatedErrors = errorInputIndexes.filter(
-                          (errIndex) => errIndex !== idx
-                        );
-                        setErrorInputIndexes(updatedErrors);
-                      }}
-                      isDisabled={!filterObj.filterCriteria}
-                      key={`filtervalue_${inputSchema}_${idx}`}
-                      inputSchema={inputSchema}
-                    />
-                  );
-                })}
-              </div>
+                      setFilterObj((prev) => ({
+                        ...prev,
+                        filterCriteria: filterObj.filterCriteria as any,
+                        filterValue: arr as any,
+                      }));
+                      // Clear Error at Input Index
+                      const updatedErrors = errorInputIndexes.filter(
+                        (errIndex) => errIndex !== idx
+                      );
+                      setErrorInputIndexes(updatedErrors);
+                    }}
+                    isDisabled={!filterObj.filterCriteria}
+                    key={`filtervalue_${inputSchema}_${idx}`}
+                    inputSchema={inputSchema}
+                  />
+                );
+              })}
             </div>
           </div>
 
@@ -434,10 +503,10 @@ const SingleFilterRow = ({
               )}
               onClick={(e) => {
                 const res = saveFilter();
-                res && setIsFilterContainerSelected(false);
+                res && setIsEditing(false);
               }}
             >
-              Save Filter
+              Save {isCondition ? "Condition" : "Filter"}
             </Button>
           </div>
         </>

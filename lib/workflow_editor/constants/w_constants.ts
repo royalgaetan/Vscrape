@@ -38,10 +38,10 @@ import {
   Tag,
   FileText,
   Variable,
+  SignpostBig,
 } from "lucide-react";
 import { PreviousInputDataType, VsNodeType } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
-import { deepFreeze } from "@/lib/utils";
 import { OperationBlock } from "../classes/operation_block";
 import { FormFieldBlock } from "../classes/form_field_block";
 import { ManualBlock } from "../classes/manual_block";
@@ -199,30 +199,28 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
 
   {
     label: "If/else Condition",
-    icon: Split,
-
+    icon: SignpostBig,
     tooltip: "Add a condition if/else inside your workflow",
     sectionName: "Core",
-    blockType: "operation",
-    blocks: [] as OperationBlock[],
+    blockType: "branches",
+    blocks: undefined,
   },
 
   {
     label: "Branch",
     icon: GitBranch,
-
-    tooltip: "Add a multiple branch at any stage of the workflow",
+    tooltip: "Add multiple branch at any stage of the workflow",
     sectionName: "Core",
-    blockType: "operation",
-    blocks: [] as OperationBlock[],
+    blockType: "branches",
+    blocks: undefined,
   },
   {
     label: "Merge",
     icon: Merge,
     tooltip: "Merge data into a single object",
     sectionName: "Core",
-    blockType: "operation",
-    blocks: [] as OperationBlock[],
+    blockType: "branches",
+    blocks: undefined,
   },
   {
     label: "Call Workflow",

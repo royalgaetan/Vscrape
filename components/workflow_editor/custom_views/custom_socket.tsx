@@ -1,8 +1,6 @@
-import { cn } from "@/lib/utils";
-import { VsSocket } from "@/lib/workflow_editor/sockets";
+import { VsSocket } from "@/lib/workflow_editor/classes/sockets";
 import { Circle } from "lucide-react";
 import React from "react";
-import { ClassicPreset } from "rete";
 
 const CustomSocket = <T extends VsSocket>({ data: socket }: { data: T }) => {
   return (

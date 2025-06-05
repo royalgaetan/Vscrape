@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { VsOperationBlockType } from "./workflow_editor/types/w_types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -35,7 +36,10 @@ export const deepFreeze = <T>(obj: T): T => {
   return obj;
 };
 
-export function deepClone<T>(input: T): T {
+export function deepClone<T>(
+  p0: Omit<VsOperationBlockType, "id">,
+  input: T
+): T {
   const seen = new WeakMap();
 
   const clone = (value: any): any => {

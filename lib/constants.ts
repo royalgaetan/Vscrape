@@ -156,6 +156,139 @@ export const appLanguages: SettingItemSelectDataType = {
     { value: "ja", label: "日本語 (Japanese)", disabled: true },
   ],
 };
+export const appVoices: SettingItemSelectDataType = {
+  "": [
+    // English voices
+    {
+      value: "en-US-JennyNeural",
+      label: "Jenny (English, US - Female)",
+      disabled: false,
+    },
+    {
+      value: "en-US-GuyNeural",
+      label: "Guy (English, US - Male)",
+      disabled: false,
+    },
+    {
+      value: "en-GB-RyanNeural",
+      label: "Ryan (English, UK - Male)",
+      disabled: false,
+    },
+    {
+      value: "en-IN-PrabhatNeural",
+      label: "Prabhat (English, India - Male)",
+      disabled: true,
+    },
+
+    // French
+    {
+      value: "fr-FR-DeniseNeural",
+      label: "Denise (French, France - Female)",
+      disabled: false,
+    },
+    {
+      value: "fr-FR-HenriNeural",
+      label: "Henri (French, France - Male)",
+      disabled: true,
+    },
+
+    // Spanish
+    {
+      value: "es-ES-ElviraNeural",
+      label: "Elvira (Spanish, Spain - Female)",
+      disabled: true,
+    },
+    {
+      value: "es-MX-DaliaNeural",
+      label: "Dalia (Spanish, Mexico - Female)",
+      disabled: true,
+    },
+
+    // German
+    {
+      value: "de-DE-KatjaNeural",
+      label: "Katja (German, Germany - Female)",
+      disabled: true,
+    },
+    {
+      value: "de-DE-ConradNeural",
+      label: "Conrad (German, Germany - Male)",
+      disabled: true,
+    },
+
+    // Chinese
+    {
+      value: "zh-CN-XiaoxiaoNeural",
+      label: "Xiaoxiao (Chinese, China - Female)",
+      disabled: true,
+    },
+    {
+      value: "zh-CN-YunyangNeural",
+      label: "Yunyang (Chinese, China - Male)",
+      disabled: true,
+    },
+
+    // Arabic
+    {
+      value: "ar-SA-ZariyahNeural",
+      label: "Zariyah (Arabic, Saudi Arabia - Female)",
+      disabled: true,
+    },
+    {
+      value: "ar-SA-HamzaNeural",
+      label: "Hamza (Arabic, Saudi Arabia - Male)",
+      disabled: true,
+    },
+
+    // Hindi
+    {
+      value: "hi-IN-MadhurNeural",
+      label: "Madhur (Hindi, India - Male)",
+      disabled: true,
+    },
+    {
+      value: "hi-IN-SwaraNeural",
+      label: "Swara (Hindi, India - Female)",
+      disabled: true,
+    },
+
+    // Portuguese
+    {
+      value: "pt-BR-FranciscaNeural",
+      label: "Francisca (Portuguese, Brazil - Female)",
+      disabled: true,
+    },
+    {
+      value: "pt-BR-AntonioNeural",
+      label: "Antonio (Portuguese, Brazil - Male)",
+      disabled: true,
+    },
+
+    // Russian
+    {
+      value: "ru-RU-DariyaNeural",
+      label: "Dariya (Russian, Russia - Female)",
+      disabled: true,
+    },
+    {
+      value: "ru-RU-DmitryNeural",
+      label: "Dmitry (Russian, Russia - Male)",
+      disabled: true,
+    },
+
+    // Japanese
+    {
+      value: "ja-JP-NanamiNeural",
+      label: "Nanami (Japanese, Japan - Female)",
+      disabled: true,
+    },
+    {
+      value: "ja-JP-KeitaNeural",
+      label: "Keita (Japanese, Japan - Male)",
+      disabled: true,
+    },
+  ],
+};
 
 export const appTimezones: SettingItemSelectDataType = {
   Americas: [

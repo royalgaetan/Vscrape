@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/global/multi_select";
@@ -7,7 +7,7 @@ import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_op
 import { delay, generateHexRandomString } from "@/lib/numbers_utils";
 import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
 import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
-import { NodeBlockType, useWorkflowEditorStore } from "@/stores/workflowStore";
+import { NodeBlockType } from "@/stores/workflowStore";
 import FieldLabel from "../field_label";
 import OperationParamCard from "./operation_param_card";
 import PanelHeader from "../panel_header";
@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
+import { cloneDeep } from "lodash";
 
 const SingleOperationPanel = ({
   nodeOrigin,
@@ -40,10 +41,6 @@ const SingleOperationPanel = ({
   onDelete: (operationId: string) => void;
   displayBackButton?: boolean;
 }) => {
-  const operationId = useRef<string>(
-    operationOrigin?.id ?? crypto.randomUUID()
-  );
-
   const [currentBlock, setCurrentBlock] = useState(operationOrigin);
   const availableOperations = workflowOperations.filter(
     (operation) => operation.nodeName === nodeOrigin.label
@@ -82,7 +79,18 @@ const SingleOperationPanel = ({
     }
   };
 
-  //   if (!(currentBlock instanceof OperationBlock)) return;
+  useEffect(() => {
+    if (availableOperations.length === 1) {
+      setCurrentBlock(new OperationBlock(cloneDeep(availableOperations[0])));
+    }
+
+    if (!currentBlock) return;
+    const sub = currentBlock.stream$().subscribe((newData) => {
+      setCurrentBlock(newData as OperationBlock);
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
 
   return (
     <div>
@@ -94,130 +102,137 @@ const SingleOperationPanel = ({
               nodeOrigin={nodeOrigin}
               displayBackButton={displayBackButton}
               onBack={() => onBack && onBack()}
+              description={currentBlock?.operationDescription}
             />
           </div>
 
           {/* Content */}
           <div className="mt-4 pb-6 space-y-4">
             {/* Operation Selector */}
-            <div className="flex flex-col justify-start items-start px-4 pr-4">
-              <FieldLabel
-                label={
-                  operationOrigin
-                    ? "Change operation type"
-                    : "Select an operation"
-                }
-                Icon={Hammer}
-              />
+            {availableOperations.length > 1 && (
+              <>
+                <div className="flex flex-col justify-start items-start px-4 pr-4">
+                  <FieldLabel
+                    label={
+                      operationOrigin
+                        ? "Change operation type"
+                        : "Select an operation"
+                    }
+                    Icon={Hammer}
+                  />
 
-              <MultiSelect
-                isTriggerDisabled={availableOperations.length === 0}
-                triggerClassName="h-9 w-[15.7rem] flex flex-1 mb-1"
-                popoverAlignment="center"
-                selectionMode="single"
-                popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
-                label={currentBlock?.operationName ?? "Pick an operation"}
-                itemTooltipClassname="w-52"
-                data={{
-                  "": availableOperations.map((op) => ({
-                    label: op.operationName,
-                    value: op.operationName,
-                    icon: nodeOrigin.icon ?? Star,
-                    iconClassName: "stroke-neutral-400 fill-transparent",
-                    tooltipContent: op.operationDescription,
-                    tooltipAlign: "end",
-                    tooltipSide: "left",
-                  })),
-                }}
-                selectedValues={
-                  currentBlock?.operationName
-                    ? [currentBlock.operationName]
-                    : []
-                }
-                handleSelect={(opSelected) => {
-                  if (
-                    currentBlock &&
-                    opSelected === currentBlock.operationName
-                  ) {
-                    setCurrentBlock(undefined);
-                  } else {
-                    const operation = workflowOperations.find(
-                      (op) =>
-                        op.operationName === opSelected &&
-                        op.nodeName === nodeOrigin?.label
-                    );
-                    if (!operation) return;
-                    setCurrentBlock(
-                      structuredClone({
-                        id: operationId.current,
-                        ...operation,
-                      } as OperationBlock)
-                    );
-                  }
-                }}
-              />
-            </div>
-            <Separator className="my-2" />
+                  <MultiSelect
+                    isTriggerDisabled={availableOperations.length === 0}
+                    triggerClassName="h-9 w-[15.7rem] flex flex-1 mb-1"
+                    popoverAlignment="center"
+                    selectionMode="single"
+                    popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
+                    label={currentBlock?.operationName ?? "Pick an operation"}
+                    itemTooltipClassname="w-52"
+                    data={{
+                      "": availableOperations.map((op) => ({
+                        label: op.operationName,
+                        value: op.operationName,
+                        icon: nodeOrigin.icon ?? Star,
+                        disabled: op.isDisabled,
+                        iconClassName: "stroke-neutral-400 fill-transparent",
+                        tooltipContent: op.operationDescription,
+                        tooltipAlign: "end",
+                        tooltipSide: "left",
+                      })),
+                    }}
+                    selectedValues={
+                      currentBlock?.operationName
+                        ? [currentBlock.operationName]
+                        : []
+                    }
+                    handleSelect={(opSelected) => {
+                      if (
+                        currentBlock &&
+                        opSelected === currentBlock.operationName
+                      ) {
+                        setCurrentBlock(undefined);
+                      } else {
+                        const operationDefinition = workflowOperations.find(
+                          (op) =>
+                            op.operationName === opSelected &&
+                            op.nodeName === nodeOrigin?.label
+                        );
+                        if (!operationDefinition) return;
+                        const operation = new OperationBlock(
+                          cloneDeep(operationDefinition)
+                        );
+                        setCurrentBlock(operation);
+                      }
+                    }}
+                  />
+                </div>
+                <Separator className="my-2" />
+              </>
+            )}
 
             {/* Parameters List */}
             <div className="flex flex-col justify-start items-start">
-              {Array.isArray(currentBlock) &&
-                currentBlock.params!.length > 0 && (
-                  <div className="flex flex-col w-full gap-4">
-                    {currentBlock?.params?.map((params, id) => {
-                      // If Params is an Array: meaning it contains "nested" params
-                      // => Display all of them in the same line
-                      // Else Params is a Param: Display it in the 1 line
-                      return (
-                        <div key={`${generateHexRandomString(20)}_param_${id}`}>
-                          {Array.isArray(params) ? (
-                            <div className="flex flex-1 !w-full justify-start gap-0 px-4 pr-4 mt-2 mb-2">
-                              {params.map((param, idx) => (
-                                <div
-                                  key={`${generateHexRandomString(
-                                    20
-                                  )}_param_inline_${idx}`}
-                                  className="flex flex-1 pl-2 pr-1 mr-2 first:pl-0"
-                                  style={{
-                                    maxWidth: `${90 / params.length}%`,
-                                  }}
-                                >
-                                  <OperationParamCard
-                                    currentOperationBlock={currentBlock}
-                                    isWithinAGroup={true}
-                                    paramData={param}
-                                    labelClassName={
-                                      param.type
-                                        .toLocaleLowerCase()
-                                        .includes("switch")
-                                        ? "text-center"
-                                        : undefined
-                                    }
-                                    inputClassName="justify-center"
-                                  />
-                                  {params.length === idx + 1 ? (
-                                    <></>
-                                  ) : (
-                                    <div className="h-full w-[0.5px] ml-2 bg-border"></div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="flex flex-1 w-full px-4 pr-4">
-                              <OperationParamCard
-                                currentOperationBlock={currentBlock}
-                                paramData={params}
-                                isWithinAGroup={false}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                    <Separator className="my-2" />
-                  </div>
-                )}
+              {currentBlock &&
+              currentBlock.params &&
+              currentBlock.params.length > 0 ? (
+                <div className="flex flex-col w-full gap-4">
+                  {currentBlock.params.map((params, id) => {
+                    // If Params is an Array: meaning it contains "nested" params
+                    // => Display all of them in the same line
+                    // Else Params is a Param: Display it in the 1 line
+                    return (
+                      <div key={`${generateHexRandomString(20)}_param_${id}`}>
+                        {params && Array.isArray(params) ? (
+                          <div className="flex flex-1 !w-full justify-start gap-0 px-4 pr-4 mt-2 mb-2">
+                            {params.map((param, idx) => (
+                              <div
+                                key={`${generateHexRandomString(
+                                  20
+                                )}_param_inline_${idx}`}
+                                className="flex flex-1 pl-2 pr-1 mr-2 first:pl-0"
+                                style={{
+                                  maxWidth: `${90 / params.length}%`,
+                                }}
+                              >
+                                <OperationParamCard
+                                  currentOperationBlock={currentBlock}
+                                  isWithinAGroup={true}
+                                  paramData={param}
+                                  labelClassName={
+                                    param.type
+                                      .toLocaleLowerCase()
+                                      .includes("switch")
+                                      ? "text-center"
+                                      : undefined
+                                  }
+                                  inputClassName="justify-center"
+                                />
+                                {params.length === idx + 1 ? (
+                                  <></>
+                                ) : (
+                                  <div className="h-full w-[0.5px] ml-2 bg-border"></div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-1 w-full px-4 pr-4">
+                            <OperationParamCard
+                              currentOperationBlock={currentBlock}
+                              paramData={params}
+                              isWithinAGroup={false}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <Separator className="my-2" />
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
 
             {/* More Options List: Detect Duplicate, Enable Loop */}
@@ -235,12 +250,18 @@ const SingleOperationPanel = ({
 
                     {/* Loop Through */}
                     {currentBlock.loopThrough !== undefined && (
-                      <MoreOptionInput optionType="loopThrough" />
+                      <MoreOptionInput
+                        optionType="loopThrough"
+                        currentBlock={currentBlock}
+                      />
                     )}
 
                     {/* Skip Duplicates */}
                     {currentBlock.skipDuplicate && (
-                      <MoreOptionInput optionType="skipDuplicate" />
+                      <MoreOptionInput
+                        optionType="skipDuplicate"
+                        currentBlock={currentBlock}
+                      />
                     )}
 
                     {/* Separator */}
@@ -252,7 +273,10 @@ const SingleOperationPanel = ({
             {/* Filters */}
             {currentBlock && (
               <div className="mt-1 flex flex-col justify-start items-start">
-                <MoreOptionInput optionType="filters" />
+                <MoreOptionInput
+                  optionType="filters"
+                  currentBlock={currentBlock}
+                />
               </div>
             )}
 

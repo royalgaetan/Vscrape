@@ -14,10 +14,7 @@ import { capitalizeFirstLetter } from "@/lib/string_utils";
 import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
 import { WaitBlock } from "@/lib/workflow_editor/classes/wait_block";
 import { formatDurationFromMs } from "@/lib/date_time_utils";
-import {
-  SetVariablesBlock,
-  SingleVariableAssignation,
-} from "@/lib/workflow_editor/classes/setVariables_block";
+import { SetVariablesBlock } from "@/lib/workflow_editor/classes/setVariables_block";
 
 const CustomNode = ({
   data: node,
@@ -171,14 +168,20 @@ const CustomNode = ({
             {/* Handle Overlays */}
 
             {/* Left Handle */}
-            <NodeHandle
-              key={`${node.id}-input`}
-              emit={emit}
-              nodeId={node.id}
-              side="input"
-              throughput={node.inputs}
-              iconClassName="-translate-x-[0.75rem]"
-            />
+            {node.inputs &&
+              Object.entries(node.inputs).map(([key, input]) => {
+                return (
+                  <NodeHandle
+                    key={key}
+                    emit={emit}
+                    nodeId={node.id}
+                    side="input"
+                    socketKey={key}
+                    throughput={input}
+                    iconClassName="-translate-x-[0.75rem]"
+                  />
+                );
+              })}
 
             {/* Node Label */}
             <div className="flex justify-center max-w-fit min-w-[6rem]">
@@ -188,14 +191,20 @@ const CustomNode = ({
             </div>
 
             {/* Right Handle */}
-            <NodeHandle
-              key={`${node.id}-output`}
-              emit={emit}
-              nodeId={node.id}
-              side="output"
-              throughput={node.outputs}
-              iconClassName="translate-x-[0.75rem]"
-            />
+            {node.outputs &&
+              Object.entries(node.outputs).map(([key, output]) => {
+                return (
+                  <NodeHandle
+                    key={key}
+                    emit={emit}
+                    nodeId={node.id}
+                    side="output"
+                    socketKey={key}
+                    throughput={output}
+                    iconClassName="translate-x-[0.75rem]"
+                  />
+                );
+              })}
           </div>
 
           {/* Rests... */}

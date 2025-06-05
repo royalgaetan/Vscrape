@@ -1,5 +1,5 @@
 import { VsNodeBlockType } from "../types/w_types";
-import { ObservableMixin } from "./observable_mixin";
+import { ObservableMixin } from "./mixins";
 
 /* {
   minute: "0,15,30",

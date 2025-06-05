@@ -1,13 +1,23 @@
 import { ClassicPreset } from "rete";
-
-export class VsInput extends ClassicPreset.Input<VsSocket> {}
-
-export class VsOutput extends ClassicPreset.Input<VsSocket> {}
+import { ThroughputMixin } from "./mixins";
 
 export class VsSocket extends ClassicPreset.Socket {
-  color: string;
-  constructor(name: string, color?: string) {
+  private _color: string = "#76879d"; //Hex
+
+  constructor(name: string, color: string) {
     super(name);
-    this.color = color ?? "#76879d";
+    this._color = color;
+  }
+
+  // Color: getter + setter
+  get color() {
+    return this._color;
+  }
+  set color(value: string) {
+    this._color = value;
   }
 }
+
+export class VsInput extends ThroughputMixin(ClassicPreset.Input<VsSocket>) {}
+
+export class VsOutput extends ThroughputMixin(ClassicPreset.Input<VsSocket>) {}

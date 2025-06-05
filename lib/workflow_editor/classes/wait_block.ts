@@ -1,4 +1,4 @@
-import { ObservableMixin } from "./observable_mixin";
+import { ObservableMixin } from "./mixins";
 
 export class WaitBlock extends ObservableMixin() {
   private _id: string;

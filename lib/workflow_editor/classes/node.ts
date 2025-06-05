@@ -3,18 +3,15 @@ import { LucideIcon } from "lucide-react";
 import { VsInput, VsOutput, VsSocket } from "./sockets";
 import { deepClone } from "@/lib/utils";
 import { workflowEditorSections } from "../constants/w_constants";
-import {
-  nodeBlockTypeNames,
-  SingleVariableAssignation,
-  VsNodeType,
-} from "../types/w_types";
+import { nodeBlockTypeNames, VsNodeType } from "../types/w_types";
 import { OperationBlock } from "./operation_block";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import { CronBlock } from "./cron_block";
-import { ObservableMixin } from "./observable_mixin";
+import { ObservableMixin } from "./mixins";
 import { WebhookBlock } from "./webhook_block";
 import { WaitBlock } from "./wait_block";
 import { SetVariablesBlock } from "./setVariables_block";
+import { cloneDeep } from "lodash";
 
 export type VsNodeBlockType =
   | OperationBlock[]
@@ -39,11 +36,12 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
   private _blockType: (typeof nodeBlockTypeNames)[number];
   private _blocks?: VsNodeBlockType;
 
-  override inputs: { [key in keyof VsInput]?: ClassicPreset.Input<VsSocket> } =
-    {};
+  override inputs: { [key in keyof VsInput]?: VsInput } = {};
   override outputs: {
-    [key in keyof VsOutput]?: ClassicPreset.Input<VsSocket>;
+    [key in keyof VsOutput]?: VsOutput;
   } = {};
+
+  private _anySocket: VsSocket;
 
   constructor(node: VsNodeType) {
     super(node.label);
@@ -56,10 +54,36 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
     this._sectionName = node.sectionName;
     this._blockType = node.blockType;
     this._blocks = node.blocks as any;
+    this._anySocket = new VsSocket("any", this._iconColor);
 
-    const anySocket = new VsSocket("any", this._iconColor);
-    this.addInput("input", new VsInput(anySocket));
-    this.addOutput("output", new VsOutput(anySocket));
+    this.insertInput();
+    this.insertOutput();
+  }
+
+  // Input Methods
+  insertInput(): void {
+    super.addInput(
+      crypto.randomUUID(),
+      new VsInput(this._anySocket, undefined, this.label.includes("Merge"))
+    );
+    this.notifyAll();
+  }
+  deleteInput(key: string): void {
+    super.removeInput(key);
+    this.notifyAll();
+  }
+
+  // Output Methods
+  insertOutput(): void {
+    super.addOutput(
+      crypto.randomUUID(),
+      new VsOutput(this._anySocket, undefined, false)
+    );
+    this.notifyAll();
+  }
+  deleteOutput(key: string): void {
+    super.removeOutput(key);
+    this.notifyAll();
   }
 
   // Getters
@@ -124,7 +148,7 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
       this._blockType === "formField" ||
       this._blockType === "operation"
     ) {
-      // Else Block content is an array like: e.g. OperationBlock[] or FieldBlockType[]
+      // Else Block content is an array like: e.g. OperationBlock[], FieldBlockType[] or BranchBlock[]
       // If no block exist yet:
       if (!this._blocks) {
         this._blocks = [];
@@ -144,7 +168,7 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
   }
 
   moveBlock(blockId: string, direction: MoveBlockDirection) {
-    // Continue: If Block content is an array like: e.g. OperationBlock[] or FieldBlockType[]
+    // Continue: If Block content is an array like: e.g. OperationBlock[], FieldBlockType[] or BranchBlock[]
     if (!Array.isArray(this._blocks)) return;
     // Get corresponding block index from blockId
     const blockIndex = this._blocks.findIndex((b) => b.id === blockId);
@@ -174,7 +198,7 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
       logoPath: this._logoPath,
       tooltip: this._tooltip,
       sectionName: this._sectionName as any,
-      blocks: deepClone(this._blocks) as any,
+      blocks: cloneDeep(this._blocks) as any,
       blockType: this._blockType as any,
     });
 

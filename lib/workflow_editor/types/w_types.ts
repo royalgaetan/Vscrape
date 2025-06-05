@@ -45,6 +45,7 @@ export type VsNodeType = {
   | NodeWithWebhookBlock
   | NodeWithWaitBlock
   | NodeWithSetVarialbesBlock
+  | NodeWithBranchBlocks
 );
 export const nodeBlockTypeNames = [
   "operation",
@@ -54,6 +55,7 @@ export const nodeBlockTypeNames = [
   "webhook",
   "wait",
   "setVariables",
+  "branches",
 ] as const;
 
 export type NodeWithOperationBlocks = {
@@ -89,6 +91,10 @@ export type NodeWithSetVarialbesBlock = {
   blockType: (typeof nodeBlockTypeNames)["6"];
   blocks: SetVariablesBlock;
 };
+export type NodeWithBranchBlocks = {
+  blockType: (typeof nodeBlockTypeNames)["7"];
+  blocks: undefined;
+};
 
 // ---------------------------------------------------------
 // ---------------------------------------------------------
@@ -96,7 +102,6 @@ export type NodeWithSetVarialbesBlock = {
 // ---------------------------------------------------------
 
 export type VsOperationBlockType = {
-  id: string;
   operationName: string;
   operationDescription: string;
   nodeName: (typeof workflowEditorNodes)[number]["label"];
@@ -112,11 +117,11 @@ export type VsOperationBlockType = {
   >[]; // Many filters can be applied to many (incoming) inputs
   outputs?: OperationThroughput; // An Output here can be: of any type
   skipDuplicate?: boolean;
+  isDisabled?: boolean;
   loopThrough?: "All items" | number | boolean;
 };
 
 export type VsFormInputFieldType = {
-  id: string;
   fieldName: string;
   fieldLabel: string;
   fieldDescription?: string;
@@ -196,6 +201,7 @@ export type OperationFilterType<
   inputID: any;
   keyId: string;
 } & Nullable<vsCriteria<T>>;
+
 export type RecordArray = { key: string; value: any }[];
 export type OperationValuesToPickFromType = number[] | string[] | boolean[];
 export type OperationMoreOptionType =

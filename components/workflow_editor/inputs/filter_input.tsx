@@ -23,6 +23,8 @@ const FilterInput = ({
     setLocalFilters(initialFilters);
   }, [initialFilters]);
 
+  const [currentlyEdittedFilter, setCurrentlyEdittedFilter] =
+    useState<number>();
   const generateEmpyFilter = (): OperationFilterType<"primitive/text"> => ({
     keyId: crypto.randomUUID(),
     filterCriteria: null,
@@ -41,12 +43,17 @@ const FilterInput = ({
       <div className="flex flex-1 items-center px-4">
         <FieldLabel label={"Filters"} Icon={ListFilterPlusIcon} />
         <Button
+          disabled={typeof currentlyEdittedFilter === "number"}
           type="button"
           variant={"outline"}
           size={"sm"}
           className="w-fit text-xs text-neutral-500 py-1 px-2 h-6 rounded-sm"
           onClick={() => {
-            setLocalFilters((prev) => [...prev, generateEmpyFilter()]);
+            const newArr = localFilters
+              ? [...localFilters, generateEmpyFilter()]
+              : [generateEmpyFilter()];
+            setCurrentlyEdittedFilter(newArr.length - 1);
+            setLocalFilters(newArr);
           }}
         >
           + Add
@@ -55,7 +62,7 @@ const FilterInput = ({
 
       {/* All Filters: list */}
       <div className="flex flex-col w-full mt-0">
-        {localFilters.length === 0 ? (
+        {!localFilters || localFilters.length === 0 ? (
           <div className=" text-muted-foreground text-xs font-semibold flex flex-1 justify-center items-center min-h-20">
             No filter yet.
           </div>
@@ -66,16 +73,24 @@ const FilterInput = ({
                 return (
                   <SingleFilterRow
                     initialFilter={filter}
+                    onEdit={() => {
+                      setCurrentlyEdittedFilter(idx);
+                    }}
                     onSave={(newFilterValue) => {
                       localFilters[idx] = newFilterValue;
                       setLocalFilters(localFilters);
+                      setCurrentlyEdittedFilter(undefined);
                     }}
+                    initialIsEditing={currentlyEdittedFilter === idx}
+                    canDelete={currentlyEdittedFilter === undefined}
+                    canEdit={currentlyEdittedFilter === undefined}
                     index={idx}
                     key={filter.keyId}
                     onDelete={() => {
                       setLocalFilters((prev) =>
                         prev.filter((_, id) => id !== idx)
                       );
+                      setCurrentlyEdittedFilter(undefined);
                     }}
                   />
                 );

@@ -7,7 +7,7 @@ const AddOperationButton = ({ onClick }: { onClick: () => void }) => {
     <Button
       variant={"ghost"}
       className={cn(
-        "group/operationItemButton relative flex flex-1 h-4 !py-[0.3rem] !w-full px-2 transition-all duration-300 justify-center items-center gap-1 hover:bg-white bg-white cursor-pointer rounded-sm hover:text-neutral-500/60 text-neutral-500 active:scale-[0.97]"
+        "group/operationItemButton border border-dashed relative flex flex-1 h-4 !py-[0.3rem] !w-full px-2 transition-all duration-300 justify-center items-center gap-1 hover:bg-white bg-white cursor-pointer rounded-sm hover:text-neutral-500/60 text-neutral-500 active:scale-[0.97]"
       )}
       onClick={(e) => onClick()}
     >
