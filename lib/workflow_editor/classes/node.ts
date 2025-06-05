@@ -146,7 +146,8 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
       this._blocks = block as any;
     } else if (
       this._blockType === "formField" ||
-      this._blockType === "operation"
+      this._blockType === "operation" ||
+      this._blockType === "preview"
     ) {
       // Else Block content is an array like: e.g. OperationBlock[], FieldBlockType[] or BranchBlock[]
       // If no block exist yet:

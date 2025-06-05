@@ -22,6 +22,7 @@ import { WebhookBlock } from "@/lib/workflow_editor/classes/webhook_block";
 import WaitBlockList from "@/components/workflow_editor/panel/wait/wait_block_list";
 import SetVariablesBlockList from "@/components/workflow_editor/panel/setVariables/setVariables_block_list";
 import BranchesList from "@/components/workflow_editor/panel/branches/branches_list";
+import DataPreviewList from "@/components/workflow_editor/panel/data_preview/data_preview_list";
 
 const EditorPanel = () => {
   // Store:
@@ -94,7 +95,8 @@ const EditorPanel = () => {
             {currentNode && isEditing && (
               <>
                 {/* Operation Panel */}
-                {currentNode.blockType === "operation" && (
+                {currentNode.blockType === "operation" ||
+                currentNode.blockType === "preview" ? (
                   <SingleOperationPanel
                     nodeOrigin={currentNode}
                     operationOrigin={blockOrigin as OperationBlock | undefined}
@@ -106,13 +108,14 @@ const EditorPanel = () => {
                     onSave={(operation) => {
                       setIsEditing(false);
                       if (!operation) return;
-                      console.log("operation saved", operation);
                       currentNode.upsertBlock(operation);
                     }}
                     onBack={() => {
                       setIsEditing(false);
                     }}
                   />
+                ) : (
+                  <></>
                 )}
 
                 {/* Form Field Block Panel */}
@@ -286,6 +289,15 @@ const EditorPanel = () => {
                 )}
 
                 {currentNode.blockType === "branches" && <BranchesList />}
+
+                {currentNode.blockType === "preview" && (
+                  <DataPreviewList
+                    onPreviewEdit={(previewOperation) => {
+                      setBlockOrigin(previewOperation);
+                      setIsEditing(true);
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>

@@ -390,7 +390,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: NotebookTextIcon,
     tooltip: "Preview or render a PDF from a file or URL",
     sectionName: "Data Preview",
-    blockType: "operation",
+    blockType: "preview",
     blocks: [] as OperationBlock[],
   },
   {
@@ -398,7 +398,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: FileText,
     tooltip: "Preview or render your data inside a Word-like previewer",
     sectionName: "Data Preview",
-    blockType: "operation",
+    blockType: "preview",
     blocks: [] as OperationBlock[],
   },
   {
@@ -406,7 +406,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: TableProperties,
     tooltip: "Preview your data inside a Spreadsheet",
     sectionName: "Data Preview",
-    blockType: "operation",
+    blockType: "preview",
     blocks: [] as OperationBlock[],
   },
   {
@@ -414,7 +414,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: LucideGalleryHorizontalEnd,
     tooltip: "Preview any image",
     sectionName: "Data Preview",
-    blockType: "operation",
+    blockType: "preview",
     blocks: [] as OperationBlock[],
   },
   {
@@ -422,7 +422,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: TvMinimalPlayIcon,
     tooltip: "Play your video or audio",
     sectionName: "Data Preview",
-    blockType: "operation",
+    blockType: "preview",
     blocks: [] as OperationBlock[],
   },
   {
@@ -430,7 +430,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: Braces,
     tooltip: "Preview a Code's snippet (JSON, XML, Markdown, etc.)",
     sectionName: "Data Preview",
-    blockType: "operation",
+    blockType: "preview",
     blocks: [] as OperationBlock[],
   },
 

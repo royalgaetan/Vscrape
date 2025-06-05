@@ -213,22 +213,27 @@ const CustomNode = ({
               {getNodeTerminology()}
             </p>
             {/* Button: Duplicate */}
-            <SimpleTooltip tooltipText="Duplicate" side="bottom">
-              <Button
-                variant={"ghost"}
-                className={cn(
-                  "flex cursor-pointer pointer-events-auto hover:opacity-70 translate-y-[0.16rem] active:scale-[0.9] h-fit !px-0 !py-0 transition-all duration-300 justify-center items-center hover:bg-transparent bg-transparent"
-                )}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setNodeIdToActOn({ nodeId: node.id, operation: "Duplicate" });
-                }}
-              >
-                {/* Icon */}
-                <Copy className="stroke-neutral-400" />
-              </Button>
-            </SimpleTooltip>
+            {node.blockType !== "preview" && (
+              <SimpleTooltip tooltipText="Duplicate" side="bottom">
+                <Button
+                  variant={"ghost"}
+                  className={cn(
+                    "flex cursor-pointer pointer-events-auto hover:opacity-70 translate-y-[0.16rem] active:scale-[0.9] h-fit !px-0 !py-0 transition-all duration-300 justify-center items-center hover:bg-transparent bg-transparent"
+                  )}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setNodeIdToActOn({
+                      nodeId: node.id,
+                      operation: "Duplicate",
+                    });
+                  }}
+                >
+                  {/* Icon */}
+                  <Copy className="stroke-neutral-400" />
+                </Button>
+              </SimpleTooltip>
+            )}
           </div>
         </div>
       </div>

@@ -5408,31 +5408,333 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   //
   // PDF Viewer Operations
+  {
+    operationName: "PDF Viewer",
+    nodeName: "PDF Viewer",
+    operationDescription: `Render and preview a PDF document directly from a file or URL.`,
+    params: [
+      {
+        paramName: "PDF To Preview",
+        paramInputPlaceholder: "Add the PDF to preview...",
+        paramDescription: `File path or URL of the PDF.`,
+        type: "primitive/text",
+        value: "",
+      },
+      [
+        {
+          paramName: "Start Page",
+          paramInputPlaceholder: "e.g. 2",
+          paramDescription: "The page number where viewing should begin.",
+          type: "primitive/number",
+          isOptional: true,
+          value: "" as any,
+        },
+        {
+          paramName: "End Page",
+          paramInputPlaceholder: "e.g. 30",
+          paramDescription: "The page number where viewing should end.",
+          type: "primitive/number",
+          isOptional: true,
+          value: "" as any,
+        },
+      ],
+      {
+        paramName: "Zoom Level",
+        paramInputPlaceholder: "e.g. 100",
+        paramDescription: "Zoom level percentage (e.g., 100).",
+        type: "primitive/number",
+        value: "" as any,
+      },
+      {
+        paramName: "Theme",
+        paramDescription: `Viewer theme.`,
+        valuesToPickFrom: ["Light", "Dark", "Auto"],
+        type: "primitive/text",
+        value: "Auto",
+      },
+      {
+        paramName: "Show Toolbar",
+        paramDescription: `Display viewer controls (next page, zoom, etc.).`,
+        type: "primitive/switch",
+        value: true,
+      },
+
+      {
+        paramName: "Allow Download",
+        paramDescription: `Allow anyone to download the previewed file.`,
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
   //
   // Docs Viewer Operations
+  {
+    operationName: "Docs Viewer",
+    nodeName: "Docs Viewer",
+    operationDescription: `Preview text-based documents like Word files or raw content inside a styled, paginated viewer.`,
+    params: [
+      {
+        paramName: "Document To Preview",
+        paramInputPlaceholder: "Add the document to preview...",
+        paramDescription: `Document path, URL or content.`,
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Page Size",
+        paramDescription: `Page size format (A4, Letter, etc.).`,
+        valuesToPickFrom: [
+          "A4",
+          "Letter",
+          "Legal",
+          "A3",
+          "A5",
+          "B5",
+          "Tabloid",
+          "Executive",
+          "Folio",
+          "Ledger",
+        ],
+        type: "primitive/text",
+        value: "A4",
+      },
+      {
+        paramName: "Theme",
+        paramDescription: `Viewer theme.`,
+        valuesToPickFrom: ["Light", "Dark", "Auto"],
+        type: "primitive/text",
+        value: "Auto",
+      },
+      {
+        paramName: "Allow Download",
+        paramDescription: `Allow anyone to download the previewed file.`,
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
   //
   // Spreadsheet Viewer Operations
+  {
+    operationName: "Spreadsheet Viewer",
+    nodeName: "Spreadsheet Viewer",
+    operationDescription: `Display structured data like Excel or CSV in an interactive spreadsheet format.`,
+    params: [
+      {
+        paramName: "Spreadsheet To Preview",
+        paramInputPlaceholder: "Add the data to preview...",
+        paramDescription: `Spreadsheet file URL or data.`,
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Sheet Name (Optional)",
+        paramInputPlaceholder: "e.g. Sheet 1",
+        paramDescription: "Sheet to render (optional).",
+        type: "primitive/text",
+        isOptional: true,
+        value: "",
+      },
+      {
+        paramName: "Start Cell (Optional)",
+        paramInputPlaceholder: "e.g. A1",
+        paramDescription: "Start rendering from this cell.",
+        type: "primitive/text",
+        isOptional: true,
+        value: "",
+      },
+      {
+        paramName: "Allow Sorting",
+        paramDescription: `Enable user sorting and filtering.`,
+        type: "primitive/switch",
+        value: true,
+      },
+      {
+        paramName: "Allow Download",
+        paramDescription: `Allow anyone to download the previewed file.`,
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
   //
   // Image Preview Operations
+  {
+    operationName: "Image Preview",
+    nodeName: "Image Preview",
+    operationDescription: `View images in-line, whether they’re uploaded or linked by URL.`,
+    params: [
+      {
+        paramName: "Images (Paths + Alt text)",
+        paramDescription: `File paths or URLs of the images to display.`,
+        type: "primitive/record",
+        value: [
+          {
+            key: "",
+            value: "",
+          },
+        ],
+      },
+      {
+        paramName: "Fit Mode",
+        paramDescription: `How the image fits in the preview area.`,
+        valuesToPickFrom: ["Contains", "Cover", "Stretch", "Original"],
+        type: "primitive/text",
+        value: "Contains",
+      },
+      {
+        paramName: "Background Color (Optional)",
+        isOptional: true,
+        paramInputPlaceholder: "e.g., #000000",
+        paramDescription: "Background color for display area.",
+        type: "primitive/text",
+        value: "" as any,
+      },
+      {
+        paramName: "Show Zoom",
+        paramDescription: `Enable zooming and panning.`,
+        type: "primitive/switch",
+        value: true,
+      },
+      {
+        paramName: "Allow Download",
+        paramDescription: `Allow anyone to download the previewed file.`,
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
   //
   // Media Player Operations
+  {
+    operationName: "Media Player",
+    nodeName: "Media Player",
+    operationDescription: `Play audio or video files directly within the workflow.`,
+    params: [
+      {
+        paramName: "Audio/Video playlist",
+        paramDescription:
+          "File paths or URLs of the audio and video files to display",
+        type: "primitive/array",
+        value: [""],
+      },
+      [
+        {
+          paramName: "Autoplay",
+          isOptional: true,
+          paramDescription: `Start playing automatically.`,
+          type: "primitive/switch",
+          value: true,
+        },
+        {
+          paramName: "Controls",
+          isOptional: true,
+          paramDescription: `Show media player controls.`,
+          type: "primitive/switch",
+          value: true,
+        },
+        {
+          paramName: "Loop",
+          isOptional: true,
+          paramDescription: `Loop playback continuously.`,
+          type: "primitive/switch",
+          value: true,
+        },
+      ],
+      {
+        paramName: "Volume (1-100)",
+        isOptional: true,
+        paramInputPlaceholder: "e.g. 75",
+        paramDescription: "Initial volume level (0–100).",
+        type: "primitive/number",
+        value: "" as any,
+      },
+      {
+        paramName: "Allow Download",
+        paramDescription: `Allow anyone to download the previewed file.`,
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //
   //
   // Code Preview Operations
+  {
+    operationName: "Code Preview",
+    nodeName: "Code Preview",
+    operationDescription: `Render code or structured text (JSON, XML, Markdown, etc.) with syntax highlighting.`,
+    params: [
+      {
+        paramName: "Code Content",
+        paramInputPlaceholder: "Paste your code or structured content...",
+        paramDescription: `File path or content to preview.`,
+        type: "primitive/text",
+        isTextarea: true,
+        value: "",
+      },
+      [
+        {
+          paramName: "Line Numbers",
+          paramDescription: `Show line numbers beside code.`,
+          type: "primitive/switch",
+          value: true,
+        },
+        {
+          paramName: "Wrap Lines",
+          paramDescription: `Wrap long lines instead of horizontal scroll.`,
+          type: "primitive/switch",
+          value: true,
+        },
+      ],
+      {
+        paramName: "Language",
+        paramDescription: `Code language for syntax highlighting.`,
+        valuesToPickFrom: ["JSON", "XML", "Markdown", "Js"],
+        type: "primitive/text",
+        value: "",
+      },
+      {
+        paramName: "Allow Download",
+        paramDescription: `Allow anyone to download the previewed content.`,
+        type: "primitive/switch",
+        value: true,
+      },
+    ],
+    inputs: {},
+    inputFilters: [],
+    outputs: {},
+  },
   //
   //
   //

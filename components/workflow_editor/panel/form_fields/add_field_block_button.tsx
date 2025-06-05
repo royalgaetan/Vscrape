@@ -2,7 +2,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 
-const AddFieldBlockButton = ({ onClick }: { onClick: () => void }) => {
+const AddFieldBlockButton = ({
+  contentText,
+  onClick,
+}: {
+  contentText?: string;
+  onClick: () => void;
+}) => {
   return (
     <Button
       variant={"ghost"}
@@ -11,7 +17,8 @@ const AddFieldBlockButton = ({ onClick }: { onClick: () => void }) => {
       )}
       onClick={(e) => onClick()}
     >
-      <Plus className="stroke-neutral-400 size-4 stroke-[1.8px]" /> Add a field
+      <Plus className="stroke-neutral-400 size-4 stroke-[1.8px]" />{" "}
+      {contentText ?? "Add a field"}
     </Button>
   );
 };

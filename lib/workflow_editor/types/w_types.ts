@@ -46,6 +46,7 @@ export type VsNodeType = {
   | NodeWithWaitBlock
   | NodeWithSetVarialbesBlock
   | NodeWithBranchBlocks
+  | NodeWithPreviewBlock
 );
 export const nodeBlockTypeNames = [
   "operation",
@@ -56,6 +57,7 @@ export const nodeBlockTypeNames = [
   "wait",
   "setVariables",
   "branches",
+  "preview",
 ] as const;
 
 export type NodeWithOperationBlocks = {
@@ -94,6 +96,10 @@ export type NodeWithSetVarialbesBlock = {
 export type NodeWithBranchBlocks = {
   blockType: (typeof nodeBlockTypeNames)["7"];
   blocks: undefined;
+};
+export type NodeWithPreviewBlock = {
+  blockType: (typeof nodeBlockTypeNames)["8"];
+  blocks: OperationBlock[];
 };
 
 // ---------------------------------------------------------
