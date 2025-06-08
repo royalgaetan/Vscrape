@@ -25,6 +25,16 @@ import {
 import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { cloneDeep } from "lodash";
+import { toast } from "sonner";
+import { getTypeBigCategory } from "@/lib/workflow_editor/utils/get_criterias";
+import {
+  extractTextFromHTML,
+  isPureVariableOnly,
+  stripMustacheBraces,
+  toCleanHTML,
+  toStringSafe,
+} from "@/lib/string_utils";
+import { resolveInputTypeFromReference } from "../../inputs/filter_input_row";
 
 const SingleOperationPanel = ({
   nodeOrigin,
@@ -46,36 +56,128 @@ const SingleOperationPanel = ({
     (operation) => operation.nodeName === nodeOrigin.label
   );
 
+  const [errorFields, setErrorFields] = useState<string[]>([]);
+
   const [isSavingOperation, setIsSavingOperation] = useState(false);
   const [SavingOperationResultIcon, setSavingOperationResultIcon] = useState<
     LucideIcon | undefined
   >(undefined);
 
   const saveOperation = async () => {
+    setErrorFields([]);
     setSavingOperationResultIcon(undefined);
     setIsSavingOperation(true);
     await delay(400);
 
-    if (!currentBlock) {
-      setIsSavingOperation(false);
-      setSavingOperationResultIcon(X);
-      await delay(1000);
-      setSavingOperationResultIcon(undefined);
-      return;
-    }
     try {
+      if (!currentBlock)
+        throw new Error("Can't save this Operation! Try again.");
+
+      // Errors Checking
+      errorChecker();
+
       setIsSavingOperation(false);
       setSavingOperationResultIcon(Check);
       await delay(150);
       setSavingOperationResultIcon(undefined);
       onSave(currentBlock);
     } catch (e) {
+      toast.error("Invalid Operation! Try again.", {
+        position: "bottom-center",
+        richColors: true,
+      });
       console.log("Err", e);
       setIsSavingOperation(false);
       setSavingOperationResultIcon(X);
       await delay(1000);
       setSavingOperationResultIcon(undefined);
       return;
+    }
+  };
+
+  const errorChecker = () => {
+    const errFields: string[] = ["Test"];
+
+    const paramFlatted =
+      currentBlock?.params && currentBlock?.params.flatMap((p) => p);
+    paramFlatted &&
+      paramFlatted.forEach((param) => {
+        const paramValueCleaned = extractTextFromHTML(
+          toStringSafe(param.value)
+        );
+        const paramType = isPureVariableOnly(paramValueCleaned)
+          ? resolveInputTypeFromReference(param.value)
+          : param.type;
+
+        console.log(
+          `Param ${param.isOptional ? "(optional)" : "(Oblig)"}:`,
+          param.paramName,
+          "\nType: ",
+          paramType,
+          `\nVal ${
+            isPureVariableOnly(paramValueCleaned) ? "(Pure)" : "(Impure):"
+          } `,
+          param.value,
+          "\nCleaned: ",
+          paramValueCleaned,
+          "Eval: ",
+          !isNaN(Number(paramValueCleaned.trim()))
+        );
+        if (param.isOptional) {
+        } else {
+          // STRINGS CHECKER
+          if (
+            (getTypeBigCategory(paramType) === "Strings" ||
+              paramType === "primitive/customSwitch") &&
+            (typeof param.value !== "string" || paramValueCleaned.length === 0)
+          ) {
+            errFields.push(param.paramName);
+          }
+
+          // NUMBER CHECKER
+          if (
+            getTypeBigCategory(paramType) === "Numbers" &&
+            (paramValueCleaned.length === 0 ||
+              isNaN(Number(paramValueCleaned.trim())))
+          ) {
+            errFields.push(param.paramName);
+          }
+
+          // BOOLEANS CHECKER
+          if (
+            getTypeBigCategory(paramType) === "Booleans" &&
+            typeof param.value !== "boolean"
+          ) {
+            errFields.push(param.paramName);
+          }
+
+          // Radio CHECKER
+          if (
+            paramType === "primitive/radio" &&
+            (typeof param.value !== "string" || param.value.length === 0)
+          ) {
+            errFields.push(param.paramName);
+          }
+
+          // Array CHECKER
+          if (
+            paramType === "primitive/array" &&
+            (!Array.isArray(param.value) ||
+              param.value.some((item, idx, arr) =>
+                shouldExcludeItem(item, idx, arr)
+              ))
+          ) {
+            errFields.push(param.paramName);
+          }
+
+          // + Record Checker + Raw
+        }
+      });
+
+    if (errFields.length > 0) {
+      setErrorFields(errFields);
+      console.log("errFields", errFields);
+      throw new Error("Invalid Operation!");
     }
   };
 
@@ -147,6 +249,7 @@ const SingleOperationPanel = ({
                         : []
                     }
                     handleSelect={(opSelected) => {
+                      setErrorFields([]);
                       if (
                         currentBlock &&
                         opSelected === currentBlock.operationName
@@ -198,6 +301,9 @@ const SingleOperationPanel = ({
                                 <OperationParamCard
                                   currentOperationBlock={currentBlock}
                                   isWithinAGroup={true}
+                                  hasError={errorFields.includes(
+                                    param.paramName
+                                  )}
                                   paramData={param}
                                   labelClassName={
                                     param.type
@@ -219,6 +325,7 @@ const SingleOperationPanel = ({
                         ) : (
                           <div className="flex flex-1 w-full px-4 pr-4">
                             <OperationParamCard
+                              hasError={errorFields.includes(params.paramName)}
                               currentOperationBlock={currentBlock}
                               paramData={params}
                               isWithinAGroup={false}
@@ -365,3 +472,33 @@ const SingleOperationPanel = ({
 };
 
 export default SingleOperationPanel;
+
+const getItemTypeCategory = (item: any): string => {
+  if (isPureVariableOnly(item)) {
+    const resolvedType = resolveInputTypeFromReference(
+      extractTextFromHTML(item)
+    );
+    return getTypeBigCategory(resolvedType) ?? "";
+  }
+  if (typeof item === "boolean") {
+    return "boolean";
+  }
+  if (!isNaN(Number(item))) {
+    return "number";
+  }
+  return typeof item;
+};
+
+const shouldExcludeItem = (item: any, idx: number, arr: any[]): boolean => {
+  const itemAsString = toCleanHTML(toStringSafe(item));
+
+  // Exclude if empty and not the last item
+  if (itemAsString.length === 0 && idx !== arr.length - 1) {
+    return true;
+  }
+
+  const typeCategory = getItemTypeCategory(itemAsString);
+
+  // Exclude if not one of the allowed types
+  return !["string", "number", "Strings", "Numbers"].includes(typeCategory);
+};

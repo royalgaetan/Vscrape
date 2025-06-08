@@ -2,7 +2,7 @@ import {
   vsAnyPrimitives,
   vsAnyRawTypes,
 } from "@/lib/workflow_editor/types/data_types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import RecordInput from "./inputs/record_input";
 import CustomSwitchInput from "./inputs/custom_switch_input";
 import { OperationValuesToPickFromType } from "@/lib/workflow_editor/types/w_types";
@@ -25,20 +25,33 @@ import DurationInput from "./inputs/duration_input";
 const ParamInput = ({
   inputType,
   placeHolder,
-  onChange,
+  onValueChange,
   valuesToPickFrom,
   initialValue,
   isWithinAGroup,
   isTextarea,
+  hasError,
 }: {
   inputType: vsAnyPrimitives["type"] | vsAnyRawTypes["type"];
   placeHolder?: string;
-  onChange: (value: any) => void;
+  onValueChange: (value: any) => void;
   initialValue: any;
   valuesToPickFrom?: OperationValuesToPickFromType;
   isWithinAGroup: boolean;
   isTextarea?: boolean;
+  hasError?: boolean;
 }) => {
+  const [hasInternalError, setHasInternalError] = useState(hasError ?? false);
+
+  useEffect(() => {
+    setHasInternalError(hasError ?? false);
+  }, [hasError]);
+
+  const onChange = (val: any) => {
+    setHasInternalError(false);
+    onValueChange(val);
+  };
+
   switch (inputType) {
     case "primitive/text":
       // Single Item Picker
@@ -52,7 +65,9 @@ const ParamInput = ({
             <SelectTrigger
               className={cn(
                 "h-[1.9rem] w-[15.7rem]",
-                isWithinAGroup && "min-w-24 max-w-24"
+                isWithinAGroup && "min-w-24 max-w-24",
+                hasInternalError &&
+                  "border-destructive/70 ring-2 ring-destructive/60"
               )}
             >
               <SelectValue className="text-xs" placeholder="Select..." />
@@ -81,7 +96,10 @@ const ParamInput = ({
         return (
           <MultiSelect
             isTriggerDisabled={valuesToPickFrom.length === 0}
-            triggerClassName="h-7 w-[15.7rem] flex flex-1 mb-1"
+            triggerClassName={`h-7 w-[15.7rem] flex flex-1 mb-1 ${
+              hasInternalError &&
+              "border-destructive/70 ring-2 ring-destructive/60"
+            }`}
             popoverAlignment="center"
             selectionMode="single"
             popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
@@ -114,6 +132,7 @@ const ParamInput = ({
           <DnDTextInput
             isTextarea={typeof initialValue === "string" && isTextarea}
             inputValue={initialValue}
+            hasError={hasInternalError}
             onTextChange={(text) => {
               onChange(text);
             }}
@@ -129,6 +148,7 @@ const ParamInput = ({
       return (
         <DnDTextInput
           inputType="email"
+          hasError={hasInternalError}
           inputValue={initialValue}
           onTextChange={(text) => {
             onChange(text);
@@ -144,6 +164,7 @@ const ParamInput = ({
       return (
         <DnDTextInput
           inputType="url"
+          hasError={hasInternalError}
           inputValue={initialValue}
           onTextChange={(text) => {
             onChange(text);
@@ -159,6 +180,7 @@ const ParamInput = ({
     case "primitive/number":
       return (
         <DnDTextInput
+          hasError={hasInternalError}
           inputType="number"
           inputValue={initialValue}
           onTextChange={(text) => {
@@ -175,6 +197,7 @@ const ParamInput = ({
       return (
         <DnDTextInput
           inputType="tel"
+          hasError={hasInternalError}
           inputValue={initialValue}
           onTextChange={(text) => {
             onChange(text);
@@ -190,7 +213,7 @@ const ParamInput = ({
     case "primitive/milliseconds":
       return (
         <DurationInput
-          hasError={false}
+          hasError={hasInternalError}
           isDisabled={false}
           initialValue={initialValue}
           onSave={(duration) => {
@@ -202,6 +225,7 @@ const ParamInput = ({
     case "primitive/array":
       return (
         <ArrayInput
+          hasError={hasInternalError}
           initialArray={initialValue}
           onChange={(newArray) => {
             onChange(newArray);
@@ -212,6 +236,7 @@ const ParamInput = ({
     case "primitive/record":
       return (
         <RecordInput
+          hasError={hasInternalError}
           initialRecords={initialValue}
           onChange={(newRecords) => {
             onChange(newRecords);
@@ -222,6 +247,7 @@ const ParamInput = ({
     case "primitive/customSwitch":
       return (
         <CustomSwitchInput
+          hasError={hasInternalError}
           valuesToPickFrom={valuesToPickFrom}
           onValueChange={(newVal) => onChange(newVal)}
           selectedValue={initialValue}
@@ -237,6 +263,7 @@ const ParamInput = ({
           )}
         >
           <SimpleSwitchInput
+            hasError={hasInternalError}
             isChecked={!!initialValue}
             onCheckedChange={(isChecked) => onChange(isChecked)}
           />
@@ -247,6 +274,7 @@ const ParamInput = ({
         <div className={cn("flex flex-1 justify-start pl-1")}>
           {valuesToPickFrom && (
             <RadioInput
+              hasError={hasInternalError}
               onSelect={onChange}
               selectedValue={initialValue}
               valuesToSelect={valuesToPickFrom.map((v) => toStringSafe(v))}

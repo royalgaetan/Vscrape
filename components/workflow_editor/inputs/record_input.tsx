@@ -2,7 +2,7 @@ import { SidebarIcon } from "@/components/global/app_sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import DnDTextInput from "./dnd_text_input";
 import { RecordArray } from "@/lib/workflow_editor/types/w_types";
 import { generateHexRandomString } from "@/lib/numbers_utils";
@@ -10,7 +10,9 @@ import { generateHexRandomString } from "@/lib/numbers_utils";
 const RecordInput = ({
   initialRecords,
   onChange,
+  hasError,
 }: {
+  hasError?: boolean;
   initialRecords: RecordArray;
   onChange?: (newRecords: RecordArray) => void;
 }) => {
@@ -18,7 +20,11 @@ const RecordInput = ({
 
   return (
     <div
-      className="flex flex-col"
+      className={cn(
+        "flex flex-col",
+        hasError &&
+          "border-destructive/70 rounded-sm ring-2 ring-offset-2 ring-destructive/60 transition-all duration-300"
+      )}
       role="button"
       tabIndex={1}
       onMouseLeave={() => onChange && onChange(localRecords)}

@@ -24,6 +24,7 @@ export type BigCriteriaCategory =
   | "DateTimes"
   | "Booleans"
   | "Numbers"
+  | "Range"
   | "Raw";
 export type DateTimePreset = "Today" | "Tomorrow" | "Yesterday" | "Now";
 export type vsCriteria<T extends (vsAnyPrimitives | vsAnyRawTypes)["type"]> =

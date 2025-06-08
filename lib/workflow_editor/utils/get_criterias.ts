@@ -18,7 +18,9 @@ import {
 } from "../types/mime_types";
 
 type T = (vsAnyPrimitives | vsAnyRawTypes)["type"];
-const getTypeBigCategory = (type?: T): BigCriteriaCategory | undefined => {
+export const getTypeBigCategory = (
+  type?: T
+): BigCriteriaCategory | undefined => {
   if (
     type === "primitive/text" ||
     type === "primitive/url" ||
@@ -28,8 +30,12 @@ const getTypeBigCategory = (type?: T): BigCriteriaCategory | undefined => {
     return "Strings";
   } else if (type === "primitive/dateTime") {
     return "DateTimes";
-  } else if (type === "primitive/boolean") {
+  } else if (type === "primitive/boolean" || type === "primitive/switch") {
     return "Booleans";
+  } else if (type === "primitive/range") {
+    return "Range";
+  } else if (type === "primitive/milliseconds" || type === "primitive/number") {
+    return "Numbers";
   } else if (
     isImageMimeType(type) ||
     isVideoMimeType(type) ||
@@ -104,7 +110,7 @@ export const getCriteriaSelection = ({
   }
 
   // Add Range Criterias
-  else if (filterType === "primitive/range") {
+  else if (getTypeBigCategory(filterType) === "Range") {
     allCriterias = allCriterias.concat([
       "is exactly",
       "overlaps with",
@@ -115,7 +121,10 @@ export const getCriteriaSelection = ({
   }
 
   // Add TimeMs Criterias
-  else if (filterType === "primitive/milliseconds") {
+  else if (
+    getTypeBigCategory(filterType) === "Numbers" &&
+    filterType === "primitive/milliseconds"
+  ) {
     allCriterias = allCriterias.concat([
       "is",
       "is not",
@@ -126,7 +135,7 @@ export const getCriteriaSelection = ({
     ] as vsTimeMsCriterias["filterCriteria"][]);
   }
   // Add Numbers Criterias
-  else if (filterType === "primitive/number") {
+  else if (getTypeBigCategory(filterType) === "Numbers") {
     allCriterias = allCriterias.concat([
       "is",
       "is not",

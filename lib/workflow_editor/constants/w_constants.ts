@@ -20,7 +20,6 @@ import {
   NotebookTextIcon,
   MessageCircleMoreIcon,
   Clock,
-  Split,
   ZapIcon,
   GitBranch,
   DatabaseZapIcon,

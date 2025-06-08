@@ -15,14 +15,28 @@ export const isTrulyEmpty = (text: string) => {
   return text.replace(/\u200B/g, "").trim().length === 0;
 };
 
+export const flattenNodeToString = (node: Node): string => {
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    return (node as HTMLElement).outerHTML;
+  } else if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent || "";
+  } else {
+    return "";
+  }
+};
+
+export const toCleanHTML = (content: any) =>
+  toStringSafe(content)
+    .replace(/\u00A0/g, " ")
+    .replace(/\u200B/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 export const extractSingleTokenType = (
   content: string
 ): string | null | undefined => {
   const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = content
-    .replace(/\u00A0/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  tempDiv.innerHTML = toCleanHTML(content);
 
   const tokenChips = tempDiv.querySelectorAll(".token-chip");
   if (tokenChips.length === 1) {
@@ -40,14 +54,19 @@ export const extractSingleTokenType = (
   return null;
 };
 
+export const stripMustacheBraces = (input: string): string => {
+  return input
+    .trim()
+    .replace(/^{{[\s\u200B]*/g, "") // start: allow spaces or zero-width
+    .replace(/[\s\u200B]*}}/g, "") // end: allow spaces or zero-width
+    .replace(/[\u200B\u200C\u200D\uFEFF]/g, ""); // remove invisible characters
+};
+
 export const isPureVariableOnly = (html: string): boolean => {
   const container = document.createElement("div");
   container.innerHTML = html;
 
-  const cleanedText = (container.textContent || "")
-    .replace(/\u00A0/g, " ")
-    .replace(/\s+/g, " ")
-    .trim(); // replace &nbsp;
+  const cleanedText = toCleanHTML(container.textContent);
 
   const matches = cleanedText.match(/{{\s*[^{}]*?\s*}}/g) || [];
 

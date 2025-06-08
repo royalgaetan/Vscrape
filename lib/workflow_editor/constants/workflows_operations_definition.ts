@@ -52,7 +52,7 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         valuesToPickFrom: ["GET", "POST"],
         paramDescription:
           "Some pages need to be scraped via POST requests (e.g. submitting filters or forms).",
-        value: "GET",
+        value: "",
       },
       {
         paramName: "Headers",
@@ -1952,7 +1952,7 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
     operationName: "Generate Voice / Audio",
     nodeName: "AI Generation",
     operationDescription:
-      "Create a short animated video (or loop) from a descriptive scene prompt.",
+      "Convert text into natural-sounding speech using AI-generated voices — useful for voiceovers, narration, or accessibility.",
     params: [
       {
         paramName: "Prompt",
@@ -2732,8 +2732,8 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         paramName: "Object Types",
         paramDescription: `Filter object types to detect. E.g., Person, Car, Dog. (leave empty for all).`,
         type: "primitive/array",
-        isOptional: true,
-        value: [""],
+        // isOptional: true,
+        value: [""] as any,
       },
     ],
     inputs: {},

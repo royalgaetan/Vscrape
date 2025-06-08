@@ -11,6 +11,7 @@ const OperationParamCard = ({
   inputClassName,
   labelClassName,
   isWithinAGroup,
+  hasError,
 }: {
   currentOperationBlock: OperationBlock;
   paramData: OperationParamItem;
@@ -18,6 +19,7 @@ const OperationParamCard = ({
   inputClassName?: string;
   labelClassName?: string;
   isWithinAGroup: boolean;
+  hasError?: boolean;
 }) => {
   const getParam = (): OperationParamItem | undefined => {
     return currentOperationBlock?.params
@@ -53,9 +55,6 @@ const OperationParamCard = ({
       }
     });
     currentOperationBlock.params = updatedOperationParams;
-
-    // console.log("@debug", "Internal Value", internalValue);
-    // console.log("@debug", "(provider) currentOperationBlock", currentOperationBlock);
   };
 
   return (
@@ -73,7 +72,6 @@ const OperationParamCard = ({
       >
         {paramData.paramName}
       </div>
-
       <div
         className={cn(
           "flex flex-1 w-full !justify-start items-center text-xs text-neutral-700",
@@ -84,7 +82,8 @@ const OperationParamCard = ({
           isWithinAGroup={isWithinAGroup}
           initialValue={internalValue}
           inputType={paramData.type}
-          onChange={onValueChange}
+          onValueChange={onValueChange}
+          hasError={hasError}
           placeHolder={paramData.paramInputPlaceholder}
           valuesToPickFrom={paramData.valuesToPickFrom}
           isTextarea={

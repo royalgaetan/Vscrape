@@ -53,6 +53,7 @@ const EditorGettingStartedButton = ({
             {workflowEditorNodes
               .filter((node) => node.sectionName === "Entry Point")
               .map((node) => {
+                const Icon = node.icon;
                 return (
                   <button
                     onClick={() =>
@@ -64,12 +65,13 @@ const EditorGettingStartedButton = ({
                     key={node.label}
                     disabled={node.label === "Chat Bot"}
                     className={cn(
-                      "w-24 h-[2.5rem] flex justify-center items-center border-none ring-4 ring-transparent rounded-full transition-all duration-300 text-center text-xs font-semibold",
+                      "min-w-24 px-3 h-[2.5rem] flex gap-1 justify-center items-center border-none ring-4 ring-transparent rounded-full transition-all duration-300 text-center text-xs font-semibold",
                       node.label !== "Chat Bot"
                         ? "bg-white/90 text-neutral-500  hover:ring-neutral-500 active:scale-[0.94]"
                         : "bg-neutral-500 text-neutral-400"
                     )}
                   >
+                    {Icon && <Icon className="size-4 stroke-neutral-600" />}
                     {node.label}
                   </button>
                 );

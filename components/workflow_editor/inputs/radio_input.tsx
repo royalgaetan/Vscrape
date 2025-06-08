@@ -10,11 +10,13 @@ const RadioInput = ({
   valuesToSelect,
   onSelect,
   className,
+  hasError,
 }: {
   valuesToSelect: string[];
   selectedValue: string;
   onSelect: (value: string) => void;
   className?: string;
+  hasError?: boolean;
 }) => {
   const componentId = useId();
   return (
@@ -22,7 +24,12 @@ const RadioInput = ({
       defaultValue={selectedValue}
       onValueChange={onSelect}
       key={`radio_${componentId}`}
-      className={cn("flex flex-col justify-start mb-0 mt-2 gap-y-3", className)}
+      className={cn(
+        "flex flex-col justify-start mb-0 mt-2 gap-y-3 border-none",
+        hasError &&
+          "rounded-sm ring-2 ring-offset-[3px] ring-destructive/60 transition-all duration-300",
+        className
+      )}
     >
       {valuesToSelect.length > 0 &&
         valuesToSelect

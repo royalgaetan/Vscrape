@@ -22,14 +22,19 @@ const DurationInput = ({
   isDisabled: boolean;
   disabledDnd?: boolean;
   isTimePicker?: boolean;
-  hasError: boolean;
+  hasError?: boolean;
   placeholder?: string;
   className?: string;
 }) => {
   const [openDurationPicker, setOpenDurationPicker] = useState(false);
 
   return (
-    <div className={cn("relative group/durationInput !h-[1.75rem]", className)}>
+    <div
+      className={cn(
+        "relative group/durationInput min-w-20 !h-[1.75rem]",
+        className
+      )}
+    >
       <DnDTextInput
         onClick={() => {
           disabledDnd && setOpenDurationPicker(true);

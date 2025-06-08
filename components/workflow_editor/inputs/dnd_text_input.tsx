@@ -1,5 +1,6 @@
 import {
   extractTextFromHTML,
+  flattenNodeToString,
   isTrulyEmpty,
   toStringSafe,
 } from "@/lib/string_utils";
@@ -17,6 +18,7 @@ import {
 } from "@/lib/dom_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { TokenInputType } from "@/lib/workflow_editor/types/w_types";
+import { resolveInputTypeFromReference } from "./filter_input_row";
 
 const DnDTextInput = ({
   placeholder,
@@ -77,10 +79,12 @@ const DnDTextInput = ({
       isTrulyEmpty(extractTextFromHTML(toStringSafe(html))));
 
   const cleanHTML = (html: any) => {
-    const cleaned = toStringSafe(html).replace(/\u200B/g, "");
-    cleaned.replace(/<br\s*\/?>/g, "");
+    const cleaned = toStringSafe(html)
+      .replace(/(?:<span>(?:\s*|\u200B)*<\/span>)+/g, "")
+      .replace(/<br\s*\/?>/g, "")
+      .trim();
 
-    return cleaned.trim();
+    return cleaned;
   };
 
   const parseEditorText = (text: string) => {
@@ -90,35 +94,34 @@ const DnDTextInput = ({
     const regex = /{{\s*[^{}]*?\s*}}/;
 
     function walk(node: Node): void {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const content = node.textContent ?? "";
-        if (!regex.test(content)) return;
+      const content = node.textContent ?? "";
+      if (!regex.test(content)) return;
 
-        const parent = node.parentNode;
-        if (!parent) return;
+      const parent = node.parentNode;
+      if (!parent) return;
 
-        const tokens = content.split(/({{\s*[^{}]*?\s*}})/g).filter(Boolean);
-        const fragments = tokens.map((token) => {
-          if (regex.test(token)) {
-            const b = document.createElement("b");
-            b.className = "token-chip";
-            b.id = crypto.randomUUID();
-            b.textContent = token.replace(/\u200B/g, "").trim();
-            return b;
-          } else {
-            const span = document.createElement("span");
-            span.className = "text-neutral-700 font-normal";
-            span.textContent = token;
-            return span;
-          }
-        });
+      const tokens = content.split(/({{\s*[^{}]*?\s*}})/g).filter(Boolean);
+      const fragments = tokens.map((token) => {
+        if (regex.test(token)) {
+          const b = document.createElement("b");
+          b.className = "token-chip";
+          b.id = crypto.randomUUID();
+          b.textContent = token.replace(/\u200B/g, "").trim();
+          b.setAttribute(
+            "data-type",
+            resolveInputTypeFromReference(token) ?? ""
+          );
+          return b;
+        } else {
+          const span = document.createElement("span");
+          span.className = "text-neutral-700 font-normal";
+          span.textContent = token;
+          return span;
+        }
+      });
 
-        fragments.forEach((frag) => parent.insertBefore(frag, node));
-        parent.removeChild(node);
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        if ((node as HTMLElement).classList.contains("token-chip")) return; // Skip existing
-        Array.from(node.childNodes).forEach(walk);
-      }
+      fragments.forEach((frag) => parent.insertBefore(frag, node));
+      parent.removeChild(node);
     }
 
     Array.from(container.childNodes).forEach(walk);
@@ -185,8 +188,10 @@ const DnDTextInput = ({
     }
 
     // Re-parse editor content after insertion
-    const html = parseEditorText(rawText);
-    editor.innerHTML = html;
+    const html = parseEditorText(rawText).concat("\u200B ");
+    const editorContentCleaned = html.replace(/<br\s*\/?>/g, "");
+
+    editor.innerHTML = editorContentCleaned;
 
     // Ensure caret is at the end after re-parsing
     const finalRange = document.createRange();
@@ -197,9 +202,6 @@ const DnDTextInput = ({
     sel?.addRange(finalRange);
 
     // Update state
-    const editorContentCleaned = editor.innerHTML.replace(/\u200B/g, "");
-    editorContentCleaned.replace(/<br\s*\/?>/g, "");
-
     setHtml(editorContentCleaned);
     onTextChange && onTextChange(editorContentCleaned);
     onElementDropped && onElementDropped(editorContentCleaned);
@@ -223,17 +225,18 @@ const DnDTextInput = ({
     preCaretRange.setEnd(range.endContainer, range.endOffset);
     const caretPosition = preCaretRange.toString().length;
 
-    const rawText = editor.innerText;
+    const rawText = editor.innerHTML;
     const html = parseEditorText(rawText);
 
+    const editorContentCleaned = cleanHTML(html);
     if (editor.innerHTML !== html) {
       if (!isTextarea) {
-        editor.innerHTML = html;
+        editor.innerHTML = editorContentCleaned;
+
         restoreCaret(editor, caretPosition);
       }
 
       // Update state
-      const editorContentCleaned = cleanHTML(html);
 
       setHtml(editorContentCleaned);
       onTextChange && onTextChange(editorContentCleaned);
@@ -326,7 +329,7 @@ const DnDTextInput = ({
       }}
       className={cn(
         !isTextarea ? "[--DnDInputHeight:1.74rem]" : "[--DnDInputHeight:5rem]",
-        "relative text-left text-xs cursor-text rounded-sm border border-gray-300 bg-white flex flex-1 justify-center items-center content-center truncate line-clamp-1 overflow-hidden max-h-[var(--DnDInputHeight)] min-h-[var(--DnDInputHeight)] transition-colors file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-foreground placeholder:font-semibold placeholder:text-muted-foreground/70 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        "relative text-left text-xs cursor-text rounded-sm border border-gray-300 max-w-[15rem] bg-transparent flex flex-1 justify-center items-center content-center truncate line-clamp-1 overflow-hidden max-h-[var(--DnDInputHeight)] min-h-[var(--DnDInputHeight)] transition-colors file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-foreground placeholder:font-semibold placeholder:text-muted-foreground/70 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         !isDisabled &&
           "focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/50 focus-within:outline-none transition-all duration-300",
         className,
@@ -366,6 +369,7 @@ const DnDTextInput = ({
           if (disableDnD) return;
           if (isDragging) setIsDragging(false);
         }}
+        onPaste={(e) => e.preventDefault()}
         onDrop={(e) => {
           if (disableDnD) return;
           e.preventDefault();

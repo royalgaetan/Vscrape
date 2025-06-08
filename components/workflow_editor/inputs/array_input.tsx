@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import DnDTextInput from "./dnd_text_input";
 import { RecordArray } from "@/lib/workflow_editor/types/w_types";
 import { generateHexRandomString } from "@/lib/numbers_utils";
+import { toStringSafe } from "@/lib/string_utils";
 
 const ArrayInput = ({
   initialArray,
@@ -21,9 +22,9 @@ const ArrayInput = ({
   return (
     <div
       className={cn(
-        "flex flex-col",
+        "flex flex-col border-none",
         hasError &&
-          "border-destructive/70 rounded-sm ring-2 ring-offset-2 ring-destructive/60 transition-all duration-300"
+          "rounded-sm ring-2 ring-offset-2 ring-destructive/60 transition-all duration-300"
       )}
       role="button"
       tabIndex={1}
@@ -40,7 +41,7 @@ const ArrayInput = ({
               key={"value"}
               placeholder={"Value..."}
               inputType="text"
-              className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)] mb-0"
+              className="min-w-[var(--dndInputWidth)] !max-w-[var(--dndInputWidth)] mb-0"
               inputValue={arrItem}
               // onBlur={(text) => {
               //   if (!text) return;
@@ -54,12 +55,10 @@ const ArrayInput = ({
                 }
               }}
               onElementDropped={(text) => {
-                if (!text) return;
-                localArray[idx] = text;
+                localArray[idx] = toStringSafe(text);
               }}
               onTextChange={(text) => {
-                if (!text) return;
-                localArray[idx] = text;
+                localArray[idx] = toStringSafe(text);
               }}
             />
             <div className="w-8 h-[1.73rem]">
