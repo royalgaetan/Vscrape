@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
 import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
-import { delay, generateHexRandomString } from "@/lib/numbers_utils";
+import {
+  delay,
+  generateHexRandomString,
+  isReallyNumber,
+} from "@/lib/numbers_utils";
 import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
 import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
 import { NodeBlockType } from "@/stores/workflowStore";
@@ -35,6 +39,8 @@ import {
   toStringSafe,
 } from "@/lib/string_utils";
 import { resolveInputTypeFromReference } from "../../inputs/filter_input_row";
+import { isRecord } from "@/lib/utils";
+import { isAFile } from "../form_fields/form_field_block_preview";
 
 const SingleOperationPanel = ({
   nodeOrigin,
@@ -119,9 +125,7 @@ const SingleOperationPanel = ({
           } `,
           param.value,
           "\nCleaned: ",
-          paramValueCleaned,
-          "Eval: ",
-          !isNaN(Number(paramValueCleaned.trim()))
+          paramValueCleaned
         );
         if (param.isOptional) {
         } else {
@@ -170,7 +174,25 @@ const SingleOperationPanel = ({
             errFields.push(param.paramName);
           }
 
-          // + Record Checker + Raw
+          // Record CHECKER
+          if (
+            paramType === "primitive/record" &&
+            (!Array.isArray(param.value) ||
+              param.value.some(
+                (rec) =>
+                  !isRecord(rec) ||
+                  Object.keys(rec).some((item, idx) =>
+                    shouldExcludeItem(item, idx)
+                  ) ||
+                  Object.values(rec).some((item, idx) =>
+                    shouldExcludeItem(item, idx)
+                  )
+              ))
+          ) {
+            errFields.push(param.paramName);
+          }
+
+          // Raw CHECKER: Non-existant in Operation Definition List
         }
       });
 
@@ -483,21 +505,24 @@ const getItemTypeCategory = (item: any): string => {
   if (typeof item === "boolean") {
     return "boolean";
   }
-  if (!isNaN(Number(item))) {
+  if (isReallyNumber(item)) {
     return "number";
   }
   return typeof item;
 };
 
-const shouldExcludeItem = (item: any, idx: number, arr: any[]): boolean => {
+const shouldExcludeItem = (item: any, idx: number, arr?: any[]): boolean => {
   const itemAsString = toCleanHTML(toStringSafe(item));
 
   // Exclude if empty and not the last item
-  if (itemAsString.length === 0 && idx !== arr.length - 1) {
+  if (arr && itemAsString.length === 0 && idx !== arr.length - 1) {
+    return true;
+  } else if (!arr && itemAsString.length === 0) {
     return true;
   }
 
-  const typeCategory = getItemTypeCategory(itemAsString);
+  const typeCategory = getItemTypeCategory(item);
+  console.log(">>>>>", item, typeCategory);
 
   // Exclude if not one of the allowed types
   return !["string", "number", "Strings", "Numbers"].includes(typeCategory);

@@ -1,5 +1,18 @@
 import { randomBytes } from "crypto";
 
+export const isReallyNumber = (value: any): boolean => {
+  // Check if type is number and is not NaN
+  if (typeof value === "number") {
+    return !Number.isNaN(value);
+  }
+  // If it's a string, check if it converts to a valid number
+  if (typeof value === "string" && value.trim() !== "") {
+    return !Number.isNaN(Number(value));
+  }
+  // Other types (boolean, null, undefined, objects) are not numbers
+  return false;
+};
+
 export const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 

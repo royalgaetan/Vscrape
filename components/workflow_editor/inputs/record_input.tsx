@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import DnDTextInput from "./dnd_text_input";
 import { RecordArray } from "@/lib/workflow_editor/types/w_types";
 import { generateHexRandomString } from "@/lib/numbers_utils";
+import { toStringSafe } from "@/lib/string_utils";
 
 const RecordInput = ({
   initialRecords,
@@ -82,48 +83,54 @@ const SingleRecordRow = ({
       role="button"
       tabIndex={1}
     >
-      <DnDTextInput
-        key={"name"}
-        placeholder={"Name..."}
-        className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
-        inputType="text"
-        inputValue={recordkey}
-        // onBlur={(text) => {
-        //   if (!text) return;
-        //   onBlur && onBlur({ key: text, value: recordValue });
-        // }}
-        onElementDropped={(text) => {
-          if (!text || text === recordkey) return;
-          setRecordkey(text);
-          onSave && onSave({ key: text, value: recordValue });
-        }}
-        onTextChange={(text) => {
-          if (!text || text === recordkey) return;
-          setRecordkey(text);
-          onSave && onSave({ key: text, value: recordValue });
-        }}
-      />
-      <DnDTextInput
-        key={"value"}
-        placeholder={"Value..."}
-        inputType="text"
-        className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
-        inputValue={recordValue}
-        // onBlur={(text) => {
-        //   if (!text) return;
-        //   onBlur && onBlur({ key: recordkey, value: text });
-        // }}
-        onElementDropped={(text) => {
-          if (!text || text === recordValue) return;
-          setRecordValue(text);
-          onSave && onSave({ key: recordkey, value: text });
-        }}
-        onTextChange={(text) => {
-          if (!text || text === recordValue) return;
-          setRecordValue(text);
-          onSave && onSave({ key: recordkey, value: text });
-        }}
-      />
+      <div className="flex flex-col w-1/2">
+        {JSON.stringify(recordkey)} <br />
+        <DnDTextInput
+          key={"name"}
+          placeholder={"Name..."}
+          className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
+          inputType="text"
+          inputValue={recordkey}
+          // onBlur={(text) => {
+          //   if (!text) return;
+          //   onBlur && onBlur({ key: text, value: recordValue });
+          // }}
+          onElementDropped={(val) => {
+            const text = toStringSafe(val);
+            setRecordkey(text);
+            onSave && onSave({ key: text, value: recordValue });
+          }}
+          onTextChange={(val) => {
+            const text = toStringSafe(val);
+            setRecordkey(text);
+            onSave && onSave({ key: text, value: recordValue });
+          }}
+        />
+      </div>
+      <div className="flex flex-col w-1/2">
+        {JSON.stringify(recordValue)} <br />
+        <DnDTextInput
+          key={"value"}
+          placeholder={"Value..."}
+          inputType="text"
+          className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
+          inputValue={recordValue}
+          // onBlur={(text) => {
+          //   if (!text) return;
+          //   onBlur && onBlur({ key: recordkey, value: text });
+          // }}
+          onElementDropped={(val) => {
+            const text = toStringSafe(val);
+            setRecordValue(text);
+            onSave && onSave({ key: recordkey, value: text });
+          }}
+          onTextChange={(val) => {
+            const text = toStringSafe(val);
+            setRecordValue(text);
+            onSave && onSave({ key: recordkey, value: text });
+          }}
+        />
+      </div>
       <div className="w-8 h-[1.73rem]">
         <Button
           variant={"ghost"}
