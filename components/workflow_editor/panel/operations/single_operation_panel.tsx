@@ -63,6 +63,7 @@ const SingleOperationPanel = ({
   );
 
   const [errorFields, setErrorFields] = useState<string[]>([]);
+  const [isEdittingAField, setIsEdittingAField] = useState(false);
 
   const [isSavingOperation, setIsSavingOperation] = useState(false);
   const [SavingOperationResultIcon, setSavingOperationResultIcon] = useState<
@@ -102,7 +103,7 @@ const SingleOperationPanel = ({
   };
 
   const errorChecker = () => {
-    const errFields: string[] = ["Test"];
+    const errFields: string[] = [];
 
     const paramFlatted =
       currentBlock?.params && currentBlock?.params.flatMap((p) => p);
@@ -115,18 +116,6 @@ const SingleOperationPanel = ({
           ? resolveInputTypeFromReference(param.value)
           : param.type;
 
-        console.log(
-          `Param ${param.isOptional ? "(optional)" : "(Oblig)"}:`,
-          param.paramName,
-          "\nType: ",
-          paramType,
-          `\nVal ${
-            isPureVariableOnly(paramValueCleaned) ? "(Pure)" : "(Impure):"
-          } `,
-          param.value,
-          "\nCleaned: ",
-          paramValueCleaned
-        );
         if (param.isOptional) {
         } else {
           // STRINGS CHECKER
@@ -178,16 +167,26 @@ const SingleOperationPanel = ({
           if (
             paramType === "primitive/record" &&
             (!Array.isArray(param.value) ||
-              param.value.some(
-                (rec) =>
-                  !isRecord(rec) ||
-                  Object.keys(rec).some((item, idx) =>
-                    shouldExcludeItem(item, idx)
-                  ) ||
-                  Object.values(rec).some((item, idx) =>
-                    shouldExcludeItem(item, idx)
-                  )
-              ))
+              (param.value as any[]).some((el, idx, arr) => {
+                const isLast = idx === arr.length - 1;
+                // Is empty: { key: "", value: "" }
+                const isEmpty =
+                  JSON.stringify(el) === JSON.stringify({ key: "", value: "" });
+
+                // Either Key or Value is missing
+                const isMissingKey = Object.keys(el).some((key) =>
+                  shouldExcludeItem(key)
+                );
+                const isMissingValue = Object.values(el).some((val) =>
+                  shouldExcludeItem(val)
+                );
+                if (!isRecord) return true;
+                if (isLast) {
+                  if (isEmpty) return false;
+                  else return isMissingKey || isMissingValue;
+                }
+                if (!isLast) return isMissingKey || isMissingValue || isEmpty;
+              }))
           ) {
             errFields.push(param.paramName);
           }
@@ -403,6 +402,13 @@ const SingleOperationPanel = ({
             {currentBlock && (
               <div className="mt-1 flex flex-col justify-start items-start">
                 <MoreOptionInput
+                  isEditting={(state) => setIsEdittingAField(state)}
+                  onError={(hasError) => {
+                    const field = "FilterInputs";
+                    if (hasError) setErrorFields((prev) => [...prev, field]);
+                    else
+                      setErrorFields((prev) => prev.filter((e) => e !== field));
+                  }}
                   optionType="filters"
                   currentBlock={currentBlock}
                 />
@@ -454,6 +460,7 @@ const SingleOperationPanel = ({
                     type="button"
                     variant={"ghost"}
                     size={"sm"}
+                    disabled={isEdittingAField}
                     className="w-fit"
                     onClick={() => {
                       // Delete Operation
@@ -468,7 +475,7 @@ const SingleOperationPanel = ({
 
             <Button
               variant={"default"}
-              disabled={isSavingOperation}
+              disabled={isSavingOperation || isEdittingAField}
               className="rounded-2xl h-7 text-xs gap-1 px-3 duration-150"
               onClick={() => saveOperation()}
               // disabled={!onboardingForm.formState.isValid}
@@ -495,7 +502,28 @@ const SingleOperationPanel = ({
 
 export default SingleOperationPanel;
 
-const getItemTypeCategory = (item: any): string => {
+export const shouldExcludeItem = (
+  item: any,
+  idx?: number,
+  arr?: any[]
+): boolean => {
+  const itemAsString = toCleanHTML(toStringSafe(item));
+
+  // Exclude if empty and not the last item
+  if (
+    (arr && idx && itemAsString.length === 0 && idx !== arr.length - 1) ||
+    (!arr && itemAsString.length === 0)
+  ) {
+    return true;
+  }
+
+  const typeCategory = getItemTypeCategory(item);
+
+  // Exclude if not one of the allowed types
+  return !["string", "number", "Strings", "Numbers"].includes(typeCategory);
+};
+
+export const getItemTypeCategory = (item: any): string => {
   if (isPureVariableOnly(item)) {
     const resolvedType = resolveInputTypeFromReference(
       extractTextFromHTML(item)
@@ -509,21 +537,4 @@ const getItemTypeCategory = (item: any): string => {
     return "number";
   }
   return typeof item;
-};
-
-const shouldExcludeItem = (item: any, idx: number, arr?: any[]): boolean => {
-  const itemAsString = toCleanHTML(toStringSafe(item));
-
-  // Exclude if empty and not the last item
-  if (arr && itemAsString.length === 0 && idx !== arr.length - 1) {
-    return true;
-  } else if (!arr && itemAsString.length === 0) {
-    return true;
-  }
-
-  const typeCategory = getItemTypeCategory(item);
-  console.log(">>>>>", item, typeCategory);
-
-  // Exclude if not one of the allowed types
-  return !["string", "number", "Strings", "Numbers"].includes(typeCategory);
 };

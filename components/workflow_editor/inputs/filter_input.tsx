@@ -11,9 +11,13 @@ import FieldLabel from "../panel/field_label";
 const FilterInput = ({
   initialFilters,
   onBlur,
+  onError,
+  isEditting,
 }: {
   initialFilters: ExtendedOperationFilterType[];
   onBlur: (newFilters: ExtendedOperationFilterType[]) => void;
+  onError?: (val: boolean) => void;
+  isEditting?: (state: boolean) => void;
 }) => {
   const [localFilters, setLocalFilters] = useState<
     ExtendedOperationFilterType[]
@@ -72,14 +76,20 @@ const FilterInput = ({
               localFilters.map((filter, idx) => {
                 return (
                   <SingleFilterRow
+                    onError={(err) => {
+                      onError && onError(err);
+                    }}
                     initialFilter={filter}
                     onEdit={() => {
                       setCurrentlyEdittedFilter(idx);
+                      isEditting && isEditting(true);
                     }}
                     onSave={(newFilterValue) => {
                       localFilters[idx] = newFilterValue;
                       setLocalFilters(localFilters);
                       setCurrentlyEdittedFilter(undefined);
+
+                      isEditting && isEditting(false);
                     }}
                     initialIsEditing={currentlyEdittedFilter === idx}
                     canDelete={currentlyEdittedFilter === undefined}
@@ -91,6 +101,8 @@ const FilterInput = ({
                         prev.filter((_, id) => id !== idx)
                       );
                       setCurrentlyEdittedFilter(undefined);
+
+                      isEditting && isEditting(false);
                     }}
                   />
                 );

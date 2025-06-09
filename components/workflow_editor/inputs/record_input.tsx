@@ -28,23 +28,36 @@ const RecordInput = ({
       )}
       role="button"
       tabIndex={1}
-      onMouseLeave={() => onChange && onChange(localRecords)}
+      // onMouseLeave={() => onChange && onChange(localRecords)}
     >
       {localRecords.map((record, idx) => {
         return (
           <SingleRecordRow
             initialRecordKey={record.key}
             initialRecordValue={record.value}
-            onSave={(newRecord) => {
-              localRecords[idx] = newRecord;
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                onChange && onChange([...localRecords]);
+              }
+            }}
+            onSaveKey={(newRecordKey) => {
+              localRecords[idx].key = newRecordKey;
+            }}
+            onSaveValue={(newRecordValue) => {
+              localRecords[idx].value = newRecordValue;
             }}
             isLast={localRecords.length === idx + 1}
             key={generateHexRandomString()}
-            onAdd={() =>
-              setLocalRecords([...localRecords, { key: "", value: "" }])
-            }
+            onAdd={() => {
+              let updArr = [...localRecords, { key: "", value: "" }];
+              setLocalRecords(updArr);
+              onChange && onChange(updArr);
+            }}
             onDelete={() => {
-              setLocalRecords((prev) => prev.filter((r, id) => id !== idx));
+              let updArr = localRecords.filter((r, id) => id !== idx);
+              setLocalRecords(updArr);
+              onChange && onChange(updArr);
             }}
           />
         );
@@ -56,20 +69,22 @@ const RecordInput = ({
 export default RecordInput;
 
 type SingleRecordRowProps = {
-  onChange?: (recordValue: { key: string; value: any }) => void;
-  onSave: (recordValue: { key: string; value: any }) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  onSaveKey: (key: any) => void;
+  onSaveValue: (key: any) => void;
   onDelete: () => void;
   onAdd: () => void;
   isLast: boolean;
-  initialRecordKey: string;
-  initialRecordValue: string;
+  initialRecordKey: any;
+  initialRecordValue: any;
 };
 
 const SingleRecordRow = ({
-  onChange,
+  onKeyDown,
   onDelete,
   onAdd,
-  onSave,
+  onSaveKey,
+  onSaveValue,
   isLast,
   initialRecordKey,
   initialRecordValue,
@@ -83,55 +98,53 @@ const SingleRecordRow = ({
       role="button"
       tabIndex={1}
     >
-      <div className="flex flex-col w-1/2">
-        {JSON.stringify(recordkey)} <br />
-        <DnDTextInput
-          key={"name"}
-          placeholder={"Name..."}
-          className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
-          inputType="text"
-          inputValue={recordkey}
-          // onBlur={(text) => {
-          //   if (!text) return;
-          //   onBlur && onBlur({ key: text, value: recordValue });
-          // }}
-          onElementDropped={(val) => {
-            const text = toStringSafe(val);
-            setRecordkey(text);
-            onSave && onSave({ key: text, value: recordValue });
-          }}
-          onTextChange={(val) => {
-            const text = toStringSafe(val);
-            setRecordkey(text);
-            onSave && onSave({ key: text, value: recordValue });
-          }}
-        />
-      </div>
-      <div className="flex flex-col w-1/2">
-        {JSON.stringify(recordValue)} <br />
-        <DnDTextInput
-          key={"value"}
-          placeholder={"Value..."}
-          inputType="text"
-          className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
-          inputValue={recordValue}
-          // onBlur={(text) => {
-          //   if (!text) return;
-          //   onBlur && onBlur({ key: recordkey, value: text });
-          // }}
-          onElementDropped={(val) => {
-            const text = toStringSafe(val);
-            setRecordValue(text);
-            onSave && onSave({ key: recordkey, value: text });
-          }}
-          onTextChange={(val) => {
-            const text = toStringSafe(val);
-            setRecordValue(text);
-            onSave && onSave({ key: recordkey, value: text });
-          }}
-        />
-      </div>
-      <div className="w-8 h-[1.73rem]">
+      <DnDTextInput
+        key={"name"}
+        placeholder={"Name..."}
+        className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
+        inputType="text"
+        inputValue={recordkey}
+        onKeyDown={onKeyDown}
+        // onBlur={(text) => {
+        //   if (!text) return;
+        //   onBlur && onBlur({ key: text, value: recordValue });
+        // }}
+        onElementDropped={(val) => {
+          const text = toStringSafe(val);
+          setRecordkey(text);
+          onSaveKey(text);
+        }}
+        onTextChange={(val) => {
+          const text = toStringSafe(val);
+          setRecordkey(text);
+          onSaveKey(text);
+        }}
+      />
+
+      <DnDTextInput
+        key={"value"}
+        placeholder={"Value..."}
+        inputType="text"
+        className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
+        inputValue={recordValue}
+        onKeyDown={onKeyDown}
+        // onBlur={(text) => {
+        //   if (!text) return;
+        //   onBlur && onBlur({ key: recordkey, value: text });
+        // }}
+        onElementDropped={(val) => {
+          const text = toStringSafe(val);
+          setRecordValue(text);
+          onSaveValue(text);
+        }}
+        onTextChange={(val) => {
+          const text = toStringSafe(val);
+          setRecordValue(text);
+          onSaveValue(text);
+        }}
+      />
+
+      <div className="!w-8 h-[1.73rem]">
         <Button
           variant={"ghost"}
           className={cn(

@@ -176,7 +176,6 @@ const ParamInput = ({
           className="mb-1 min-w-[15.7rem] max-w-[15.7rem]"
         />
       );
-
     case "primitive/number":
       return (
         <DnDTextInput
@@ -209,7 +208,6 @@ const ParamInput = ({
           className="min-w-[100%] max-w-[100%]"
         />
       );
-
     case "primitive/milliseconds":
       return (
         <DurationInput
@@ -221,7 +219,6 @@ const ParamInput = ({
           }}
         />
       );
-
     case "primitive/array":
       return (
         <ArrayInput

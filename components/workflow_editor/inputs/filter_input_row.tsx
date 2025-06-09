@@ -42,6 +42,7 @@ type SingleFilterRowProps = {
   isCondition?: boolean;
   titleContent?: string;
   onEdit?: () => void;
+  onError?: (val: boolean) => void;
 };
 
 const SingleFilterRow = ({
@@ -52,11 +53,19 @@ const SingleFilterRow = ({
   onSave,
   onDelete,
   onEdit,
+  onError,
   isCondition,
   titleContent,
   index,
 }: SingleFilterRowProps) => {
-  const [isEditing, setIsEditing] = useState<boolean>(initialIsEditing ?? true);
+  const [isEditing, setIsEditing] = useState<boolean>(
+    initialIsEditing
+      ? () => {
+          onEdit && onEdit();
+          return true;
+        }
+      : false
+  );
 
   const [filterObj, setFilterObj] =
     useState<ExtendedOperationFilterType>(initialFilter);
@@ -107,6 +116,7 @@ const SingleFilterRow = ({
     );
     if (isInputIDPure && simplifiedType === "undefined") {
       setErrorInputID(true);
+      onError && onError(true);
       return false;
     }
     if (
@@ -114,6 +124,7 @@ const SingleFilterRow = ({
       (typeof filterObj.inputID === "string" && filterObj.inputID.length === 0)
     ) {
       setErrorInputID(true);
+      onError && onError(true);
       return false;
     }
 
@@ -123,12 +134,18 @@ const SingleFilterRow = ({
       (typeof filterObj.inputID === "string" && filterObj.inputID.length === 0)
     ) {
       setErrorCriteria(true);
+      onError && onError(true);
       return false;
     }
 
     // If Filter value is null and isn't an array of values: avoid saving the filter
-    if (filterObj.filterValue === null || !Array.isArray(filterObj.filterValue))
+    if (
+      filterObj.filterValue === null ||
+      !Array.isArray(filterObj.filterValue)
+    ) {
+      onError && onError(true);
       return false;
+    }
 
     // Check Filter values: if incorrect display error in corresponding input field
     valueInputsSchema.forEach((inputSchemaAt, id) => {
@@ -207,8 +224,10 @@ const SingleFilterRow = ({
 
     if (errorIndexes.length > 0) {
       setErrorInputIndexes(errorIndexes);
+      onError && onError(true);
       return false;
     } else {
+      onError && onError(false);
       onSave(filterObj);
       return true;
     }

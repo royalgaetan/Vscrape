@@ -29,15 +29,30 @@ const getInitialOptionValues = ({
 type Props = {
   optionType: OperationMoreOptionType;
   currentBlock: OperationBlock;
+  hasError?: boolean;
+  onError?: (val: boolean) => void;
+  isEditting?: (state: boolean) => void;
 };
 
-const MoreOptionInput = ({ optionType, currentBlock }: Props) => {
+const MoreOptionInput = ({
+  optionType,
+  currentBlock,
+  hasError,
+  onError,
+  isEditting,
+}: Props) => {
   const [internalValue, setInternalValue] = useState<any>(
     getInitialOptionValues({
       optionType: optionType,
       currentBlock: currentBlock,
     })
   );
+
+  const [hasInternalError, setHasInternalError] = useState(hasError ?? false);
+
+  useEffect(() => {
+    setHasInternalError(hasError ?? false);
+  }, [hasError]);
 
   const updateValue = (newValue: any) => {
     if (!currentBlock) return;
@@ -64,6 +79,7 @@ const MoreOptionInput = ({ optionType, currentBlock }: Props) => {
           <MoreOptionLabel label={"Skip Duplicate"} />
 
           <SimpleSwitchInput
+            hasError={hasInternalError}
             isChecked={!!internalValue}
             onCheckedChange={(isChecked) => updateValue(isChecked)}
           />
@@ -76,6 +92,7 @@ const MoreOptionInput = ({ optionType, currentBlock }: Props) => {
           <MoreOptionLabel label={"Loop Through"} />
 
           <SimpleSwitchInput
+            hasError={hasInternalError}
             isChecked={!!internalValue}
             onCheckedChange={(isChecked) => updateValue(isChecked)}
           />
@@ -85,6 +102,10 @@ const MoreOptionInput = ({ optionType, currentBlock }: Props) => {
     case "filters":
       return (
         <FilterInput
+          isEditting={(state) => isEditting && isEditting(state)}
+          onError={(err) => {
+            onError && onError(err);
+          }}
           initialFilters={internalValue}
           onBlur={(newFilters) => updateValue(newFilters)}
         />

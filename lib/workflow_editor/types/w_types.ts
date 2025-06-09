@@ -208,7 +208,7 @@ export type OperationFilterType<
   keyId: string;
 } & Nullable<vsCriteria<T>>;
 
-export type RecordArray = { key: string; value: any }[];
+export type RecordArray = { key: any; value: any }[];
 export type OperationValuesToPickFromType = number[] | string[] | boolean[];
 export type OperationMoreOptionType =
   | "filters"
