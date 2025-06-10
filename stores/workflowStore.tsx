@@ -8,10 +8,11 @@ import { create } from "zustand";
 import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 
 export type NodeBlockType = OperationBlock | FieldBlockType | undefined;
-export type NodeToActOn =
+export type ElementToActOn =
   | {
-      nodeId: string;
-      operation: "Delete" | "Duplicate";
+      type: "Node" | "Connection" | "Output";
+      elementId: string;
+      operation: "Delete" | "Duplicate" | "BranchDeleted";
     }
   | undefined;
 
@@ -25,9 +26,9 @@ interface WorkflowEditorState {
   currentNode: VsNode | undefined;
   toggleWorkflowPanel: (isOpen: boolean, node?: VsNode) => void;
 
-  // Node Actions: Duplicate, Delete
-  setNodeIdToActOn: (act: NodeToActOn) => void;
-  nodeIdToActOn: NodeToActOn;
+  // Elements Actions: Duplicate, Delete, Branch Deletion
+  setElementIdToActOn: (act: ElementToActOn) => void;
+  elementToActOn: ElementToActOn;
 
   // Worfklow Shared Outputs Dialog
   isSharedOutputsDialogOpen: boolean;
@@ -61,8 +62,8 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
     },
 
     // Node Actions: Duplicate, Delete
-    nodeIdToActOn: undefined,
-    setNodeIdToActOn: (act) => set({ nodeIdToActOn: act }),
+    elementToActOn: undefined,
+    setElementIdToActOn: (act) => set({ elementToActOn: act }),
 
     // Shared Output-related
     isSharedOutputsDialogOpen: false,

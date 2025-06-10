@@ -11,6 +11,9 @@ import { Info } from "lucide-react";
 const BranchesList = () => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const setElementIdToActOn = useWorkflowEditorStore(
+    (s) => s.setElementIdToActOn
+  );
   // End Store
   const [nodeOutputs, setNodeOutputs] = useState(
     currentNode ? currentNode.outputs : undefined
@@ -55,7 +58,7 @@ const BranchesList = () => {
       ) : (
         <div>
           <h5 className="text-base font-semibold text-[#333] line-clamp-1 mb-0">
-            Conditions
+            {isBranchNode ? "Routes" : "Conditions"}
           </h5>
           <p className="text-xs text-muted-foreground line-clamp-1 mb-3">
             {nodeOutputs ? Object.keys(nodeOutputs).length : 0} Branch
@@ -109,6 +112,12 @@ const BranchesList = () => {
                       onDelete={() => {
                         setBranchCurrentlyEditted(undefined);
                         currentNode.deleteOutput(key);
+
+                        setElementIdToActOn({
+                          type: "Output",
+                          elementId: key,
+                          operation: "BranchDeleted",
+                        });
                       }}
                       onSave={(newCondition) => {
                         setBranchCurrentlyEditted(undefined);

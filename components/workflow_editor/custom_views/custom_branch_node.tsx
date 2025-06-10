@@ -24,7 +24,9 @@ const CustomBranchNode = ({
   );
 
   // Store
-  const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
+  const setElementIdToActOn = useWorkflowEditorStore(
+    (s) => s.setElementIdToActOn
+  );
   // End Store
 
   useEffect(() => {
@@ -44,11 +46,15 @@ const CustomBranchNode = ({
       onKeyDown={(e) => {
         // Handle Delete Node
         if (e.key === "Delete") {
-          setNodeIdToActOn({ nodeId: node.id, operation: "Delete" });
+          setElementIdToActOn({
+            type: "Node",
+            elementId: node.id,
+            operation: "Delete",
+          });
         }
       }}
       className={cn(
-        "relative flex flex-col justify-center cursor-pointer items-center group min-w-[6rem] w-[calc(100%+2rem)] max-w-[13rem] gap-3 border-[3px] border-transparent select-none hover:opacity-95 transition-all duration-0",
+        "relative flex flex-col justify-center cursor-pointer items-center group min-w-[6rem] w-[calc(100%+2rem)] max-w-[13rem] gap-3 border-[3px] border-transparent select-none hover:opacity-95 transition-all duration-500",
         node.selected && "border-border/70 rounded-2xl"
       )}
     >

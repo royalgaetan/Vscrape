@@ -41,7 +41,9 @@ const CustomNode = ({
   );
 
   // Store
-  const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
+  const setElementIdToActOn = useWorkflowEditorStore(
+    (s) => s.setElementIdToActOn
+  );
   // End Store
 
   useEffect(() => {
@@ -103,7 +105,11 @@ const CustomNode = ({
       onKeyDown={(e) => {
         // Handle Delete Node
         if (e.key === "Delete") {
-          setNodeIdToActOn({ nodeId: node.id, operation: "Delete" });
+          setElementIdToActOn({
+            type: "Node",
+            elementId: node.id,
+            operation: "Delete",
+          });
         }
       }}
       className={cn(
@@ -223,8 +229,9 @@ const CustomNode = ({
                   onPointerDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setNodeIdToActOn({
-                      nodeId: node.id,
+                    setElementIdToActOn({
+                      type: "Node",
+                      elementId: node.id,
                       operation: "Duplicate",
                     });
                   }}

@@ -173,6 +173,9 @@ importers:
       rete-render-utils:
         specifier: ^2.0.3
         version: 2.0.3(rete-area-plugin@2.1.3(rete@2.0.5))(rete@2.0.5)
+      rete-structures:
+        specifier: ^2.0.3
+        version: 2.0.3(rete@2.0.5)
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
@@ -2958,6 +2961,11 @@ packages:
     peerDependencies:
       rete: ^2.0.0
       rete-area-plugin: ^2.0.0
+
+  rete-structures@2.0.3:
+    resolution: {integrity: sha512-C5XbF+bp0MQCu386oOrjQ6ZNnkliH4Pf+fX9xUxyREOARpiDyQdyDzgqp78UUelKyq01tQbsB7a5+N9tHCkZUA==}
+    peerDependencies:
+      rete: ^2.0.1
 
   rete@2.0.5:
     resolution: {integrity: sha512-36loeImuwyP9/AzEnNBb/qnHtU/pcTccdkgwvFggly9+RDv/y2g5EfIvuhHCbv+uIkTzo8Dx8LvXCQSi0yzFZQ==}
@@ -6263,6 +6271,10 @@ snapshots:
       '@babel/runtime': 7.26.9
       rete: 2.0.5
       rete-area-plugin: 2.1.3(rete@2.0.5)
+
+  rete-structures@2.0.3(rete@2.0.5):
+    dependencies:
+      rete: 2.0.5
 
   rete@2.0.5:
     dependencies:

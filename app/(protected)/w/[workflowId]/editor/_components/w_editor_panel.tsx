@@ -186,10 +186,9 @@ const EditorPanel = () => {
               <div className="px-4 w-full">
                 {/* Header */}
                 <PanelHeader nodeOrigin={currentNode} />
-
+                <div> {JSON.stringify(currentNode.id)}</div> <br />
                 {/* Buttons : Credit Cost, Notification, Unit test, Delete Node */}
                 <NodeActionButtons />
-
                 {/* Node: Block(Operations, FormFields) List (All) */}
                 {currentNode.blockType === "operation" && (
                   <OperationsList
@@ -203,7 +202,6 @@ const EditorPanel = () => {
                     }}
                   />
                 )}
-
                 {currentNode.blockType === "formField" && (
                   <FormFieldsList
                     onFieldEdit={(fieldBlockToEdit) => {
@@ -222,7 +220,6 @@ const EditorPanel = () => {
                     }}
                   />
                 )}
-
                 {currentNode.blockType === "cron" && (
                   <CronBlockList
                     onCronEdit={(cron) => {
@@ -234,7 +231,6 @@ const EditorPanel = () => {
                     }}
                   />
                 )}
-
                 {currentNode.blockType === "manual" && (
                   <div className="flex flex-col gap-6 mt-[3rem]">
                     {/* Good To Know */}
@@ -260,7 +256,6 @@ const EditorPanel = () => {
                     <ExecuteButton />
                   </div>
                 )}
-
                 {currentNode.blockType === "webhook" && (
                   <WebhookBlockList
                     onWebhookEdit={(webhook) => {
@@ -269,7 +264,6 @@ const EditorPanel = () => {
                     }}
                   />
                 )}
-
                 {currentNode.blockType === "wait" && (
                   <WaitBlockList
                     onSave={(waitBlock) => {
@@ -278,7 +272,6 @@ const EditorPanel = () => {
                     }}
                   />
                 )}
-
                 {currentNode.blockType === "setVariables" && (
                   <SetVariablesBlockList
                     onSave={(setVariablesBlock) => {
@@ -287,9 +280,7 @@ const EditorPanel = () => {
                     }}
                   />
                 )}
-
                 {currentNode.blockType === "branches" && <BranchesList />}
-
                 {currentNode.blockType === "preview" && (
                   <DataPreviewList
                     onPreviewEdit={(previewOperation) => {

@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { NodeEditor, GetSchemes } from "rete";
 import CustomLoader from "@/components/global/loader";
 import { createRoot } from "react-dom/client";
@@ -10,7 +16,13 @@ import {
 } from "rete-connection-plugin";
 import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
 import { convertDropPositionToEditorCoords } from "@/lib/workflow_editor/utils/convert_position_to_editor_coords";
-import { getVsNodeFromLabel } from "@/lib/workflow_editor/utils/w_utils";
+import {
+  buildAdjacency,
+  entryPointNodesLabels,
+  getVsNodeFromLabel,
+  hasAlreadyEntryPoint,
+  hasCycleInAdjacency,
+} from "@/lib/workflow_editor/utils/w_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { VsConnection } from "@/lib/workflow_editor/classes/connections";
 import CustomConnection from "@/components/workflow_editor/custom_views/custom_connection";
@@ -20,6 +32,8 @@ import CustomSocket from "@/components/workflow_editor/custom_views/custom_socke
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { VsSelector } from "@/lib/workflow_editor/classes/selector";
 import CustomBranchNode from "@/components/workflow_editor/custom_views/custom_branch_node";
+import { debounce } from "@/lib/utils";
+import { toast } from "sonner";
 
 export type Schemes = GetSchemes<VsNode, VsConnection<VsNode>>;
 export type AreaExtra = ReactArea2D<Schemes>;
@@ -48,7 +62,9 @@ const WorkflowEditor = ({
     (s) => s.toggleWorkflowPanel
   );
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-  const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
+  const setElementIdToActOn = useWorkflowEditorStore(
+    (s) => s.setElementIdToActOn
+  );
   // End Store
 
   const editorCursorPosition = useRef<{ x: number; y: number } | null>(null);
@@ -58,8 +74,8 @@ const WorkflowEditor = ({
   const handleNodeDeletion = async (nodeId: string) => {
     try {
       const editor = editorInstanceRef.current;
-      if (!editor) return;
-      await editor.removeNode(nodeId);
+      const area = areaInstanceRef.current;
+      if (!editor || !area) throw new Error("Can't load area or editor...");
 
       // Delete Related Connections
       const relatedConnections = editor
@@ -68,15 +84,20 @@ const WorkflowEditor = ({
       if (relatedConnections.length > 0) {
         relatedConnections.forEach((connection) => {
           editor.removeConnection(connection.id);
+          area.removeConnectionView(connection.id);
         });
       }
+      await editor.removeNode(nodeId);
 
       if (currentNodeRef.current && currentNodeRef.current.id === nodeId) {
         toggleWorkflowPanel(false);
       }
-      setNodeIdToActOn(undefined);
     } catch (err) {
-      console.log(`Cannot delete the node: ${nodeId}`);
+      console.log(
+        err instanceof Error ? err.message : `Cannot delete the node: ${nodeId}`
+      );
+    } finally {
+      setElementIdToActOn(undefined);
     }
   };
 
@@ -105,9 +126,14 @@ const WorkflowEditor = ({
 
       console.log("@DEBUG", "Node duplicated", duplicatedNode.id);
     } catch (err) {
-      console.log(`Cannot duplicate the node: ${nodeId}`);
+      console.log(
+        err instanceof Error
+          ? err.message
+          : `Cannot duplicate the node: ${nodeId}`
+      );
+    } finally {
+      setElementIdToActOn(undefined);
     }
-    setNodeIdToActOn(undefined);
   };
 
   const getDuplicatedNodePosition = (
@@ -123,6 +149,36 @@ const WorkflowEditor = ({
     let yPosition = oldNodeView.position.y + randomY;
 
     return { x: xPosition, y: yPosition };
+  };
+
+  const handleBranchDeletion = async (outputKey: string) => {
+    try {
+      const editor = editorInstanceRef.current;
+      const area = areaInstanceRef.current;
+      if (!editor || !area) throw new Error("Can't load area or editor...");
+
+      // Get Connections
+      const connectionsToDelete = editor
+        .getConnections()
+        .filter(
+          (c) => c.sourceOutput === outputKey || c.targetInput === outputKey
+        );
+
+      if (connectionsToDelete.length > 0) {
+        connectionsToDelete.forEach((connection) => {
+          editor.removeConnection(connection.id);
+          area.removeConnectionView(connection.id);
+        });
+      }
+    } catch (err) {
+      console.log(
+        err instanceof Error
+          ? err.message
+          : `Cannot delete all associated connections from this Branch: ${outputKey}`
+      );
+    } finally {
+      setElementIdToActOn(undefined);
+    }
   };
 
   useEffect(() => {
@@ -210,14 +266,26 @@ const WorkflowEditor = ({
         selectorRef.current && selectorRef.current?.unselectAll();
       }
 
-      // Listen to node to delete
-      if (state.nodeIdToActOn && state.nodeIdToActOn.nodeId) {
-        if (state.nodeIdToActOn.operation === "Delete") {
-          // Handle Node Deletion
-          handleNodeDeletion(state.nodeIdToActOn.nodeId);
-        } else if (state.nodeIdToActOn.operation === "Duplicate") {
-          // Handle Node Duplication
-          handleNodeDuplication(state.nodeIdToActOn.nodeId);
+      // Listen to node actions
+      if (state.elementToActOn && state.elementToActOn.elementId) {
+        // NODE CASE:
+        if (state.elementToActOn.type === "Node") {
+          if (state.elementToActOn.operation === "Delete") {
+            // Handle Node Deletion
+            handleNodeDeletion(state.elementToActOn.elementId);
+          } else if (state.elementToActOn.operation === "Duplicate") {
+            // Handle Node Duplication
+            handleNodeDuplication(state.elementToActOn.elementId);
+          }
+        }
+
+        // BRANCH CASE: Outputs
+        // SPECIAL TO Node with Branches: If/Else, Branch
+        else if (state.elementToActOn.type === "Output") {
+          // Handle Node Branch Deletion
+          if (state.elementToActOn.operation === "BranchDeleted") {
+            handleBranchDeletion(state.elementToActOn.elementId);
+          }
         }
       }
     });
@@ -251,6 +319,23 @@ const WorkflowEditor = ({
     );
 
     area.addPipe((context) => {
+      // On New Connection: Check for Cycles (D.A.G)
+      if (context.type === "connectioncreated") {
+        const adj = buildAdjacency(editor);
+        if (hasCycleInAdjacency(adj)) {
+          const editor = editorInstanceRef.current;
+          if (!editor) throw new Error("Can't load editor...");
+          editor.removeConnection(context.data.id);
+          toast.error(
+            "Oops! Looks like your workflow loops back on itself—We've removed your last connection.",
+            {
+              position: "bottom-center",
+              richColors: true,
+            }
+          );
+          return;
+        }
+      }
       // Picked: Node "full" Clicked
       if (context.type === "nodepicked") {
         isTranslatingCurrentNode.current = false;
@@ -303,9 +388,22 @@ const WorkflowEditor = ({
   const onNodeAdded = async (droppedItem: DroppedToolItem) => {
     const editor = editorInstanceRef.current;
     const area = areaInstanceRef.current;
-    const nodeToAdd = getVsNodeFromLabel(droppedItem.label);
 
+    const nodeToAdd = getVsNodeFromLabel(droppedItem.label);
     if (!editor || !area || !nodeToAdd || droppedItem.label.length < 1) return;
+
+    // Check for Double EntryPoints
+    if (
+      entryPointNodesLabels.includes(droppedItem.label) &&
+      hasAlreadyEntryPoint(editor)
+    ) {
+      toast.error("Only one starting point allowed in a workflow.", {
+        position: "bottom-center",
+        richColors: true,
+      });
+      return;
+    }
+
     await editor.addNode(nodeToAdd);
 
     const position = convertDropPositionToEditorCoords(

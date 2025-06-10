@@ -18,7 +18,9 @@ import React, { useRef } from "react";
 const NodeActionButtons = () => {
   // Store
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
-  const setNodeIdToActOn = useWorkflowEditorStore((s) => s.setNodeIdToActOn);
+  const setElementIdToActOn = useWorkflowEditorStore(
+    (s) => s.setElementIdToActOn
+  );
   //   End Store
 
   const NotificationIcon = useRef<LucideIcon>(
@@ -111,8 +113,9 @@ const NodeActionButtons = () => {
           onClick={() => {
             // Handle Node Duplication
             if (!currentNode) return;
-            setNodeIdToActOn({
-              nodeId: currentNode.id,
+            setElementIdToActOn({
+              type: "Node",
+              elementId: currentNode.id,
               operation: "Duplicate",
             });
           }}
@@ -132,8 +135,9 @@ const NodeActionButtons = () => {
           onClick={(e) => {
             // Handle Node Deletion
             if (!currentNode) return;
-            setNodeIdToActOn({
-              nodeId: currentNode.id,
+            setElementIdToActOn({
+              type: "Node",
+              elementId: currentNode.id,
               operation: "Delete",
             });
           }}
