@@ -1,13 +1,24 @@
 {
-  "name": "shared",
+  "name": "@vscrape/shared",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "orchestrator.ts",
+  "types": "orchestrator.ts",
+  "private": "true",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.5.1"
+  "packageManager": "pnpm@10.5.1",
+  "dependencies": {
+    "puppeteer": "^24.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
 }
