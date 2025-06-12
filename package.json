@@ -1,5 +1,5 @@
 {
-  "name": "kitchen-sink",
+  "name": "vscrape",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -10,6 +10,10 @@
     "test": "turbo run test",
     "check-types": "turbo run check-types"
   },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "devDependencies": {
     "prettier": "^3.5.3",
     "turbo": "^2.5.4"

@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 243 0% 100%;
+    --foreground: 243 0% 10%;
+    --card: 243 0% 100%;
+    --card-foreground: 243 0% 15%;
+    --popover: 243 0% 100%;
+    --popover-foreground: 243 95% 10%;
+    --primary: 243 30.3% 52.2%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 243 10% 90%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 205 10% 95%;
+    --muted-foreground: 243 0% 40%;
+    --accent: 205 10% 90%;
+    --accent-foreground: 243 0% 15%;
+    --destructive: 0 50% 50%;
+    --destructive-foreground: 243 0% 100%;
+    --border: 243 20% 82%;
+    --input: 243 20% 50%;
+    --ring: 243 30.3% 52.2%;
+    --radius: 0.75rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --background: 243 10% 10%;
+    --foreground: 243 0% 100%;
+    --card: 243 0% 10%;
+    --card-foreground: 243 0% 100%;
+    --popover: 243 10% 5%;
+    --popover-foreground: 243 0% 100%;
+    --primary: 243 30.3% 52.2%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 243 10% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 205 10% 25%;
+    --muted-foreground: 243 0% 65%;
+    --accent: 205 10% 25%;
+    --accent-foreground: 243 0% 95%;
+    --destructive: 0 50% 50%;
+    --destructive-foreground: 243 0% 100%;
+    --border: 243 20% 50%;
+    --input: 243 20% 50%;
+    --ring: 243 30.3% 52.2%;
+    --radius: 0.75rem;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html,
+  body {
+    @apply h-full w-full bg-transparent overflow-x-hidden overscroll-none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .token-chip {
+    display: inline-block;
+    width: fit-content;
+    border-radius: 9px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 3px;
+    height: 1.3rem !important;
+    user-select: none;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    background-color: rgba(100, 96, 170, 0.2); /* bg-primary/20 */
+    color: rgba(100, 96, 170, 0.8); /* text-primary/80 */
+    cursor: pointer;
+    font-size: 0.75rem; /* text-xs */
+    transition: all 0.2s ease-in-out;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: break-all;
+  }
+
+  .token-chip:hover {
+    background-color: rgba(100, 96, 170, 0.3); /* hover:bg-primary/30 */
+  }
+
+  .editor-background-dots {
+    background-color: #f8f8f8 !important;
+    background-image: radial-gradient(
+      circle,
+      #d0d2d6 1px,
+      transparent 1px
+    ) !important;
+    background-size: 10px 10px !important;
+  }
+
+  .editor-background-lines {
+    background-color: white !important;
+    background-image: linear-gradient(to right, #d0d2d6 1px, transparent 1px),
+      linear-gradient(to bottom, #d0d2d6 1px, transparent 1px) !important;
+    background-size: 24px 24px !important;
+  }
+
+  .editor-background-noise {
+    background-color: #f8f8f8 !important;
+    background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png") !important;
+    background-size: auto !important;
+  }
+
+  .fill-area {
+    background-color: #6460aa;
+    z-index: -1;
+    position: absolute;
+    top: -320000px;
+    left: -320000px;
+    width: 640000px;
+    height: 640000px;
+  }
+
+  .background {
+    background-color: #ffffff;
+    opacity: 1;
+    background-image: linear-gradient(#f1f1f1 3.2px, transparent 3.2px),
+      linear-gradient(90deg, #f1f1f1 3.2px, transparent 3.2px),
+      linear-gradient(#f1f1f1 1.6px, transparent 1.6px),
+      linear-gradient(90deg, #f1f1f1 1.6px, #ffffff 1.6px);
+    background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    background-position: -3.2px -3.2px, -3.2px -3.2px, -1.6px -1.6px,
+      -1.6px -1.6px;
+  }
+}

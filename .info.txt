@@ -1,0 +1,91 @@
+Desc:
+	Name: Vscrape
+	Type: Automation tool
+	Motto: Take automation to the next level: create workflows, scrape the web while you sleep, extract data with AI, and export it in any format.
+	Color HEX: 
+		- #333333 (text colors)
+		- #6460aa (primary)
+
+
+	Meeting Link:	
+	Form Link: https://tally.so/r/mYx46d
+
+###################################################################################""
+Is this painful enough that people already duct-tape it together?
+Does this touch revenue or save hours?
+Can AI make the result faster, smarter, or more personalized?
+Can I build a working demo in 2–4 weeks?
+
+--> Bug Tracking
+--> Product Specifications
+--> Usability Testing
+
+💠Rust (via WASM) =>	High-performance logic: image/video/audio manipulation, compression, validation, parsers
+💠Python 		  => 	ML, NLP, data science, LangChain/Ollama integration
+💠TS/JS           => 	UI logic, orchestration, cloud APIs, low-latency integration
+
+React Lib (Node-based UIs)
+	- https://github.com/projectstorm/react-diagrams
+
+
+Workflow automation tools (out there):
+	- https://www.producthunt.com/products/flowscraper
+	- (ecom unmet needs) https://www.producthunt.com/products/flowscraper?comment=4098702#flowscraper
+
+	- https://www.activepieces.com/
+	- https://www.workflow86.com/
+	- https://www.gumloop.com/
+	- https://latenode.com/
+	- https://www.konnectify.co/
+	
+	- Hexomatic: Web Scraping 
+	- Make.com
+	- Octoparse: https://www.octoparse.com/
+	- Clay.com
+	- Shopify Flow
+	- Automate.io
+	- Zapier
+	- https://www.klaviyo.com/features/flows
+
+	- https://en.minea.com/
+	- DSers: The Best AliExpress Dropshipping Tool For E-Commerce | https://www.dsers.com/
+	- https://www.dropified.com/dropified-vs-dsers/
+
+	- ComfyUI: https://github.com/comfyanonymous/ComfyUI
+
+Others:
+	- Review Apps (Shopify):
+		- https://apps.shopify.com/loox?ot=87e20ecc-4f3c-4e72-989c-af4416b7c01e&surface_detail=marketing-and-conversion-social-trust-product-reviews&surface_inter_position=1&surface_intra_position=1&surface_type=category_ad&surface_version=redesign
+
+
+	
+☑️Product Research: 
+	- SmartScout
+	- Helium10
+	- Jungle Scout
+	- Keepa
+	- Seller Amp SAS
+	- BuyBot Pro
+
+		
+
+
+SAAS Video Presentation #inspo:
+	- https://www.youtube.com/@whatastory/videos
+	- 
+
+Landing pages #inspo:	
+	- https://www.octoparse.com/
+	- https://products.aspose.app/ocr/font-detector
+	- (animation) https://webflow.com/made-in-webflow/website/cards-spread-while-scrolling-animation
+
+
+
+
+
+
+
+
+
+
+

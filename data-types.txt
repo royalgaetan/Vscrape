@@ -1,0 +1,63 @@
+Primitives:
+Simple:     URL, Text, Array, Boolean, EmailURL, Number, Range, Tel, DateTime, TimeMs
+Raw (file): Image, Video, Audio, PDF, JSON, HTMLDocument, XML, DOCX, CSV, XSLX, PlainText
+            FormData, APIResponse
+Complex:    StructuredJSON, ChatMessage, Email, SMS, Voicemail 
+Others:     CRON, None
+
+Webhook: URL --> APIResponse
+Manual: None --> None
+Cron: CRON --> None
+FormInput: Any Simple/Raw Primitives[] -> FormData
+ChatBot: ChatMessage --> ChatMessage
+
+
+WebScraper: URL[] --> HTMLDocument[]
+File Reader: (raw) File Primitive --> StructuredJSON
+KnowledgeBase Reader: Any Primitive (+ Prompt) --> StructuredJSON (RAG)
+Database Reader: Any Primitive (+ Prompt) --> StructuredJSON
+
+
+Wait: TimeMs --> None
+Set Variables --> None
+If/Else: None --> None
+Branch: StructuredJSON --> StructuredJSON
+Merge: StructuredJSON --> StructuredJSON
+Call Workflow: Text (WorkflowName) --> None
+Call API: URL --> APIResponse
+Send: Any Primitive --> ChatMessage, Email, SMS, Voicemail
+
+
+Extract Data: Any Primitive --> StructuredJSON
+Tag: Any Primitive --> StructuredJSON
+Field Mapper: StructuredJSON --> StructuredJSON
+
+
+Text Manipulation: Any Primitive --> StructuredJSON
+AI Generation: Any Primitive --> StructuredJSON
+Sentiment Analysis: Any Primitive --> StructuredJSON
+Data Enrichment: Any Primitive --> StructuredJSON
+Image Manipulation: Any Primitive --> StructuredJSON
+Video Manipulation: Any Primitive --> StructuredJSON
+Audio Manipulation: Any Primitive --> StructuredJSON
+
+
+Data Converter:  StructuredJSON --> JSON, CSV, XSLX, DOCX, PDF
+Image Converter: StructuredJSON, Image --> Image
+Video Converter: StructuredJSON, Video --> Video
+Audio Converter: StructuredJSON, Audio --> Audio
+Encoding: StructuredJSON --> Base64, Binary, Hex
+To Markup: StructuredJSON, HTML, JSON, CSV, XSLX, DOCX, PlainText --> HTML, XML, Markdown, PlainText
+
+
+PDF Viewer: PDF --> None, URL (download url)
+Docs Viewer: HTML, Markdown, DOCX, PlainText --> None, URL (download url)
+Spreadsheet Viewer: CSV, XSLX --> None, URL (download url)
+Image Preview: Image --> None, URL (download url)
+Media Player: Video, Audio --> None, URL (download url)
+Code Preview: JSON, HTML, XML, Markdown --> None
+ 
+
+ App Sync: Any Primitive --> StructuredJSON
+
+

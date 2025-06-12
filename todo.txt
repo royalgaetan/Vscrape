@@ -1,0 +1,114 @@
+New Product Spec's 04 Jun --> 30 Jun (written 04 Jun:02h57-->03h42)
+
+
+------------------------------------ 04 Jun 2025 ----------------------------------------------
+✔️-05 juin 2025<01:30-->22:23>Editor Special Nodes: Cores: ✔️If/Else | ✔️Branch | ✔️Merge | Call Workflow | ✔️Call API | ✔️Send | ✔️Data Preview Nodes
+✔️-05 juin 2025<22:41>|07 juin 2025<21:09-->08 juin 2025<05:21>: Blocks Error Checker: on values entered
+✔️09 juin 2025<16:06-->17:12-->18:24>::RecordInput: Keys do not save correctly | +RecordInput Error Checker + Filters Err Checker
+✔️09 juin 2025<19:10>|10 juin 2025<11:03:11:44>::Editor: Error Checker: ✔️Invalid Connections | ✔️(11:23)Cycles (D.A.G) | ✔️(11:44)Double EntryPoint
+-10 juin 2025<11:46>Editor: <11:46,13:28|>Get Workflow Definition (toJSON) | Get Execution Plan
+-11 Juin 2025 Monorepo (shared, frontend, backend) config: Turborepo
+-Blocks: Get Last Node/Operation/Variables outputData
+
+------------------------------------ 09 Jun 2025 ----------------------------------------------
+-Editor: Setup Runners (Ts, Python, Rust) (local/server): for all blocks 
+-Debug (Editor/Unit): Gen FakePayload (payload are in function on expected type:string,number,etc.)
+
+------------------------------------ 16 Jun 2025 ----------------------------------------------
+-Account Auth: Register (+free credits) | Login | Google Auth | Logout | Forget+Reset Password | Verify Email
+-Workflows: Create Workflow (+Assign folder) | List all | WorkflowCard (Exc, Edit, Details) | Folder (add/remove)
+-Blocks: make block independants when loaded (even if Block Class definition has changed)
+-Editor: Save (draft) | Publish (+embedding link) | Embedding Page | Assign credit to each operation | Run(+details Page) 
+-Dashboard: Metrics
+
+------------------------------------ 23 Jun 2025 ----------------------------------------------
+-Settings: Name,ProfilePic,Email,Pwd | Sessions History + Revoking | Delete account(+ related Workflows)
+-More: Credit Left Page | Integration Page (+Slack 1 connection) | API Keys (add/remove) | Support Tab
+-Deployment: Frontend ([@Github] [@Vercel] + Domain) | Backend[@Render] | Thorough Testing (Demo Account)
+*
+-GTM: Niche Selection | Market Research (+ICP Profile) | Offer Creation (8) | Spreadsheet Setup | Outreach Accounts
+-Outreach: List building | Opener/Ice Breaker under KPI | Offer acceptance under KPI | ABR under KPI
+-Sales: SUR under KPI | SCR under KPI
+
+------------------------------------ 30 Jun 2025 ----------------------------------------------
+
+
+
+       
+      
+    
+      
+      
+
+
+
+
+
+#####################################################################################################
+#####################################################################################################
+#####################################################################################################
+
+# Nice to do
+- UseCallback & UseMemo, Clossures (ExcecutionEnvironment), <https://react.dev/warnings/invalid-hook-call-warning>,
+- Never keyword (.Ts), declare (declare const \_brand: unique symbol), ReturnType<>, Awaited<>
+- CSS: ::after ::before keywords, document.caretRangeFromPoint, DnDTextInput Text Parser + onKeyDown:Regex
+-Rete.js: dfs,D.A.G Cycle Checker
+
+
+- Versioning Lock each workflow to a version of the execution engine. That way, if your backend logic changes, published workflows don’t break.
+- known bug – visual connection remains after Node deletion in Rete.js
+- Remove native Rete.js drag-n-drop feature -- do not create a node if dragItem is invalid
+- Editor Background (make it movable)
+- Restrict Pan area and expand it on newNodeAdded
+- Add Tabs to Runs details (Inputs used, Outputs generated, Logs)
+
+
+### Done
+
+✖️✔️
+✔️Connection UI (final or good to gooo):
+✔️---><https://retejs.org/docs/guides/renderers/react/#customization>>
+✔️--->Connections, Sockets, Input & Output, Controls, etc. (play around)
+✔️--->D:\.drive\8uint.com\V Scrape\ui\Workflow\workflow editor - topbar, element colors.webp
+✔️---><https://retejs.org/docs/guides/validation>
+✔️Template pages
+✔️Template Item Card 19h00 (20min) -> 19h21
+✔️Preview template dialog: Ratings | downloads | userProfile => Desc, UpdatedAt, CTA:Rate
+✔️Generate pages
+✔️Chat textarea
+✔️Chat when response being generated
+✔️---> Workflow Editor: Topbar
+✔️---> Workflow Editor: BottomBar
+✔️---> Workflow Editor: Sidebar: Versions
+✔️---> Workflow Editor: Sidebar: Chat
+✔️---> Workflow Editor: Workflow Executions Page: Runs
+✔️---> Workflow Editor: Sidebar: Tools
+✔️---> Workflow Editor: Rightbar Panel: UI + itemsUI
+✔️---> Workflow Editor: OptionBar (right sidebar)
+✔️---> Workflow Editor: Node UI Add btns:✔️Add Operation ✔️Notification ✔️Test Unit ✔️CreditCost ✔️Drag Handler
+✔️Learn Rete.js:
+✔️---> <https://retejs.org/docs/guides/processing/dataflow>
+✔️---> <https://retejs.org/examples/processing/dataflow>
+✔️---> <https://retejs.org/docs/concepts/engine>
+✔️---> <https://retejs.org/docs/guides/processing/control-flow>
+✔️---> <https://retejs.org/examples/processing/control-flow>
+✔️---> <https://retejs.org/docs/guides/processing/hybrid>
+✔️---> <https://retejs.org/examples/processing/hybrid-engine>
+✔️---> <https://retejs.org/examples/chatbot>
+✔️WorkflowEditorProvider => Zustand Migration
+✔️Connection + Socket UI
+✔️Node Operation List
+✔️List out all Operations + pre-options (in constants)
+✔️19h => 26 mai 2025<20:00>::Editor Onboarding: Select an entry Point
+✔️21h => 27 mai 2025<00:58>:Editor Entry Points: Refactoring: NodeBlock: OperationBlock + FormField
+✔️29 mai 2025<18:15>:: Editor: Switch to FieldBlock Classes (instead of objects) + Add reactivity (RxJS)
+✔️29 mai 2025<21:40>:: Add VsNode reactivity
+✔️02 juin 2025<06:18 - 09:09>::Editor Entry Points: ✔️Manual | ✔️Cron | ✔️Webhook | ✔️Form Input | ✔️Patches:add support for block update/save/back + input error handlers
+✖️Workflow Editor Buttons: Zoom In | Zoom Out | Fit | Lock| Undo/Redo
+✖️Fix Space between NodeUI Btns: UnitTest and Notications
+✔️03 juin 2025<05:40>::Editor Special Nodes: Cores:✔️Wait | ✔️Set Variables
+
+
+
+
+
