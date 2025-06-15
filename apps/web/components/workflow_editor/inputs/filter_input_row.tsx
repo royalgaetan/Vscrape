@@ -235,11 +235,15 @@ const SingleFilterRow = ({
 
   const valueInputsSchema: GetFilterValueInputs = getFilterValueInputs({
     filterCriteria: filterObj.filterCriteria,
-    filterType: resolveInputTypeFromReference(filterObj?.inputID) as any,
+    filterType: resolveInputTypeFromReference(
+      extractTextFromHTML(filterObj?.inputID)
+    ) as any,
   });
   const criteriaSelectionName: string =
     getCriteriaSelection({
-      filterType: resolveInputTypeFromReference(filterObj?.inputID),
+      filterType: resolveInputTypeFromReference(
+        extractTextFromHTML(filterObj?.inputID)
+      ),
     }).length > 0
       ? "Criterias"
       : "";
@@ -336,9 +340,9 @@ const SingleFilterRow = ({
       ) : (
         // Editing Mode: If filter input is select, expand it to allow user to add changes
         <>
-          <div className="flex flex-1 items-start gap-2 group/filterItem h-7 mt-1 mb-2">
+          <div className="flex flex-1 items-start gap-1 group/filterItem h-7 ml-2 mt-1 mb-2">
             {/* Input ID: let user add the input from which filter will be applied to */}
-            <div className="flex !w-1/3 max-w-[5rem]">
+            <div className="flex !w-1/3 max-w-[5.1rem]">
               <DnDTextInput
                 placeholder={"Input ID..."}
                 inputType="text"
@@ -358,14 +362,14 @@ const SingleFilterRow = ({
             </div>
 
             {/* Select a Criteria */}
-            <div className="flex !w-1/3  max-w-[5rem]">
+            <div className="flex !w-1/3 max-w-[5.1rem]">
               <MultiSelect
                 isTriggerDisabled={
                   !filterObj?.inputID ||
                   !resolveInputTypeFromReference(filterObj?.inputID)
                 }
                 triggerClassName={cn(
-                  "!h-[var(--input-height)] bg-slate-100/40 flex flex-1 mb-1",
+                  "!h-[1.8rem] bg-slate-100/40 flex flex-1 mb-1",
                   errorCriteria && inputErrorClassName
                 )}
                 popoverAlignment="center"
@@ -375,7 +379,7 @@ const SingleFilterRow = ({
                 data={{
                   [criteriaSelectionName]: getCriteriaSelection({
                     filterType: resolveInputTypeFromReference(
-                      filterObj?.inputID
+                      extractTextFromHTML(filterObj?.inputID)
                     ),
                   }).map((criteria) => ({
                     label: capitalizeFirstLetter(criteria),
@@ -414,7 +418,7 @@ const SingleFilterRow = ({
             </div>
 
             {/* Filter Value Inputs: value(s) to compare against */}
-            <div className="!w-1/3 max-w-[5rem] flex-col gap-2">
+            <div className="!w-1/3 max-w-[5.1rem] flex-col space-y-2">
               {valueInputsSchema.map((inputSchema, idx) => {
                 return (
                   <FilterValueInput

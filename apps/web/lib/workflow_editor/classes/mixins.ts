@@ -7,7 +7,7 @@ export const ObservableMixin = <TBase extends Constructor = Constructor>(
   Base: TBase = class {} as TBase
 ) => {
   return class extends Base {
-    _stream$ = new BehaviorSubject<any>(this);
+    private _stream$ = new BehaviorSubject<typeof this>(this);
 
     // Notify All Class instance Subscribers
     notifyAll() {

@@ -31,7 +31,7 @@ const DurationInput = ({
   return (
     <div
       className={cn(
-        "relative group/durationInput min-w-20 !h-[1.75rem]",
+        "relative group/durationInput min-w-20 !h-[1.75rem] bg-white",
         className
       )}
     >

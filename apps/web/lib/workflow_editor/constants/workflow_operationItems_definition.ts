@@ -1,44 +1,29 @@
 import { appLanguages, appVoices } from "@/lib/constants";
-import { VsOperationBlockType } from "../types/w_types";
+import { VsOperationItemType } from "../types/w_types";
 
-export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
-  // Webhook Operations
+export const workflowOperationItems: VsOperationItemType[] = [
+  // Webhook Operations: Not available. It's Special Node
+  // Manual Operations: Not available. It's Special Node
+  // Cron Operations: Not available. It's Special Node
+  // FormInput Operations: Note: Here "Operation" === "Field". FormInput contains a collection of Fields[]. Refer to workflow_form_fields_definition file
   //
   //
   //
   //
-  // Manual Operations
-  //
-  //
-  //
-  //
-  // Cron Operations
-  //
-  //
-  //
-  //
-  // FormInput Operations
-  // Note: Here "Operation" === "Field". FormInput contains a collection of Fields[]
-  // Refer to workflow_formfields_definition file
-
-  //
-  //
-  //
-  //
-  // ChatBot Operations
+  // ChatBot Operations: This node is Disabled.
   //
   //
   //
   //
   // Web Scraper Operations
   {
-    operationName: "Scrape a Web Page",
+    operationItemName: "Scrape a Web Page",
     nodeName: "Web Scraper",
-    operationDescription:
+    operationItemDescription:
       "Extracts content from a single web page, allowing retrieval of specific elements such as text, images, links, or structured data using defined selectors.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "URL to scrape",
         paramInputPlaceholder: "Website URL...",
@@ -110,18 +95,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Auto-Paginate and Scrape",
+    operationItemName: "Auto-Paginate and Scrape",
     nodeName: "Web Scraper",
-    operationDescription:
+    operationItemDescription:
       "Automatically navigates through multiple pages of a paginated website and extracts content from each page, enabling large-scale data collection without manual intervention.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Start URL",
         paramInputPlaceholder: "Enter the url to begin with...",
@@ -156,9 +141,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -166,13 +151,13 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // File Reader Operations
   {
-    operationName: "Read Text File",
+    operationItemName: "Read Text File",
     nodeName: "File reader",
-    operationDescription:
+    operationItemDescription:
       "Read content from .txt, .log, .md, or similar plain text files.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "File input",
         paramInputPlaceholder: "File or file path...",
@@ -214,17 +199,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Parse CSV",
+    operationItemName: "Parse CSV",
     nodeName: "File reader",
-    operationDescription: "Parse and extract data from a CSV file.",
+    operationItemDescription: "Parse and extract data from a CSV file.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "File input",
         paramInputPlaceholder: "File or file path...",
@@ -262,17 +247,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [""],
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Parse PDF",
+    operationItemName: "Parse PDF",
     nodeName: "File reader",
-    operationDescription:
+    operationItemDescription:
       "Extract text, tables, and optionally structured fields from PDF documents.",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "File input",
         paramInputPlaceholder: "File or file path...",
@@ -318,17 +303,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Read Image File",
+    operationItemName: "Read Image File",
     nodeName: "File reader",
-    operationDescription:
+    operationItemDescription:
       "Get image metadata, base64 encoding, or run OCR on an image.",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "File input",
         paramInputPlaceholder: "File or file path...",
@@ -345,17 +330,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "AI-Powered File Summary",
+    operationItemName: "AI-Powered File Summary",
     nodeName: "File reader",
-    operationDescription:
+    operationItemDescription:
       "Reads the content of a file (various formats supported — e.g., .pdf, .docx, .txt, .pptx, etc.) and generates a human-readable summary using AI.",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "File input",
         paramInputPlaceholder: "File or file path...",
@@ -380,9 +365,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -390,12 +375,12 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // KnowledgeBase Reader Operations
   {
-    operationName: "Query Knowledge Base",
+    operationItemName: "Query Knowledge Base",
     nodeName: "Knowledge Base",
-    operationDescription:
+    operationItemDescription:
       "Ask a question and retrieve the most relevant articles or documents in your knowledge base",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Query",
         paramInputPlaceholder: "Enter query...",
@@ -420,17 +405,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [""],
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Add to Knowledge Base",
+    operationItemName: "Add to Knowledge Base",
     nodeName: "Knowledge Base",
-    operationDescription:
+    operationItemDescription:
       "Paste or write content directly, or provide a URL or a file path to be parsed and added to the knowledge base.",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Title (optional)",
         isOptional: true,
@@ -458,9 +443,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [""],
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -493,10 +478,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Call Workflow Operations
   {
-    operationName: "Call a specific workflow",
+    operationItemName: "Call a specific workflow",
     nodeName: "Call Workflow",
-    operationDescription: "Call a specific workflow by its name",
-    params: [
+    operationItemDescription: "Call a specific workflow by its name",
+    itemParams: [
       {
         paramName: "Workflows",
         paramInputPlaceholder: "The Workflow Name",
@@ -523,9 +508,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -533,11 +518,11 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Call API Operations
   {
-    operationName: "Basic API Call",
+    operationItemName: "Basic API Call",
     nodeName: "Call API",
-    operationDescription:
+    operationItemDescription:
       "Make a standard HTTP request (GET, POST, PUT, PATCH, DELETE) with full control over URL, headers, body, and method.",
-    params: [
+    itemParams: [
       {
         paramName: "API URL",
         paramInputPlaceholder: "e.g., https://api.example.com/resource",
@@ -599,9 +584,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -609,10 +594,11 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Send Operations
   {
-    operationName: "Send Email",
+    operationItemName: "Send Email",
     nodeName: "Send",
-    operationDescription: "Deliver a custom email to one or more recipients.",
-    params: [
+    operationItemDescription:
+      "Deliver a custom email to one or more recipients.",
+    itemParams: [
       {
         paramName: "From",
         paramInputPlaceholder: "e.g., noreply@yourapp.com",
@@ -666,15 +652,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [""],
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Send SMS",
+    operationItemName: "Send SMS",
     nodeName: "Send",
-    operationDescription: "Instantly send a text message to a phone number.",
-    params: [
+    operationItemDescription:
+      "Instantly send a text message to a phone number.",
+    itemParams: [
       {
         paramName: "Phone Number",
         paramInputPlaceholder: "e.g., +123456789",
@@ -699,15 +686,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Send Chat Message",
+    operationItemName: "Send Chat Message",
     nodeName: "Send",
-    operationDescription: "Post a message inside the chat bot",
-    params: [
+    operationItemDescription: "Post a message inside the chat bot",
+    itemParams: [
       {
         paramName: "Message",
         paramInputPlaceholder: "e.g., Hi there!",
@@ -718,15 +705,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
       },
     ],
     isDisabled: true,
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Initiate Phone Call",
+    operationItemName: "Initiate Phone Call",
     nodeName: "Send",
-    operationDescription: "Trigger an automated phone call to a user.",
-    params: [
+    operationItemDescription: "Trigger an automated phone call to a user.",
+    itemParams: [
       {
         paramName: "Phone Number",
         paramInputPlaceholder: "e.g., +123456789",
@@ -751,15 +738,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Send Voice Message (TTS)",
+    operationItemName: "Send Voice Message (TTS)",
     nodeName: "Send",
-    operationDescription: "Send an audio message using synthesized speech.",
-    params: [
+    operationItemDescription: "Send an audio message using synthesized speech.",
+    itemParams: [
       {
         paramName: "Recipient Phone",
         paramInputPlaceholder: "e.g., +1234567890",
@@ -823,9 +810,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -833,13 +820,13 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Extract Data Operations
   {
-    operationName: "Extract with AI",
+    operationItemName: "Extract with AI",
     nodeName: "Extract Data",
-    operationDescription:
+    operationItemDescription:
       "Extract structured data from raw input using AI, based on a target schema.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste content, email, file path, etc.",
@@ -867,18 +854,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Extract with Regex",
+    operationItemName: "Extract with Regex",
     nodeName: "Extract Data",
-    operationDescription:
+    operationItemDescription:
       "Use one or multiple regular expressions to extract specific matches.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste content, email, file path, etc.",
@@ -905,18 +892,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Extract Table from HTML",
+    operationItemName: "Extract Table from HTML",
     nodeName: "Extract Data",
-    operationDescription:
+    operationItemDescription:
       "Detect and extract tables from HTML pages or fragments.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "HTML Input",
         paramInputPlaceholder: "<table>...</table> or URL",
@@ -935,18 +922,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Extract Named Entities",
+    operationItemName: "Extract Named Entities",
     nodeName: "Extract Data",
-    operationDescription:
+    operationItemDescription:
       "Use NLP to extract names, dates, locations, etc., from text.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder:
@@ -993,9 +980,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [] as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -1003,13 +990,13 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Tag Operations
   {
-    operationName: "AI-based Tagging",
+    operationItemName: "AI-based Tagging",
     nodeName: "Tag",
-    operationDescription:
+    operationItemDescription:
       "Automatically generate tags based on the semantic content of text using AI.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content, url or file path...",
@@ -1043,17 +1030,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Keyword-Based Tagging",
+    operationItemName: "Keyword-Based Tagging",
     nodeName: "Tag",
-    operationDescription: "Tag content by matching predefined keyword sets.",
+    operationItemDescription:
+      "Tag content by matching predefined keyword sets.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content, url or file path...",
@@ -1076,9 +1064,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: false,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -1086,13 +1074,13 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Field Mapper Operations
   {
-    operationName: "Rename Fields",
+    operationItemName: "Rename Fields",
     nodeName: "Field Mapper",
-    operationDescription: `Change the names of fields in your data object to match a new schema.
+    operationItemDescription: `Change the names of fields in your data object to match a new schema.
     Example: { "first_name": "Alice" } → { "name": "Alice" }`,
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Object",
         paramInputPlaceholder: "e.g. { 'name': 'Eva', 'dob': '1990-01-01' }",
@@ -1122,18 +1110,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Flatten Nested Structure",
+    operationItemName: "Flatten Nested Structure",
     nodeName: "Field Mapper",
-    operationDescription: `Convert a deeply nested object into a flat key-value format using separators.
+    operationItemDescription: `Convert a deeply nested object into a flat key-value format using separators.
     Example: { "user": { "name": "Alice" } } → { "user.name": "Alice" }`,
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Object",
         paramInputPlaceholder:
@@ -1157,18 +1145,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: false,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Rebuild Nested Structure",
+    operationItemName: "Rebuild Nested Structure",
     nodeName: "Field Mapper",
-    operationDescription: `Turn a flat object with dot-separated keys into a nested structure.
+    operationItemDescription: `Turn a flat object with dot-separated keys into a nested structure.
     Example: { "user.name": "Alice" } → { "user": { "name": "Alice" } }`,
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Object",
         paramInputPlaceholder: "e.g. { 'user.name.first': 'Alice' }",
@@ -1185,9 +1173,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
 
   //
@@ -1196,13 +1184,13 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Text Manipulation Operations
   {
-    operationName: "Trim Whitespace",
+    operationItemName: "Trim Whitespace",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Remove leading and trailing whitespace from a text content.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1212,18 +1200,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         isTextarea: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Change Case",
+    operationItemName: "Change Case",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Convert text to uppercase, lowercase, title case, or sentence case.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1245,18 +1233,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Replace Subtext",
+    operationItemName: "Replace Subtext",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Find and replace parts of a text content using plain text or regex.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Find",
         paramInputPlaceholder: `Type your content or regex pattern ("\\s+")`,
@@ -1279,18 +1267,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: false,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Split Text",
+    operationItemName: "Split Text",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Split a text content into parts using a delimiter (e.g., comma, space).",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1314,18 +1302,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Subtext",
+    operationItemName: "Subtext",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Extract a part of a text based on start index and length.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1351,18 +1339,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Sanitize Text",
+    operationItemName: "Sanitize Text",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Remove special characters, HTML tags, or emojis from text.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1390,18 +1378,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: false,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Normalize Accents",
+    operationItemName: "Normalize Accents",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Convert accented characters to plain letters (é → e, ñ → n).",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1411,17 +1399,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         isTextarea: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Slugify",
+    operationItemName: "Slugify",
     nodeName: "Text Manipulation",
-    operationDescription: `Convert text to a URL-safe slug (e.g., "Hello World!" → "hello-world").`,
+    operationItemDescription: `Convert text to a URL-safe slug (e.g., "Hello World!" → "hello-world").`,
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1444,17 +1432,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Limit Length",
+    operationItemName: "Limit Length",
     nodeName: "Text Manipulation",
-    operationDescription: `Truncate a text content to a max length with optional ellipsis.`,
+    operationItemDescription: `Truncate a text content to a max length with optional ellipsis.`,
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1477,16 +1465,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Remove Duplicates (Words or Lines)",
+    operationItemName: "Remove Duplicates (Words or Lines)",
     nodeName: "Text Manipulation",
-    operationDescription: "Remove repeated words or lines from the text.",
+    operationItemDescription: "Remove repeated words or lines from the text.",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1509,17 +1497,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Translate Text",
+    operationItemName: "Translate Text",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Automatically translate text from one language to another.",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1538,17 +1526,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Count Words/Characters",
+    operationItemName: "Count Words/Characters",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Return the total word count or character count of the text.",
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Add text content...",
@@ -1566,17 +1554,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Obfuscate / Mask Text",
+    operationItemName: "Obfuscate / Mask Text",
     nodeName: "Text Manipulation",
-    operationDescription: `Mask sensitive parts of a text (e.g., john@example.com → j***@example.com).`,
+    operationItemDescription: `Mask sensitive parts of a text (e.g., john@example.com → j***@example.com).`,
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1609,17 +1597,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Strip Punctuation",
+    operationItemName: "Strip Punctuation",
     nodeName: "Text Manipulation",
-    operationDescription: "Remove all punctuation characters from the text.",
+    operationItemDescription:
+      "Remove all punctuation characters from the text.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1636,17 +1625,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [""],
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Add Prefix / Suffix",
+    operationItemName: "Add Prefix / Suffix",
     nodeName: "Text Manipulation",
-    operationDescription: "Wrap or decorate each word in a text content.",
+    operationItemDescription: "Wrap or decorate each word in a text content.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1672,17 +1661,17 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Pluralize or Singularize",
+    operationItemName: "Pluralize or Singularize",
     nodeName: "Text Manipulation",
-    operationDescription: "Convert text between singular and plural forms.",
+    operationItemDescription: "Convert text between singular and plural forms.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1699,18 +1688,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Randomize Text",
+    operationItemName: "Randomize Text",
     nodeName: "Text Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Shuffle words, letters, or apply text scrambling for anonymization.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Input Content",
         paramInputPlaceholder: "Paste your content...",
@@ -1735,9 +1724,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -1745,13 +1734,13 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // AI Generation Operations
   {
-    operationName: "Generate Text",
+    operationItemName: "Generate Text",
     nodeName: "AI Generation",
-    operationDescription:
+    operationItemDescription:
       "Create written content from a prompt — for articles, emails, product descriptions, etc.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Prompt",
         paramInputPlaceholder: "e.g., Write a blog intro about skydiving...",
@@ -1785,18 +1774,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Summarize or Rewrite Content",
+    operationItemName: "Summarize or Rewrite Content",
     nodeName: "AI Generation",
-    operationDescription:
+    operationItemDescription:
       "Transform existing text — summarizing or paraphrasing it with a clear intent.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Prompt",
         paramInputPlaceholder: "Paste your content here...",
@@ -1822,18 +1811,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Generate Metadata (SEO, Tags, Titles)",
+    operationItemName: "Generate Metadata (SEO, Tags, Titles)",
     nodeName: "AI Generation",
-    operationDescription:
+    operationItemDescription:
       "Generate optimized metadata from raw content (titles, descriptions, tags).",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Prompt",
         paramInputPlaceholder:
@@ -1859,17 +1848,18 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Generate Image",
+    operationItemName: "Generate Image",
     nodeName: "AI Generation",
-    operationDescription: "Create an image from a descriptive prompt using AI.",
+    operationItemDescription:
+      "Create an image from a descriptive prompt using AI.",
     skipDuplicate: true,
     loopThrough: false,
-    params: [
+    itemParams: [
       {
         paramName: "Prompt",
         paramInputPlaceholder:
@@ -1909,16 +1899,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Generate Video (Short Loop)",
+    operationItemName: "Generate Video (Short Loop)",
     nodeName: "AI Generation",
-    operationDescription:
+    operationItemDescription:
       "Create a short animated video (or loop) from a descriptive scene prompt.",
-    params: [
+    itemParams: [
       {
         paramName: "Prompt",
         paramInputPlaceholder:
@@ -1944,16 +1934,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Generate Voice / Audio",
+    operationItemName: "Generate Voice / Audio",
     nodeName: "AI Generation",
-    operationDescription:
+    operationItemDescription:
       "Convert text into natural-sounding speech using AI-generated voices — useful for voiceovers, narration, or accessibility.",
-    params: [
+    itemParams: [
       {
         paramName: "Prompt",
         paramInputPlaceholder:
@@ -1988,9 +1978,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -1998,11 +1988,11 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Sentiment Analysis Operations
   {
-    operationName: "Basic Sentiment Classification",
+    operationItemName: "Basic Sentiment Classification",
     nodeName: "Sentiment Analysis",
-    operationDescription:
+    operationItemDescription:
       "Determine if the input text expresses a positive, negative, or neutral sentiment.",
-    params: [
+    itemParams: [
       {
         paramName: "Text Content",
         paramInputPlaceholder: "Paste the content to analyze...",
@@ -2022,16 +2012,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Sentiment Scoring",
+    operationItemName: "Sentiment Scoring",
     nodeName: "Sentiment Analysis",
-    operationDescription:
+    operationItemDescription:
       "Return a numerical sentiment score (e.g., -1 to 1) and confidence levels.",
-    params: [
+    itemParams: [
       {
         paramName: "Text Content",
         paramInputPlaceholder: "Enter the text to be scored...",
@@ -2049,16 +2039,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Emotion Detection",
+    operationItemName: "Emotion Detection",
     nodeName: "Sentiment Analysis",
-    operationDescription:
+    operationItemDescription:
       "Detect emotional undertones in the text — e.g., joy, anger, sadness, fear, surprise.",
-    params: [
+    itemParams: [
       {
         paramName: "Text Content",
         paramInputPlaceholder: "Enter text to be analyzed for emotions...",
@@ -2076,16 +2066,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Intent Classification",
+    operationItemName: "Intent Classification",
     nodeName: "Sentiment Analysis",
-    operationDescription:
+    operationItemDescription:
       "Classify the text intent — e.g., ask a question, express frustration, request support, etc.",
-    params: [
+    itemParams: [
       {
         paramName: "Text Content",
         paramInputPlaceholder: "e.g., I need help with my order...",
@@ -2103,16 +2093,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [""],
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Tone Classification",
+    operationItemName: "Tone Classification",
     nodeName: "Sentiment Analysis",
-    operationDescription:
+    operationItemDescription:
       "Detect the tone of the text — e.g., formal, casual, sarcastic, professional, angry.",
-    params: [
+    itemParams: [
       {
         paramName: "Text Content",
         paramInputPlaceholder: "Paste your text content here...",
@@ -2122,16 +2112,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Sentiment from Image",
+    operationItemName: "Sentiment from Image",
     nodeName: "Sentiment Analysis",
-    operationDescription:
+    operationItemDescription:
       "Analyze the sentiment from an Image. Optionally detect facial emotions if faces are present.",
-    params: [
+    itemParams: [
       {
         paramName: "Text Content",
         paramInputPlaceholder: "Enter Image Path or URL...",
@@ -2148,9 +2138,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -2158,11 +2148,11 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Data Enrichment Operations
   {
-    operationName: "Email Lookup",
+    operationItemName: "Email Lookup",
     nodeName: "Data Enrichment",
-    operationDescription:
+    operationItemDescription:
       "Enrich an email address with associated profile data (name, company, job title, LinkedIn, etc.)",
-    params: [
+    itemParams: [
       {
         paramName: "Email to look up",
         paramInputPlaceholder: "e.g., john.doe@example.com",
@@ -2172,16 +2162,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Company Info Lookup",
+    operationItemName: "Company Info Lookup",
     nodeName: "Data Enrichment",
-    operationDescription:
+    operationItemDescription:
       "Retrieve enriched data about a company using its domain (size, industry, tech stack, logo, etc.)",
-    params: [
+    itemParams: [
       {
         paramName: "Domain",
         paramInputPlaceholder: "e.g., shopify.com",
@@ -2191,16 +2181,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Social Profile Extraction",
+    operationItemName: "Social Profile Extraction",
     nodeName: "Data Enrichment",
-    operationDescription:
+    operationItemDescription:
       "Extract and enrich data from a given social media URL (e.g., LinkedIn, Twitter, etc.)",
-    params: [
+    itemParams: [
       {
         paramName: "Profile URL",
         paramInputPlaceholder: "e.g., https://www.linkedin.com/in/john-doe",
@@ -2209,16 +2199,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "IP to Geo & ISP Info",
+    operationItemName: "IP to Geo & ISP Info",
     nodeName: "Data Enrichment",
-    operationDescription:
+    operationItemDescription:
       "Enrich an IP address with location (city, country), timezone, ISP, and organization data.",
-    params: [
+    itemParams: [
       {
         paramName: "IP Address",
         paramInputPlaceholder: "e.g., 192.168.0.1",
@@ -2228,16 +2218,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Phone Number Lookup",
+    operationItemName: "Phone Number Lookup",
     nodeName: "Data Enrichment",
-    operationDescription:
+    operationItemDescription:
       "Validate and enrich a phone number with carrier, line type, country, and region data.",
-    params: [
+    itemParams: [
       {
         paramName: "Phone Number",
         paramInputPlaceholder: "e.g., +14155552671",
@@ -2247,16 +2237,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Zip/Postal Code Enrichment",
+    operationItemName: "Zip/Postal Code Enrichment",
     nodeName: "Data Enrichment",
-    operationDescription:
+    operationItemDescription:
       "Get city, state, region, timezone, and population data from a zip or postal code.",
-    params: [
+    itemParams: [
       {
         paramName: "Postal Code",
         paramInputPlaceholder: "e.g., 94107",
@@ -2275,9 +2265,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -2285,11 +2275,11 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Image Manipulation Operations
   {
-    operationName: "Resize Image",
+    operationItemName: "Resize Image",
     nodeName: "Image Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Resize an image to specific dimensions or by percentage.",
-    params: [
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2327,16 +2317,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Crop Image",
+    operationItemName: "Crop Image",
     nodeName: "Image Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Crop using coordinates or aspect ratio, with optional Smart Crop to focus on key content.",
-    params: [
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2403,15 +2393,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: false,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Compress Image",
+    operationItemName: "Compress Image",
     nodeName: "Image Manipulation",
-    operationDescription: "Reduce file size with quality control.",
-    params: [
+    operationItemDescription: "Reduce file size with quality control.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2435,16 +2425,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Blur Image",
+    operationItemName: "Blur Image",
     nodeName: "Image Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Apply a blur effect to the entire image or selective areas (including faces).",
-    params: [
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2466,15 +2456,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: false,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Overlay Text / Watermark",
+    operationItemName: "Overlay Text / Watermark",
     nodeName: "Image Manipulation",
-    operationDescription: "Add text or image watermark with styling.",
-    params: [
+    operationItemDescription: "Add text or image watermark with styling.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2532,15 +2522,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Rotate / Flip Image",
+    operationItemName: "Rotate / Flip Image",
     nodeName: "Image Manipulation",
-    operationDescription: "Rotate or flip the image.",
-    params: [
+    operationItemDescription: "Rotate or flip the image.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2570,15 +2560,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Remove Background",
+    operationItemName: "Remove Background",
     nodeName: "Image Manipulation",
-    operationDescription: "Automatically isolate and remove image background.",
-    params: [
+    operationItemDescription:
+      "Automatically isolate and remove image background.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2604,15 +2595,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Enhance Image (Super Resolution)",
+    operationItemName: "Enhance Image (Super Resolution)",
     nodeName: "Image Manipulation",
-    operationDescription: "Improve blurry or low-res images to high quality.",
-    params: [
+    operationItemDescription:
+      "Improve blurry or low-res images to high quality.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2636,16 +2628,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Image Quality Enhancer",
+    operationItemName: "Image Quality Enhancer",
     nodeName: "Image Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Enhances image clarity by combining sharpening, brightness/contrast adjustment, and noise reduction.",
-    params: [
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2682,15 +2674,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Extract Dominant Colors",
+    operationItemName: "Extract Dominant Colors",
     nodeName: "Image Manipulation",
-    operationDescription: "Identify main colors in the image.",
-    params: [
+    operationItemDescription: "Identify main colors in the image.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2706,15 +2698,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Detect Faces and Objects",
+    operationItemName: "Detect Faces and Objects",
     nodeName: "Image Manipulation",
-    operationDescription: "Detect faces and objects with bounding boxes.",
-    params: [
+    operationItemDescription: "Detect faces and objects with bounding boxes.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2736,15 +2728,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [""],
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Generate Thumbnail",
+    operationItemName: "Generate Thumbnail",
     nodeName: "Image Manipulation",
-    operationDescription: "Create a small optimized preview image.",
-    params: [
+    operationItemDescription: "Create a small optimized preview image.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2775,16 +2767,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Add Shape & Border",
+    operationItemName: "Add Shape & Border",
     nodeName: "Image Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Shapes the image (e.g., circle) and adds border or padding.",
-    params: [
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2833,15 +2825,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Apply Filters",
+    operationItemName: "Apply Filters",
     nodeName: "Image Manipulation",
-    operationDescription: "Add artistic filters to an image.",
-    params: [
+    operationItemDescription: "Add artistic filters to an image.",
+    itemParams: [
       {
         paramName: "Image input",
         paramInputPlaceholder: "Add your Image, URL or Path...",
@@ -2889,16 +2881,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Image Fusion",
+    operationItemName: "Image Fusion",
     nodeName: "Image Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Combines multiple images using side-by-side, stacked, or overlay layouts.",
-    params: [
+    itemParams: [
       {
         paramName: "Images",
         paramInputPlaceholder: "List of image path, URLs or base64 to merge.",
@@ -2945,9 +2937,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -2955,10 +2947,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Video Manipulation Operations
   {
-    operationName: "Trim Video",
+    operationItemName: "Trim Video",
     nodeName: "Video Manipulation",
-    operationDescription: "Cut the video to a specific start and end time.",
-    params: [
+    operationItemDescription: "Cut the video to a specific start and end time.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add Video path, URL or base64 to trim.",
@@ -2981,15 +2973,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Resize Video",
+    operationItemName: "Resize Video",
     nodeName: "Video Manipulation",
-    operationDescription: "Change dimensions to match platform or screen.",
-    params: [
+    operationItemDescription: "Change dimensions to match platform or screen.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add Video path, URL or base64 to resize.",
@@ -3020,15 +3012,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Overlay Text / Watermark",
+    operationItemName: "Overlay Text / Watermark",
     nodeName: "Video Manipulation",
-    operationDescription: "Add branding or labels onto the video.",
-    params: [
+    operationItemDescription: "Add branding or labels onto the video.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Video to add watermark on...",
@@ -3103,15 +3095,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Generate Thumbnail",
+    operationItemName: "Generate Thumbnail",
     nodeName: "Video Manipulation",
-    operationDescription: "Auto-create a thumbnail image from a video frame.",
-    params: [
+    operationItemDescription:
+      "Auto-create a thumbnail image from a video frame.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add your Video, URL or Path...",
@@ -3145,15 +3138,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Compress Video",
+    operationItemName: "Compress Video",
     nodeName: "Video Manipulation",
-    operationDescription: "Reduce file size without losing too much quality.",
-    params: [
+    operationItemDescription:
+      "Reduce file size without losing too much quality.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add Video path, URL or base64 to compress.",
@@ -3180,15 +3174,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Add Captions / Subtitles",
+    operationItemName: "Add Captions / Subtitles",
     nodeName: "Video Manipulation",
-    operationDescription: "Overlay subtitles (manual or AI-generated).",
-    params: [
+    operationItemDescription: "Overlay subtitles (manual or AI-generated).",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Video to add captions to.",
@@ -3232,15 +3226,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Speed Adjustment",
+    operationItemName: "Speed Adjustment",
     nodeName: "Video Manipulation",
-    operationDescription: "Change the video playback speed.",
-    params: [
+    operationItemDescription: "Change the video playback speed.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Video to modify playback speed.",
@@ -3266,15 +3260,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Smart Video Stitcher",
+    operationItemName: "Smart Video Stitcher",
     nodeName: "Video Manipulation",
-    operationDescription: "Combine multiple videos and add intro/outro.",
-    params: [
+    operationItemDescription: "Combine multiple videos and add intro/outro.",
+    itemParams: [
       {
         paramName: "Video Clips",
         paramInputPlaceholder: "Enter video URLs or paths to merge...",
@@ -3321,15 +3315,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Auto Clean Audio",
+    operationItemName: "Auto Clean Audio",
     nodeName: "Video Manipulation",
-    operationDescription: "Optimize audio for clarity and compliance.",
-    params: [
+    operationItemDescription: "Optimize audio for clarity and compliance.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add video to clean...",
@@ -3341,7 +3335,7 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         paramName: "Remove Silences",
         paramDescription: `Automatically detect and cut silent parts.`,
         type: "primitive/switch",
-        value: "" as any,
+        value: true,
       },
       {
         paramName: "Censor List",
@@ -3364,16 +3358,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Smart Highlights (AI)",
+    operationItemName: "Smart Highlights (AI)",
     nodeName: "Video Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Generate engaging short clips from a video using AI.",
-    params: [
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add video to highlight",
@@ -3416,15 +3410,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: [] as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Apply Color Grade",
+    operationItemName: "Apply Color Grade",
     nodeName: "Video Manipulation",
-    operationDescription: "Stylize the video with cinematic filters.",
-    params: [
+    operationItemDescription: "Stylize the video with cinematic filters.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add video to stylize.",
@@ -3466,15 +3460,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Smart Audio Mixer",
+    operationItemName: "Smart Audio Mixer",
     nodeName: "Video Manipulation",
-    operationDescription: "Full control over video audio track.",
-    params: [
+    operationItemDescription: "Full control over video audio track.",
+    itemParams: [
       {
         paramName: "Video",
         paramInputPlaceholder: "Add video to modify...",
@@ -3511,9 +3505,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -3521,10 +3515,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Audio Manipulation Operations
   {
-    operationName: "Trim Audio",
+    operationItemName: "Trim Audio",
     nodeName: "Audio Manipulation",
-    operationDescription: "Cut audio to a specific start and end time.",
-    params: [
+    operationItemDescription: "Cut audio to a specific start and end time.",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "The source audio to trim...",
@@ -3547,16 +3541,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Clean & Adjust Audio",
+    operationItemName: "Clean & Adjust Audio",
     nodeName: "Audio Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Improve audio clarity by removing noise, adjusting volume, and changing pitch.",
-    params: [
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "The source audio to enhance...",
@@ -3593,16 +3587,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Add Background Music",
+    operationItemName: "Add Background Music",
     nodeName: "Audio Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Overlay a background music track with adjustable volume.",
-    params: [
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "Enter the Main audio track ...",
@@ -3634,15 +3628,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Auto-Censor & Filler Cutter",
+    operationItemName: "Auto-Censor & Filler Cutter",
     nodeName: "Audio Manipulation",
-    operationDescription: "Clean audio by removing fillers and censoring words",
-    params: [
+    operationItemDescription:
+      "Clean audio by removing fillers and censoring words",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "Enter the audio to clean...",
@@ -3678,15 +3673,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Speed Adjustment",
+    operationItemName: "Speed Adjustment",
     nodeName: "Audio Manipulation",
-    operationDescription: "Change the audio playback speed.",
-    params: [
+    operationItemDescription: "Change the audio playback speed.",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "Audio to modify playback speed...",
@@ -3719,15 +3714,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Fade In / Fade Out",
+    operationItemName: "Fade In / Fade Out",
     nodeName: "Audio Manipulation",
-    operationDescription: "Create smooth fade-in and fade-out effects",
-    params: [
+    operationItemDescription: "Create smooth fade-in and fade-out effects",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "The source audio to fade...",
@@ -3752,15 +3747,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Merge Audio",
+    operationItemName: "Merge Audio",
     nodeName: "Audio Manipulation",
-    operationDescription: "Combine multiple audio into one.",
-    params: [
+    operationItemDescription: "Combine multiple audio into one.",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "List of audio to merge in sequence...",
@@ -3776,15 +3771,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Voice Isolation",
+    operationItemName: "Voice Isolation",
     nodeName: "Audio Manipulation",
-    operationDescription: "Remove music and isolate voice from mixed audio.",
-    params: [
+    operationItemDescription:
+      "Remove music and isolate voice from mixed audio.",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "The source audio to isolate...",
@@ -3801,15 +3797,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Compress Audio",
+    operationItemName: "Compress Audio",
     nodeName: "Audio Manipulation",
-    operationDescription: "Reduce audio size while maintaining quality.",
-    params: [
+    operationItemDescription: "Reduce audio size while maintaining quality.",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "The source audio to compress...",
@@ -3835,15 +3831,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Transcribe Audio (AI)",
+    operationItemName: "Transcribe Audio (AI)",
     nodeName: "Audio Manipulation",
-    operationDescription: "Generate a text transcript from an audio track.",
-    params: [
+    operationItemDescription: "Generate a text transcript from an audio track.",
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "Source audio for transcript",
@@ -3874,16 +3870,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Summarize Audio (AI)",
+    operationItemName: "Summarize Audio (AI)",
     nodeName: "Audio Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Extract key points from long recordings or meetings.",
-    params: [
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "Source audio for summarization...",
@@ -3906,16 +3902,16 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Apply Styles",
+    operationItemName: "Apply Styles",
     nodeName: "Audio Manipulation",
-    operationDescription:
+    operationItemDescription:
       "Choose from predefined styles like podcast, radio, phone, etc.",
-    params: [
+    itemParams: [
       {
         paramName: "Audio",
         paramInputPlaceholder: "Source audio to apply style to...",
@@ -3947,9 +3943,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -3957,10 +3953,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Data Converter Operations
   {
-    operationName: "Convert to PDF",
+    operationItemName: "Convert to PDF",
     nodeName: "Data Converter",
-    operationDescription: `Convert any data into a well-formatted PDF document.`,
-    params: [
+    operationItemDescription: `Convert any data into a well-formatted PDF document.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -3995,15 +3991,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to CSV",
+    operationItemName: "Convert to CSV",
     nodeName: "Data Converter",
-    operationDescription: `Convert structured data into CSV format.`,
-    params: [
+    operationItemDescription: `Convert structured data into CSV format.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4026,15 +4022,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to Excel (XLSX)",
+    operationItemName: "Convert to Excel (XLSX)",
     nodeName: "Data Converter",
-    operationDescription: `Convert datasets to a spreadsheet format.`,
-    params: [
+    operationItemDescription: `Convert datasets to a spreadsheet format.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4057,15 +4053,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to Plain Text",
+    operationItemName: "Convert to Plain Text",
     nodeName: "Data Converter",
-    operationDescription: `Flatten and serialize any data into readable plain text.`,
-    params: [
+    operationItemDescription: `Flatten and serialize any data into readable plain text.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4081,9 +4077,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -4091,10 +4087,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Image Converter Operations
   {
-    operationName: "Convert to JPEG",
+    operationItemName: "Convert to JPEG",
     nodeName: "Image Converter",
-    operationDescription: `Convert image to JPG format with optional quality settings.`,
-    params: [
+    operationItemDescription: `Convert image to JPG format with optional quality settings.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4118,15 +4114,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to PNG",
+    operationItemName: "Convert to PNG",
     nodeName: "Image Converter",
-    operationDescription: `Convert any data to PNG format.`,
-    params: [
+    operationItemDescription: `Convert any data to PNG format.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4142,15 +4138,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: false,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to WebP",
+    operationItemName: "Convert to WebP",
     nodeName: "Image Converter",
-    operationDescription: `Convert image to WebP for faster web loading.`,
-    params: [
+    operationItemDescription: `Convert image to WebP for faster web loading.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4173,15 +4169,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to AVIF",
+    operationItemName: "Convert to AVIF",
     nodeName: "Image Converter",
-    operationDescription: `Convert to AVIF for high compression, modern web usage.`,
-    params: [
+    operationItemDescription: `Convert to AVIF for high compression, modern web usage.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4205,15 +4201,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to TIFF",
+    operationItemName: "Convert to TIFF",
     nodeName: "Image Converter",
-    operationDescription: `Convert to TIFF for high-quality print and publishing.`,
-    params: [
+    operationItemDescription: `Convert to TIFF for high-quality print and publishing.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4230,15 +4226,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to BMP",
+    operationItemName: "Convert to BMP",
     nodeName: "Image Converter",
-    operationDescription: `Convert to BMP for legacy system compatibility.`,
-    params: [
+    operationItemDescription: `Convert to BMP for legacy system compatibility.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4255,15 +4251,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to ICO",
+    operationItemName: "Convert to ICO",
     nodeName: "Image Converter",
-    operationDescription: `Convert to .ico for favicon or desktop apps.`,
-    params: [
+    operationItemDescription: `Convert to .ico for favicon or desktop apps.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4280,15 +4276,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to SVG",
+    operationItemName: "Convert to SVG",
     nodeName: "Image Converter",
-    operationDescription: `Use tracing/edge-detection to generate SVG from raster (AI-assisted).`,
-    params: [
+    operationItemDescription: `Use tracing/edge-detection to generate SVG from raster (AI-assisted).`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4312,9 +4308,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -4322,10 +4318,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Video Converter Operations
   {
-    operationName: "Convert to MP4",
+    operationItemName: "Convert to MP4",
     nodeName: "Video Converter",
-    operationDescription: `Convert to MP4 with H.264 encoding for universal playback.`,
-    params: [
+    operationItemDescription: `Convert to MP4 with H.264 encoding for universal playback.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4368,15 +4364,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to WebM",
+    operationItemName: "Convert to WebM",
     nodeName: "Video Converter",
-    operationDescription: `Convert to WebM for optimized browser performance.`,
-    params: [
+    operationItemDescription: `Convert to WebM for optimized browser performance.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4435,15 +4431,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to MOV",
+    operationItemName: "Convert to MOV",
     nodeName: "Video Converter",
-    operationDescription: `Convert to Apple-compatible MOV format.`,
-    params: [
+    operationItemDescription: `Convert to Apple-compatible MOV format.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4502,15 +4498,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to AVI",
+    operationItemName: "Convert to AVI",
     nodeName: "Video Converter",
-    operationDescription: `Convert to AVI for legacy software needs.`,
-    params: [
+    operationItemDescription: `Convert to AVI for legacy software needs.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4569,15 +4565,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to MKV",
+    operationItemName: "Convert to MKV",
     nodeName: "Video Converter",
-    operationDescription: `Convert to MKV for media archiving and subtitles.`,
-    params: [
+    operationItemDescription: `Convert to MKV for media archiving and subtitles.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4636,15 +4632,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to GIF",
+    operationItemName: "Convert to GIF",
     nodeName: "Video Converter",
-    operationDescription: `Convert video clips into animated GIFs.`,
-    params: [
+    operationItemDescription: `Convert video clips into animated GIFs.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4676,9 +4672,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -4686,10 +4682,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Audio Converter Operations
   {
-    operationName: "Convert to MP3",
+    operationItemName: "Convert to MP3",
     nodeName: "Audio Converter",
-    operationDescription: `Convert (any data) to MP3 with bitrate options.`,
-    params: [
+    operationItemDescription: `Convert (any data) to MP3 with bitrate options.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4721,15 +4717,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to WAV",
+    operationItemName: "Convert to WAV",
     nodeName: "Audio Converter",
-    operationDescription: `Convert to WAV (uncompressed audio quality).`,
-    params: [
+    operationItemDescription: `Convert to WAV (uncompressed audio quality).`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4761,15 +4757,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to AAC",
+    operationItemName: "Convert to AAC",
     nodeName: "Audio Converter",
-    operationDescription: `Convert to AAC for iTunes/Apple devices.`,
-    params: [
+    operationItemDescription: `Convert to AAC for iTunes/Apple devices.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4801,15 +4797,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to OGG",
+    operationItemName: "Convert to OGG",
     nodeName: "Audio Converter",
-    operationDescription: `Convert to OGG for open-source friendly audio.`,
-    params: [
+    operationItemDescription: `Convert to OGG for open-source friendly audio.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4841,15 +4837,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to FLAC",
+    operationItemName: "Convert to FLAC",
     nodeName: "Audio Converter",
-    operationDescription: `Convert to FLAC for lossless compression.`,
-    params: [
+    operationItemDescription: `Convert to FLAC for lossless compression.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4881,15 +4877,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to M4A",
+    operationItemName: "Convert to M4A",
     nodeName: "Audio Converter",
-    operationDescription: `Convert to M4A (used in mobile/web apps).`,
-    params: [
+    operationItemDescription: `Convert to M4A (used in mobile/web apps).`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4921,15 +4917,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to Opus",
+    operationItemName: "Convert to Opus",
     nodeName: "Audio Converter",
-    operationDescription: `Convert to Opus for efficient speech audio (e.g., VoIP).`,
-    params: [
+    operationItemDescription: `Convert to Opus for efficient speech audio (e.g., VoIP).`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -4961,15 +4957,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to AMR",
+    operationItemName: "Convert to AMR",
     nodeName: "Audio Converter",
-    operationDescription: `Convert for compatibility with mobile voice apps.`,
-    params: [
+    operationItemDescription: `Convert for compatibility with mobile voice apps.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -5001,9 +4997,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -5011,10 +5007,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Encoding Operations
   {
-    operationName: "Convert to Base64",
+    operationItemName: "Convert to Base64",
     nodeName: "Encoding",
-    operationDescription: `Encode any data into base64 string.`,
-    params: [
+    operationItemDescription: `Encode any data into base64 string.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to encode... (bulk is allowed)",
@@ -5032,15 +5028,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to Hexadecimal",
+    operationItemName: "Convert to Hexadecimal",
     nodeName: "Encoding",
-    operationDescription: `Encode any data into hexadecimal format.`,
-    params: [
+    operationItemDescription: `Encode any data into hexadecimal format.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to encode... (bulk is allowed)",
@@ -5058,15 +5054,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to Binary",
+    operationItemName: "Convert to Binary",
     nodeName: "Encoding",
-    operationDescription: `Convert (any) data to binary encoding.`,
-    params: [
+    operationItemDescription: `Convert (any) data to binary encoding.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to encode... (bulk is allowed)",
@@ -5084,15 +5080,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to QR Code",
+    operationItemName: "Convert to QR Code",
     nodeName: "Encoding",
-    operationDescription: `Encode any data into QR image, returned as base64 image.`,
-    params: [
+    operationItemDescription: `Encode any data into QR image, returned as base64 image.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to encode... (bulk is allowed)",
@@ -5135,9 +5131,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         },
       ],
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -5145,10 +5141,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Markup Operations
   {
-    operationName: "Convert to JSON",
+    operationItemName: "Convert to JSON",
     nodeName: "Markup",
-    operationDescription: `Convert data into JSON for APIs or storage.`,
-    params: [
+    operationItemDescription: `Convert data into JSON for APIs or storage.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -5172,15 +5168,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to HTML",
+    operationItemName: "Convert to HTML",
     nodeName: "Markup",
-    operationDescription: `Convert structured data or text into semantic HTML.`,
-    params: [
+    operationItemDescription: `Convert structured data or text into semantic HTML.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -5249,15 +5245,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to Markdown",
+    operationItemName: "Convert to Markdown",
     nodeName: "Markup",
-    operationDescription: `Convert data into Markdown format.`,
-    params: [
+    operationItemDescription: `Convert data into Markdown format.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -5290,15 +5286,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to XML",
+    operationItemName: "Convert to XML",
     nodeName: "Markup",
-    operationDescription: `Convert data into XML markup.`,
-    params: [
+    operationItemDescription: `Convert data into XML markup.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -5329,15 +5325,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "",
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to YAML",
+    operationItemName: "Convert to YAML",
     nodeName: "Markup",
-    operationDescription: `Convert data into YAML for devops/config readability.`,
-    params: [
+    operationItemDescription: `Convert data into YAML for devops/config readability.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -5361,15 +5357,15 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   {
-    operationName: "Convert to LaTeX",
+    operationItemName: "Convert to LaTeX",
     nodeName: "Markup",
-    operationDescription: `Convert data (mathematical or academic content) to LaTeX markup.`,
-    params: [
+    operationItemDescription: `Convert data (mathematical or academic content) to LaTeX markup.`,
+    itemParams: [
       {
         paramName: "Data Input",
         paramInputPlaceholder: "Add data to convert (multiple allowed)...",
@@ -5398,9 +5394,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: "" as any,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
 
   //
@@ -5409,10 +5405,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // PDF Viewer Operations
   {
-    operationName: "PDF Viewer",
+    operationItemName: "PDF Viewer",
     nodeName: "PDF Viewer",
-    operationDescription: `Render and preview a PDF document directly from a file or URL.`,
-    params: [
+    operationItemDescription: `Render and preview a PDF document directly from a file or URL.`,
+    itemParams: [
       {
         paramName: "PDF To Preview",
         paramInputPlaceholder: "Add the PDF to preview...",
@@ -5466,9 +5462,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -5476,10 +5472,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Docs Viewer Operations
   {
-    operationName: "Docs Viewer",
+    operationItemName: "Docs Viewer",
     nodeName: "Docs Viewer",
-    operationDescription: `Preview text-based documents like Word files or raw content inside a styled, paginated viewer.`,
-    params: [
+    operationItemDescription: `Preview text-based documents like Word files or raw content inside a styled, paginated viewer.`,
+    itemParams: [
       {
         paramName: "Document To Preview",
         paramInputPlaceholder: "Add the document to preview...",
@@ -5519,9 +5515,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -5529,10 +5525,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Spreadsheet Viewer Operations
   {
-    operationName: "Spreadsheet Viewer",
+    operationItemName: "Spreadsheet Viewer",
     nodeName: "Spreadsheet Viewer",
-    operationDescription: `Display structured data like Excel or CSV in an interactive spreadsheet format.`,
-    params: [
+    operationItemDescription: `Display structured data like Excel or CSV in an interactive spreadsheet format.`,
+    itemParams: [
       {
         paramName: "Spreadsheet To Preview",
         paramInputPlaceholder: "Add the data to preview...",
@@ -5569,9 +5565,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -5579,10 +5575,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Image Preview Operations
   {
-    operationName: "Image Preview",
+    operationItemName: "Image Preview",
     nodeName: "Image Preview",
-    operationDescription: `View images in-line, whether they’re uploaded or linked by URL.`,
-    params: [
+    operationItemDescription: `View images in-line, whether they’re uploaded or linked by URL.`,
+    itemParams: [
       {
         paramName: "Images (Paths + Alt text)",
         paramDescription: `File paths or URLs of the images to display.`,
@@ -5622,9 +5618,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -5632,10 +5628,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Media Player Operations
   {
-    operationName: "Media Player",
+    operationItemName: "Media Player",
     nodeName: "Media Player",
-    operationDescription: `Play audio or video files directly within the workflow.`,
-    params: [
+    operationItemDescription: `Play audio or video files directly within the workflow.`,
+    itemParams: [
       {
         paramName: "Audio/Video playlist",
         paramDescription:
@@ -5681,9 +5677,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //
@@ -5691,10 +5687,10 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
   //
   // Code Preview Operations
   {
-    operationName: "Code Preview",
+    operationItemName: "Code Preview",
     nodeName: "Code Preview",
-    operationDescription: `Render code or structured text (JSON, XML, Markdown, etc.) with syntax highlighting.`,
-    params: [
+    operationItemDescription: `Render code or structured text (JSON, XML, Markdown, etc.) with syntax highlighting.`,
+    itemParams: [
       {
         paramName: "Code Content",
         paramInputPlaceholder: "Paste your code or structured content...",
@@ -5731,9 +5727,9 @@ export const workflowOperations: Omit<VsOperationBlockType, "id">[] = [
         value: true,
       },
     ],
-    inputs: {},
-    inputFilters: [],
-    outputs: {},
+
+    itemInputFilters: [],
+    itemOutputs: {},
   },
   //
   //

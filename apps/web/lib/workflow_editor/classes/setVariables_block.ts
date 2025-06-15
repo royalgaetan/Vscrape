@@ -31,10 +31,13 @@ export class SetVariablesBlock extends ObservableMixin() {
     this.notifyAll();
   }
 
-  // To JSON
-  toJSON(): object {
+  // To Object
+  toObject(): object {
     return {
-      SetVariablesBlock: "SetVariablesBlock",
+      id: this._id,
+      variableAssignations: this._variableAssignations.map((r) =>
+        JSON.stringify(r)
+      ),
     };
   }
 }

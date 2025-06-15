@@ -74,14 +74,19 @@ const WHeader = () => {
       if (!currentEditor.editor)
         throw new Error("An error occured while saving the workflow...");
 
-      const workflowDefinition = getWorkflowDefinition(currentEditor.editor);
+      const workflowDefinition = getWorkflowDefinition();
       if (!workflowDefinition)
         throw new Error("Cannot save the current workflow...");
 
+      // TODO:save workflow definition in DB as draft
       console.log("workflowDefinition", workflowDefinition);
 
       setIsSaving(false);
       setSavingResultIcon(Check);
+
+      toast.success("Workflow successfully saved...", {
+        richColors: true,
+      });
     } catch (err) {
       toast.error(
         err instanceof Error

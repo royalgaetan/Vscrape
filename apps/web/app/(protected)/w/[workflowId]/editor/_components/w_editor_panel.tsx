@@ -4,12 +4,9 @@ import { Button } from "@/components/ui/button";
 import NodeActionButtons from "@/components/workflow_editor/panel/node_action_buttons";
 import PanelHeader from "@/components/workflow_editor/panel/panel_header";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
-import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import OperationsList from "@/components/workflow_editor/panel/operations/operations_list";
-import SingleOperationPanel from "@/components/workflow_editor/panel/operations/single_operation_panel";
 import { Info, Play, X } from "lucide-react";
-import SingleFormFieldPanel from "@/components/workflow_editor/panel/form_fields/single_form_field_panel";
-import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
+import SingleFormFieldPanel from "@/components/workflow_editor/panel/form_fields/single_formFieldItem_panel";
 import FormFieldsList from "@/components/workflow_editor/panel/form_fields/form_field_list";
 import CronBlockList from "@/components/workflow_editor/panel/cron/cron_block_list";
 import SingleCronEditorPanel from "@/components/workflow_editor/panel/cron/single_cron_editor_panel";
@@ -23,6 +20,15 @@ import WaitBlockList from "@/components/workflow_editor/panel/wait/wait_block_li
 import SetVariablesBlockList from "@/components/workflow_editor/panel/setVariables/setVariables_block_list";
 import BranchesList from "@/components/workflow_editor/panel/branches/branches_list";
 import DataPreviewList from "@/components/workflow_editor/panel/data_preview/data_preview_list";
+import SingleOperationItemPanel from "@/components/workflow_editor/panel/operations/single_operationItem_panel";
+import {
+  OperationBlock,
+  OperationItem,
+} from "@/lib/workflow_editor/classes/operation_block";
+import {
+  FormBlock,
+  FormFieldItem,
+} from "@/lib/workflow_editor/classes/form_field_block";
 
 const EditorPanel = () => {
   // Store:
@@ -97,18 +103,24 @@ const EditorPanel = () => {
                 {/* Operation Panel */}
                 {currentNode.blockType === "operation" ||
                 currentNode.blockType === "preview" ? (
-                  <SingleOperationPanel
-                    nodeOrigin={currentNode}
-                    operationOrigin={blockOrigin as OperationBlock | undefined}
+                  <SingleOperationItemPanel
+                    initialNode={currentNode}
+                    initialOperationItem={
+                      blockOrigin as OperationItem | undefined
+                    }
                     displayBackButton={isEditing}
-                    onDelete={(operationId) => {
+                    onDelete={(operationItemId) => {
                       setIsEditing(false);
-                      currentNode.removeBlock(operationId);
+                      if (!operationItemId) return;
+                      (currentNode.block as OperationBlock).removeItem(
+                        operationItemId
+                      );
                     }}
-                    onSave={(operation) => {
+                    onSave={(operationItem) => {
                       setIsEditing(false);
-                      if (!operation) return;
-                      currentNode.upsertBlock(operation);
+                      (currentNode.block as OperationBlock).upsertItem(
+                        operationItem
+                      );
                     }}
                     onBack={() => {
                       setIsEditing(false);
@@ -121,17 +133,21 @@ const EditorPanel = () => {
                 {/* Form Field Block Panel */}
                 {currentNode.blockType === "formField" && (
                   <SingleFormFieldPanel
-                    nodeOrigin={currentNode}
-                    fieldBlockOrigin={blockOrigin as FieldBlockType | undefined}
+                    initialNode={currentNode}
+                    initialFieldItem={blockOrigin as FormFieldItem | undefined}
                     displayBackButton={isEditing}
-                    onSave={(fieldBlock) => {
+                    onSave={(fieldItem) => {
                       setIsEditing(false);
-                      if (!fieldBlock) return;
-                      currentNode.upsertBlock(fieldBlock);
+                      if (!fieldItem) return;
+                      (currentNode.block as FormBlock).upsertFieldItem(
+                        fieldItem
+                      );
                     }}
-                    onDelete={(fieldBlockId) => {
+                    onDelete={(fieldItemId) => {
                       setIsEditing(false);
-                      currentNode.removeBlock(fieldBlockId);
+                      (currentNode.block as FormBlock).removeFieldItem(
+                        fieldItemId
+                      );
                     }}
                     onBack={() => {
                       setIsEditing(false);
@@ -145,14 +161,14 @@ const EditorPanel = () => {
                     nodeOrigin={currentNode}
                     cronBlockOrigin={blockOrigin as CronBlock | undefined}
                     displayBackButton={isEditing}
-                    onDelete={(cronId) => {
+                    onDelete={() => {
                       setIsEditing(false);
-                      currentNode.removeBlock(cronId);
+                      currentNode.block = undefined;
                     }}
                     onSave={(cron) => {
                       setIsEditing(false);
                       if (!cron) return;
-                      currentNode.upsertBlock(cron);
+                      currentNode.block = cron;
                     }}
                     onBack={() => {
                       setIsEditing(false);
@@ -169,15 +185,13 @@ const EditorPanel = () => {
                     onSave={(webhook) => {
                       setIsEditing(false);
                       if (!webhook) return;
-                      currentNode.upsertBlock(webhook);
+                      currentNode.block = webhook;
                     }}
                     onBack={() => {
                       setIsEditing(false);
                     }}
                   />
                 )}
-
-                {/*  */}
               </>
             )}
 
@@ -191,11 +205,11 @@ const EditorPanel = () => {
                 {/* Node: Block(Operations, FormFields) List (All) */}
                 {currentNode.blockType === "operation" && (
                   <OperationsList
-                    onOperationSelect={(operation) => {
-                      setBlockOrigin(operation);
+                    onOperationItemSelect={(operationItem) => {
+                      setBlockOrigin(operationItem);
                       setIsEditing(true);
                     }}
-                    onAddOperation={() => {
+                    onAddOperationItem={() => {
                       setBlockOrigin(undefined);
                       setIsEditing(true);
                     }}
@@ -203,19 +217,25 @@ const EditorPanel = () => {
                 )}
                 {currentNode.blockType === "formField" && (
                   <FormFieldsList
-                    onFieldEdit={(fieldBlockToEdit) => {
-                      setBlockOrigin(fieldBlockToEdit);
-                      setIsEditing(true);
-                    }}
-                    onAddNewField={() => {
+                    onAddNewFieldItem={() => {
                       setBlockOrigin(undefined);
                       setIsEditing(true);
                     }}
-                    onFieldDelete={(fieldBlockId) => {
-                      currentNode.removeBlock(fieldBlockId);
+                    onFieldItemDelete={(fieldItemId) => {
+                      setIsEditing(false);
+                      (currentNode.block as FormBlock).removeFieldItem(
+                        fieldItemId
+                      );
                     }}
-                    onFieldMove={(fieldBlockId, direction) => {
-                      currentNode.moveBlock(fieldBlockId, direction);
+                    onFieldItemEdit={(fieldItem) => {
+                      setBlockOrigin(fieldItem);
+                      setIsEditing(true);
+                    }}
+                    onFieldItemMove={(fieldItemId, direction) => {
+                      (currentNode.block as FormBlock).moveFieldItem(
+                        fieldItemId,
+                        direction
+                      );
                     }}
                   />
                 )}
@@ -225,8 +245,8 @@ const EditorPanel = () => {
                       setBlockOrigin(cron);
                       setIsEditing(true);
                     }}
-                    onCronDelete={(cronId) => {
-                      currentNode.removeBlock(cronId);
+                    onCronDelete={() => {
+                      currentNode.block = undefined;
                     }}
                   />
                 )}
@@ -267,7 +287,7 @@ const EditorPanel = () => {
                   <WaitBlockList
                     onSave={(waitBlock) => {
                       if (!waitBlock) return;
-                      currentNode.upsertBlock(waitBlock);
+                      currentNode.block = waitBlock;
                     }}
                   />
                 )}
@@ -275,16 +295,23 @@ const EditorPanel = () => {
                   <SetVariablesBlockList
                     onSave={(setVariablesBlock) => {
                       if (!setVariablesBlock) return;
-                      currentNode.upsertBlock(setVariablesBlock);
+                      currentNode.block = setVariablesBlock;
                     }}
                   />
                 )}
-                {currentNode.blockType === "branches" && <BranchesList />}
+
+                {currentNode.blockType === "branch" && <BranchesList />}
+
                 {currentNode.blockType === "preview" && (
                   <DataPreviewList
-                    onPreviewEdit={(previewOperation) => {
-                      setBlockOrigin(previewOperation);
+                    onPreviewItemEdit={(previewItem) => {
+                      setBlockOrigin(previewItem);
                       setIsEditing(true);
+                    }}
+                    onPreviewItemDelete={(previewItemId) => {
+                      (currentNode.block as OperationBlock).removeItem(
+                        previewItemId
+                      );
                     }}
                   />
                 )}

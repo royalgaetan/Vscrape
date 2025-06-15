@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { cronPresets } from "@/lib/date_time_utils";
 import { isValidCron } from "cron-validator";
 import { toast } from "sonner";
+import { cloneDeep } from "lodash";
 
 const SingleCronEditorPanel = ({
   nodeOrigin,
@@ -32,11 +33,11 @@ const SingleCronEditorPanel = ({
   cronBlockOrigin?: CronBlock;
   onBack?: () => void;
   onSave: (block?: CronBlock) => void;
-  onDelete: (cronBlockId: string) => void;
+  onDelete: () => void;
   displayBackButton?: boolean;
 }) => {
   const [currentBlock, setCurrentBlock] = useState<CronBlock | undefined>(
-    cronBlockOrigin ?? getNewCronBlock()
+    cloneDeep(cronBlockOrigin) ?? getNewCronBlock()
   );
   const [isLoadingBlock, setIsLoadingBlock] = useState(false);
   const [errorFields, setErrorFields] = useState<string[]>([]);
@@ -449,7 +450,7 @@ const SingleCronEditorPanel = ({
                   className="w-fit"
                   onClick={() => {
                     // Delete Field
-                    onDelete(currentBlock.id);
+                    onDelete();
                   }}
                 >
                   <Trash2 />

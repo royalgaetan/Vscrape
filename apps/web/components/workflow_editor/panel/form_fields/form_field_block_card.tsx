@@ -101,6 +101,7 @@ const FormFieldBlockCard = ({
             selectionMode="multi"
             popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
             label={
+              Array.isArray(currentValue) &&
               (currentValue as string[]).length > 0
                 ? getExtensionNamesJoinned(currentValue as string[])
                 : `${fieldAttrPlaceholder ?? "Select..."}`
@@ -128,7 +129,7 @@ const FormFieldBlockCard = ({
             }}
             selectedValues={currentValue}
             handleSelect={(extMimeSelected) => {
-              if (!extMimeSelected) return;
+              if (!extMimeSelected || !Array.isArray(currentValue)) return;
 
               if ((currentValue as string[]).includes(extMimeSelected)) {
                 onValueChange(

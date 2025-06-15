@@ -51,10 +51,13 @@ export class WebhookBlock extends ObservableMixin() {
     this.notifyAll();
   }
 
-  // To JSON
-  toJSON(): object {
+  // To Object
+  toObject(): object {
     return {
-      WebhookBlock: "WebhookBlock",
+      id: this._id,
+      endpointUrl: this._endpointUrl,
+      httpMethod: this._httpMethod,
+      authToken: this._authToken,
     };
   }
 }

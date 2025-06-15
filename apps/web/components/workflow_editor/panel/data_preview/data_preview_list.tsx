@@ -1,51 +1,57 @@
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import React, { useEffect, useState } from "react";
-import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
+import {
+  OperationBlock,
+  OperationItem,
+} from "@/lib/workflow_editor/classes/operation_block";
 import AddFieldBlockButton from "../form_fields/add_field_block_button";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PenLineIcon, Trash2 } from "lucide-react";
+import { cloneDeep } from "lodash";
 
 const DataPreviewList = ({
-  onPreviewEdit,
+  onPreviewItemEdit,
+  onPreviewItemDelete,
 }: {
-  onPreviewEdit: (operationBlock?: OperationBlock) => void;
+  onPreviewItemEdit: (previewItem?: OperationItem) => void;
+  onPreviewItemDelete: (previewItemId: string) => void;
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
   // End Store
-  const [nodeBlocks, setNodeBlocks] = useState(
-    currentNode ? (currentNode.blocks as OperationBlock[]) : undefined
+  const [nodeBlock, setNodeBlock] = useState(
+    currentNode ? (currentNode.block as OperationBlock) : undefined
   );
 
   useEffect(() => {
-    if (!currentNode) return;
-    const sub = currentNode.stream$().subscribe((newData) => {
-      setNodeBlocks(newData.blocks as OperationBlock[]);
+    if (!nodeBlock) return;
+    const sub = nodeBlock.stream$().subscribe((newData) => {
+      setNodeBlock(cloneDeep(newData));
     });
 
     return () => sub.unsubscribe();
   }, []);
 
-  if (!currentNode) {
+  if (!currentNode || !(nodeBlock instanceof OperationBlock)) {
     return <div></div>;
   }
 
   return (
-    // Here Blocks represents: Form Fields
+    // Here Blocks represents: Operation Items (or PreviewItem)
     <div>
       <h5 className="text-base font-semibold text-[#333] line-clamp-1 mb-4">
         Data Preview
       </h5>
 
       <div className="flex flex-col">
-        {Array.isArray(nodeBlocks) && nodeBlocks.length > 0 ? (
+        {nodeBlock.items.length > 0 ? (
           <div>
-            {nodeBlocks.map((previewOperation) => {
+            {nodeBlock.items.map((previewItem) => {
               return (
                 <div
-                  key={previewOperation.id}
+                  key={previewItem.id}
                   className="relative flex flex-1 min-h-36 justify-center items-center w-full mb-10 group/dataPreviewItem border border-border ring-0 hover:ring-2 ring-border overflow-clip rounded-md bg-neutral-100/20 transition-all duration-150"
                 >
                   {/* Action Buttons: Edit | Delete */}
@@ -57,7 +63,7 @@ const DataPreviewList = ({
                         className={cn(
                           "!h-6 p-2 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
                         )}
-                        onClick={() => onPreviewEdit(previewOperation)}
+                        onClick={() => onPreviewItemEdit(previewItem)}
                       >
                         <PenLineIcon className="!size-3" /> Edit
                       </Button>
@@ -71,7 +77,7 @@ const DataPreviewList = ({
                           "!h-6 p-2 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
                         )}
                         onClick={() => {
-                          currentNode.removeBlock(previewOperation.id);
+                          onPreviewItemDelete(previewItem.id);
                         }}
                       >
                         <Trash2 className="!size-3" /> Delete
@@ -109,7 +115,7 @@ const DataPreviewList = ({
             {/* Add Preview */}
             <AddFieldBlockButton
               contentText="Add a file to preview"
-              onClick={() => onPreviewEdit()}
+              onClick={() => onPreviewItemEdit()}
             />
           </div>
         )}

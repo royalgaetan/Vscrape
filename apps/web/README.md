@@ -1,3 +1,3 @@
-# Vcrape Frontend
+# Vscrape Frontend
 
 ## Roadmap

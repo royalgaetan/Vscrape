@@ -140,7 +140,7 @@ const ParamInput = ({
               onChange(text);
             }}
             placeholder={placeHolder}
-            className="min-w-[100%] max-w-[100%]"
+            className={`min-w-[100%] max-w-[100%] ${isWithinAGroup && "min-w-[6rem] max-w-[6rem]"}`}
           />
         );
       }
@@ -157,7 +157,7 @@ const ParamInput = ({
             onChange(text);
           }}
           placeholder={placeHolder}
-          className="mb-1 min-w-[15.7rem] max-w-[15.7rem]"
+          className={`mb-1 min-w-[15.7rem] max-w-[15.7rem] ${isWithinAGroup && "min-w-[6rem] max-w-[6rem]"}`}
         />
       );
     case "primitive/url":
@@ -173,7 +173,7 @@ const ParamInput = ({
             onChange(text);
           }}
           placeholder={placeHolder}
-          className="mb-1 min-w-[15.7rem] max-w-[15.7rem]"
+          className={`mb-1 min-w-[15.7rem] max-w-[15.7rem] ${isWithinAGroup && "min-w-[6rem] max-w-[6rem]"}`}
         />
       );
     case "primitive/number":
@@ -189,7 +189,7 @@ const ParamInput = ({
             onChange(text);
           }}
           placeholder={placeHolder}
-          className="min-w-[100%] max-w-[100%]"
+          className={`min-w-[100%] max-w-[100%] ${isWithinAGroup && "min-w-[6rem] max-w-[6rem]"}`}
         />
       );
     case "primitive/tel":
@@ -205,7 +205,7 @@ const ParamInput = ({
             onChange(text);
           }}
           placeholder={placeHolder}
-          className="min-w-[100%] max-w-[100%]"
+          className={`min-w-[100%] max-w-[100%] ${isWithinAGroup && "min-w-[6rem] max-w-[6rem]"}`}
         />
       );
     case "primitive/milliseconds":

@@ -42,7 +42,7 @@ import {
 import { PreviousInputDataType, VsNodeType } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
 import { OperationBlock } from "../classes/operation_block";
-import { FormFieldBlock } from "../classes/form_field_block";
+import { FormBlock } from "../classes/form_field_block";
 import { ManualBlock } from "../classes/manual_block";
 import { WebhookBlock } from "../classes/webhook_block";
 import { WaitBlock } from "../classes/wait_block";
@@ -96,7 +96,7 @@ export const workflowEditorSections = {
   },
 } as const;
 
-export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
+export const workflowEditorNodes: Omit<VsNodeType, "iconColor">[] = [
   // Entry Points
   {
     label: "Webhook",
@@ -104,7 +104,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Trigger the workflow when an external service sends a request.",
     sectionName: "Entry Point",
     blockType: "webhook",
-    blocks: new WebhookBlock(),
+    block: new WebhookBlock(),
   },
   {
     label: "Manual",
@@ -112,7 +112,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Manually start the workflow when needed.",
     sectionName: "Entry Point",
     blockType: "manual",
-    blocks: new ManualBlock(),
+    block: new ManualBlock(),
   },
   {
     label: "Cron",
@@ -120,7 +120,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Run the workflow on a scheduled time or interval.",
     sectionName: "Entry Point",
     blockType: "cron",
-    blocks: undefined,
+    block: undefined,
   },
   {
     label: "Form Input",
@@ -128,7 +128,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Start the workflow when a user submits a form.",
     sectionName: "Entry Point",
     blockType: "formField",
-    blocks: [] as FormFieldBlock[],
+    block: new FormBlock(),
   },
   {
     label: "Chat Bot",
@@ -138,7 +138,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
       "Trigger the workflow when a new conversation is started with the chat assistant",
     sectionName: "Entry Point",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Chat Bot"),
   },
 
   // Data Reading
@@ -148,7 +148,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "",
     sectionName: "Data Reading",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Web Scraper"),
   },
   {
     label: "File reader",
@@ -156,7 +156,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "",
     sectionName: "Data Reading",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("File reader"),
   },
   {
     label: "Knowledge Base",
@@ -164,7 +164,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "",
     sectionName: "Data Reading",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Knowledge Base"),
   },
 
   {
@@ -174,7 +174,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     isDisabled: true,
     sectionName: "Data Reading",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Database reader"),
   },
 
   // Core
@@ -184,7 +184,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Add a delay before moving to the next step",
     sectionName: "Core",
     blockType: "wait",
-    blocks: new WaitBlock(),
+    block: new WaitBlock(),
   },
   {
     label: "Set Variables",
@@ -192,7 +192,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Add/Remove Global Variables",
     sectionName: "Core",
     blockType: "setVariables",
-    blocks: new SetVariablesBlock(),
+    block: new SetVariablesBlock(),
   },
 
   {
@@ -200,8 +200,8 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: SignpostBig,
     tooltip: "Add a condition if/else inside your workflow",
     sectionName: "Core",
-    blockType: "branches",
-    blocks: undefined,
+    blockType: "branch",
+    block: new OperationBlock("If/else Condition"),
   },
 
   {
@@ -209,16 +209,16 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: GitBranch,
     tooltip: "Add multiple branch at any stage of the workflow",
     sectionName: "Core",
-    blockType: "branches",
-    blocks: undefined,
+    blockType: "branch",
+    block: new OperationBlock("Branch"),
   },
   {
     label: "Merge",
     icon: Merge,
     tooltip: "Merge data into a single object",
     sectionName: "Core",
-    blockType: "branches",
-    blocks: undefined,
+    blockType: "branch",
+    block: new OperationBlock("Merge"),
   },
   {
     label: "Call Workflow",
@@ -226,7 +226,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Launch another workflow to take over",
     sectionName: "Core",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Call Workflow"),
   },
   {
     label: "Call API",
@@ -234,7 +234,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Call an external API",
     sectionName: "Core",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Call API"),
   },
   {
     label: "Send",
@@ -243,7 +243,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
       "Send an Email, Chat Message, SMS, leave a Voicemail or launch a Phone Call",
     sectionName: "Core",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Send"),
   },
 
   // Data Extraction
@@ -253,7 +253,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Retrieve data from a webpage, API, or document.",
     sectionName: "Data Extraction",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Extract Data"),
   },
   {
     label: "Tag",
@@ -261,7 +261,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Auto-tagging or intent detection",
     sectionName: "Data Extraction",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Tag"),
   },
   {
     label: "Field Mapper",
@@ -269,7 +269,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Manually attach certain data to specific field",
     sectionName: "Data Extraction",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Field Mapper"),
   },
 
   // Data Manipulation
@@ -279,7 +279,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Enhance and modify any data text",
     sectionName: "Data Manipulation",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Text Manipulation"),
   },
   {
     label: "AI Generation",
@@ -287,7 +287,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: BrainIcon,
     sectionName: "Data Manipulation",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("AI Generation"),
   },
 
   {
@@ -297,7 +297,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
       "Analyze a data and determine the overall sentiment (positive, negative, neutral).",
     sectionName: "Data Manipulation",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Sentiment Analysis"),
   },
   {
     label: "Data Enrichment",
@@ -305,7 +305,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Fetch relevant data around data source",
     sectionName: "Data Manipulation",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Data Enrichment"),
   },
   {
     label: "Image Manipulation",
@@ -313,7 +313,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Modify, resize, or process images within the workflow.",
     sectionName: "Data Manipulation",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Image Manipulation"),
   },
   {
     label: "Video Manipulation",
@@ -321,7 +321,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Modify or edit videos within the workflow.",
     sectionName: "Data Manipulation",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Video Manipulation"),
   },
   {
     label: "Audio Manipulation",
@@ -329,7 +329,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     icon: AudioLines,
     sectionName: "Data Manipulation",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Audio Manipulation"),
   },
 
   // Data Conversion
@@ -339,7 +339,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Convert extracted or processed data into a another format.",
     sectionName: "Data Conversion",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Data Converter"),
   },
   {
     label: "Image Converter",
@@ -347,7 +347,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Convert any image into another format.",
     sectionName: "Data Conversion",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Image Converter"),
   },
   {
     label: "Video Converter",
@@ -355,7 +355,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Convert any video into another format.",
     sectionName: "Data Conversion",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Video Converter"),
   },
   {
     label: "Audio Converter",
@@ -363,7 +363,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Convert any audio file into another format.",
     sectionName: "Data Conversion",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Audio Converter"),
   },
   {
     label: "Encoding",
@@ -371,7 +371,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Convert your data to format like binary, hex, base64, etc.",
     sectionName: "Data Conversion",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Encoding"),
   },
   {
     label: "Markup",
@@ -379,7 +379,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Convert data into a Markup language",
     sectionName: "Data Conversion",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Markup"),
   },
 
   // Data Preview
@@ -389,7 +389,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Preview or render a PDF from a file or URL",
     sectionName: "Data Preview",
     blockType: "preview",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("PDF Viewer"),
   },
   {
     label: "Docs Viewer",
@@ -397,7 +397,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Preview or render your data inside a Word-like previewer",
     sectionName: "Data Preview",
     blockType: "preview",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Docs Viewer"),
   },
   {
     label: "Spreadsheet Viewer",
@@ -405,7 +405,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Preview your data inside a Spreadsheet",
     sectionName: "Data Preview",
     blockType: "preview",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Spreadsheet Viewer"),
   },
   {
     label: "Image Preview",
@@ -413,7 +413,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Preview any image",
     sectionName: "Data Preview",
     blockType: "preview",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Image Preview"),
   },
   {
     label: "Media Player",
@@ -421,7 +421,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Play your video or audio",
     sectionName: "Data Preview",
     blockType: "preview",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Media Player"),
   },
   {
     label: "Code Preview",
@@ -429,7 +429,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Preview a Code's snippet (JSON, XML, Markdown, etc.)",
     sectionName: "Data Preview",
     blockType: "preview",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Code Preview"),
   },
 
   // Data Sync
@@ -439,7 +439,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Sync and organize files automatically in Dropbox.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Dropbox"),
   },
   {
     label: "Google Drive",
@@ -447,7 +447,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Sync files and folders between workflows and Google Drive.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Google Drive"),
   },
 
   {
@@ -456,7 +456,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Sync and manage Airtable records seamlessly.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Airtable"),
   },
 
   {
@@ -465,7 +465,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Automate email campaigns and sync subscriber lists.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Mailchimp"),
   },
 
   {
@@ -474,7 +474,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Manage Trello boards, lists, and cards automatically.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Trello"),
   },
   {
     label: "Figma",
@@ -482,7 +482,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Retrieve designs and track changes in Figma.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Figma"),
   },
   {
     label: "Github",
@@ -490,7 +490,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Automate issues, pull requests, and repo management.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Github"),
   },
 
   {
@@ -499,7 +499,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Manage contacts, deals, and automation within HubSpot.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("HubSpot"),
   },
   {
     label: "Zoom",
@@ -507,7 +507,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Automate Zoom meeting scheduling and data sync.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Zoom"),
   },
   {
     label: "Slack",
@@ -515,7 +515,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Send messages and automate notifications in Slack.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Slack"),
   },
   {
     label: "Asana",
@@ -523,7 +523,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Automate task creation and project management in Asana.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Asana"),
   },
 
   {
@@ -532,7 +532,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Create and update Notion pages automatically.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Notion"),
   },
   {
     label: "Shopify",
@@ -540,7 +540,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Sync orders, products, and customer details with Shopify.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Shopify"),
   },
   {
     label: "WordPress",
@@ -548,7 +548,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Sync posts, pages, and custom fields with WordPress.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("WordPress"),
   },
   {
     label: "Calendly",
@@ -556,7 +556,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Automate meeting scheduling and follow-ups with Calendly.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Calendly"),
   },
 
   {
@@ -565,7 +565,7 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Sync products, orders, and customer data with BigCommerce.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("BigCommerce"),
   },
 
   {
@@ -574,6 +574,6 @@ export const workflowEditorNodes: Omit<VsNodeType, "iconColor" | "nodeId">[] = [
     tooltip: "Automate Webflow site updates and CMS management.",
     sectionName: "Data Sync",
     blockType: "operation",
-    blocks: [] as OperationBlock[],
+    block: new OperationBlock("Webflow"),
   },
 ] as const;

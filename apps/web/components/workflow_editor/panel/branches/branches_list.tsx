@@ -88,10 +88,10 @@ const BranchesList = () => {
                         isBranchNode
                           ? `Branch ${idx + 1}`
                           : isLast
-                          ? "ELSE"
-                          : isFirst
-                          ? "IF"
-                          : "Else IF"
+                            ? "ELSE"
+                            : isFirst
+                              ? "IF"
+                              : "Else IF"
                       }
                       canEdit={
                         isBranchNode
@@ -156,8 +156,8 @@ const BranchesList = () => {
                       isBranchNode
                         ? "Add Branch"
                         : Object.entries(nodeOutputs).length === 1
-                        ? "Add ELSE Condition"
-                        : "Add IF and ELSE Conditions"
+                          ? "Add ELSE Condition"
+                          : "Add IF and ELSE Conditions"
                     }
                     isDisabled={
                       !isTrulyEmpty(toStringSafe(branchCurrentlyEditted))

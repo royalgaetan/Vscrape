@@ -1,13 +1,108 @@
 import {
-  VsFormInputFieldType,
+  MoveBlockDirection,
+  VsFormFieldItemType,
   VsFormInputFieldTypeUnion,
 } from "../types/w_types";
 import { ObservableMixin } from "./mixins";
 
-export class FormFieldBlock extends ObservableMixin() {
+export class FormBlock extends ObservableMixin() {
+  private _id: string;
+  private _formName: string = "Form";
+  private _formDescription: string = "";
+
+  private _fields: FormFieldItem[] = [];
+
+  constructor() {
+    super();
+    this._id = crypto.randomUUID();
+  }
+
+  // Form Id: getter
+  get id() {
+    return this._id;
+  }
+
+  // Form Name: getter
+  get formName() {
+    return this._formName;
+  }
+  set formName(value: string) {
+    this._formName = value;
+    this.notifyAll();
+  }
+
+  // Form Description: getter
+  get formDescription(): string {
+    return this._formDescription;
+  }
+  set formDescription(value: string) {
+    this._formDescription = value;
+    this.notifyAll();
+  }
+
+  // Form Fields: getter
+  get fields(): FormFieldItem[] {
+    return this._fields;
+  }
+
+  // Methods
+  removeFieldItem(id: string) {
+    this._fields = this._fields.filter((field) => field.id !== id);
+    this.notifyAll();
+  }
+
+  upsertFieldItem(item: FormFieldItem) {
+    // Update if the Item already exists within Fields list
+    const itemIdsList = this._fields.map((f) => f.id);
+    if (itemIdsList.includes(item.id)) {
+      const indexAt = itemIdsList.findIndex((id) => id === item.id);
+      this._fields[indexAt] = item;
+    }
+
+    // Add if the Item doesn't exist yet inside the Fields list: add it
+    else {
+      this._fields = [...this._fields, item];
+    }
+    this.notifyAll();
+  }
+
+  moveFieldItem(itemId: string, direction: MoveBlockDirection) {
+    // Get corresponding Field Item index from ItemId
+    const itemIndex = this._fields.findIndex((f) => f.id === itemId);
+    if (itemIndex === -1) return this;
+
+    const targetIndex = direction === "Up" ? itemIndex - 1 : itemIndex + 1;
+
+    // Prevent out-of-bounds move
+    if (targetIndex < 0 || targetIndex >= this._fields.length) return this;
+
+    // Safe Swap: using Array destructuring
+    const itemCopy = [...this._fields];
+    [itemCopy[itemIndex], itemCopy[targetIndex]] = [
+      itemCopy[targetIndex],
+      itemCopy[itemIndex],
+    ];
+
+    this._fields = itemCopy;
+    this.notifyAll();
+  }
+
+  // To Object
+  toObject(): object {
+    return {
+      id: this._id,
+      formName: this._formName,
+      formDescription: this._formDescription,
+      fields: this._fields.map((f) => f.toObject()),
+    };
+  }
+}
+
+export class FormFieldItem extends ObservableMixin() {
   private _id: string;
   private _fieldName: string;
   private _fieldLabel: string;
+  private _fieldType: VsFormInputFieldTypeUnion["type"];
   private _fieldValue: any;
   private _fieldDescription?: string;
   private _fieldPlaceholder?: string;
@@ -17,24 +112,32 @@ export class FormFieldBlock extends ObservableMixin() {
 
   private _fieldValueToPickFrom?: string[];
   private _isOptional?: boolean;
-
   private _isHidden?: boolean;
-  private _fieldType: VsFormInputFieldTypeUnion["type"];
 
-  constructor(formField: Omit<VsFormInputFieldType, "id">) {
+  // Special
+  private _isMultiline?: boolean;
+  private _acceptedFileExtensions?: string[];
+
+  constructor(formField: VsFormFieldItemType) {
     super();
-    this._id = crypto.randomUUID();
+    this._id = formField.id ?? crypto.randomUUID();
+
     this._fieldName = formField.fieldName;
     this._fieldLabel = formField.fieldLabel;
     this._fieldType = formField.type;
     this._fieldValue = formField.value;
     this._fieldDescription = formField.fieldDescription;
     this._fieldPlaceholder = formField.fieldPlaceholder;
+
     this._fieldDefaultPlaceholder = formField.fieldDefaultPlaceholder;
     this._fieldDefaultDescription = formField.fieldDefaultDescription;
+
     this._fieldValueToPickFrom = formField.fieldValueToPickFrom;
     this._isOptional = formField.isOptional;
     this._isHidden = formField.isHidden;
+
+    this._isMultiline = formField.isMultiline;
+    this._acceptedFileExtensions = formField.acceptedFileExtensions;
   }
 
   // Field Id: getter + setter
@@ -127,10 +230,49 @@ export class FormFieldBlock extends ObservableMixin() {
     this.notifyAll();
   }
 
-  // To JSON
-  toJSON(): object {
+  // -----------------------------------------------
+  // ------------------- Specials ------------------
+  // -----------------------------------------------
+
+  // Field IsMultiline: getter + setter
+  get isMultiline(): boolean | undefined {
+    return this._isMultiline;
+  }
+  set isMultiline(isMultiline: boolean | undefined) {
+    this._isMultiline = isMultiline;
+    this.notifyAll();
+  }
+
+  // Field Accepted File Extensions: getter + setter
+  get acceptedFileExtensions(): string[] | undefined {
+    return this._acceptedFileExtensions;
+  }
+  set acceptedFileExtensions(extensionsList: string[] | undefined) {
+    this._acceptedFileExtensions = extensionsList;
+    this.notifyAll();
+  }
+
+  // -----------------------------------------------
+  // ---------------- End Specials -----------------
+  // -----------------------------------------------
+
+  // To Object
+  toObject(): object {
     return {
-      FormFieldBlock: "FormFieldBlock",
+      id: this._id,
+      fieldName: this._fieldName,
+      fieldLabel: this.fieldLabel,
+
+      fieldValue: this._fieldValue,
+      fieldDescription: this._fieldDescription,
+      fieldPlaceholder: this._fieldPlaceholder,
+
+      fieldValueToPickFrom: this._fieldValueToPickFrom,
+      isOptional: this._isOptional,
+      isHidden: this._isHidden,
+
+      isMultiline: this._isMultiline,
+      acceptedFileExtensions: this._acceptedFileExtensions,
     };
   }
 }

@@ -24,10 +24,11 @@ export class WaitBlock extends ObservableMixin() {
     this.notifyAll();
   }
 
-  // To JSON
-  toJSON(): object {
+  // To Object
+  toObject(): object {
     return {
-      WaitBlock: "WaitBlock",
+      id: this._id,
+      durationMs: this._durationMs,
     };
   }
 }

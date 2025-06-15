@@ -1,18 +1,15 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { NodeEditor, GetSchemes } from "rete";
 import CustomLoader from "@/components/global/loader";
 import { createRoot } from "react-dom/client";
 import { ReactPlugin, Presets, ReactArea2D } from "rete-react-plugin";
 import { AreaPlugin, AreaExtensions, NodeView } from "rete-area-plugin";
 import {
+  ClassicFlow,
   ConnectionPlugin,
   Presets as ConnectionPresets,
+  getSourceTarget,
+  makeConnection,
 } from "rete-connection-plugin";
 import { DroppedToolItem } from "@/lib/workflow_editor/types/w_types";
 import { convertDropPositionToEditorCoords } from "@/lib/workflow_editor/utils/convert_position_to_editor_coords";
@@ -197,12 +194,35 @@ const WorkflowEditor = ({
     const connection = new ConnectionPlugin<Schemes, AreaExtra>();
 
     // Add Presets and Custom UI to Render and Connections
-    connection.addPreset(ConnectionPresets.classic.setup());
+    connection.addPreset(
+      () =>
+        new ClassicFlow({
+          makeConnection(from, to, context) {
+            const [source, target] = getSourceTarget(from, to) || [null, null];
+            const { editor } = context;
+            if (!source || !target) return false;
+
+            const sourceNode = editor.getNode(source.nodeId);
+            const targetNode = editor.getNode(target.nodeId);
+            if (!sourceNode || !targetNode) return false;
+
+            editor.addConnection(
+              new VsConnection(
+                sourceNode,
+                source.key as any,
+                targetNode,
+                target.key as any
+              )
+            );
+            return true;
+          },
+        })
+    );
     render.addPreset(
       Presets.classic.setup({
         customize: {
           node(data) {
-            if (data.payload.blockType === "branches") return CustomBranchNode;
+            if (data.payload.blockType === "branch") return CustomBranchNode;
             else return CustomNode;
           },
           connection() {

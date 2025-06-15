@@ -1,18 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  PossibleFieldBlockType as FieldBlockType,
-  FormFieldFileUpload,
-  FormFieldTextInput,
-  workflowFormFieldBlocks,
-} from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
-import { CalendarDaysIcon, Clock, Hash, X } from "lucide-react";
+import React, { useRef, useState } from "react";
+
+import { Hash, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  isAudioMimeType,
-  isDocumentMimeType,
-  isImageMimeType,
-  isVideoMimeType,
-} from "@/lib/workflow_editor/types/mime_types";
 import { Label } from "@/components/ui/label";
 import {
   capitalizeFirstLetter,
@@ -33,57 +22,26 @@ import RadioInput from "../../inputs/radio_input";
 import CheckboxInput from "../../inputs/checkbox_input";
 import { formatDurationMs, isValidISODateString } from "@/lib/date_time_utils";
 import { formatDate } from "date-fns";
-import DatePicker from "@/components/global/date_picker";
 import { Button } from "@/components/ui/button";
 import SimpleSwitchInput from "../../inputs/simple_switch_input";
 import { Textarea } from "@/components/ui/textarea";
 import SimpleTooltip from "@/components/global/simple_tooltip";
-import DurationPicker from "@/components/global/duration_picker";
 import { getExtensionNamesJoinned } from "./form_field_block_card";
 import DateInput from "../../inputs/date_input";
 import DurationInput from "../../inputs/duration_input";
 import { VsFormInputFieldTypeUnion } from "@/lib/workflow_editor/types/w_types";
+import { workflowFormFieldItems } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
+import { isAFile } from "@/lib/workflow_editor/types/mime_types";
+import { FormFieldItem } from "@/lib/workflow_editor/classes/form_field_block";
 
-export const isAFile = (fieldType: string) =>
-  isImageMimeType(fieldType) ||
-  isVideoMimeType(fieldType) ||
-  isAudioMimeType(fieldType) ||
-  isDocumentMimeType(fieldType);
-
-const FormFieldBlockPreview = ({
-  fieldName,
-  fieldLabel,
-  fieldValue,
-  fieldDescription,
-  fieldPlaceholder,
-  fieldDefaultPlaceholder,
-  fieldDefaultDescription,
-  fieldValueToPickFrom,
-  fieldIsOptional,
-  fieldType,
-  fieldIsMultiline,
-  fieldAcceptedExtensions,
-}: {
-  fieldName: string;
-  fieldLabel: string;
-  fieldValue: any;
-  fieldDescription?: string;
-  fieldPlaceholder?: string;
-  fieldDefaultPlaceholder?: string;
-  fieldDefaultDescription?: string;
-  fieldValueToPickFrom?: string[];
-  fieldIsOptional?: boolean;
-  fieldType: VsFormInputFieldTypeUnion["type"];
-
-  fieldIsMultiline?: boolean;
-  fieldAcceptedExtensions: string[];
-}) => {
+const FormFieldBlockPreview = ({ fieldItem }: { fieldItem: FormFieldItem }) => {
   const Icon =
-    workflowFormFieldBlocks.find((field) => field.fieldName === fieldName)
-      ?.fieldIcon ?? Hash;
+    workflowFormFieldItems.find(
+      (field) => field.fieldName === fieldItem.fieldName
+    )?.fieldIcon ?? Hash;
 
   // To Simulate Fake Data Entry
-  const [enteredValue, setEnteredValue] = useState<any>(fieldValue);
+  const [enteredValue, setEnteredValue] = useState<any>(fieldItem.fieldValue);
 
   // Others States
   const [isDraggingOVer, setIsDraggingOVer] = useState(false);
@@ -91,14 +49,18 @@ const FormFieldBlockPreview = ({
   const fieldBlockPreviewFileUploadContainerRef =
     useRef<HTMLButtonElement>(null);
 
-  const narrowedFieldType = fieldType.split("/").at(-1);
-  const placeHolderDisplayed = isTrulyEmpty(toStringSafe(fieldPlaceholder))
-    ? fieldDefaultPlaceholder
-    : fieldPlaceholder;
+  const narrowedFieldType = fieldItem.fieldType.split("/").at(-1);
+  const placeHolderDisplayed = isTrulyEmpty(
+    toStringSafe(fieldItem.fieldPlaceholder)
+  )
+    ? fieldItem.fieldDefaultPlaceholder
+    : fieldItem.fieldPlaceholder;
 
-  const descriptionDisplayed = isTrulyEmpty(toStringSafe(fieldDescription))
-    ? fieldDefaultDescription
-    : fieldDescription;
+  const descriptionDisplayed = isTrulyEmpty(
+    toStringSafe(fieldItem.fieldDescription)
+  )
+    ? fieldItem.fieldDefaultDescription
+    : fieldItem.fieldDescription;
 
   const onKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement> | undefined
@@ -143,10 +105,11 @@ const FormFieldBlockPreview = ({
       {/* Label && Description */}
       <div className="flex flex-1 w-full">
         <div className="flex flex-col gap-0 justify-start items-start">
-          {!isTrulyEmpty(toStringSafe(fieldLabel)) && (
+          {!isTrulyEmpty(toStringSafe(fieldItem.fieldLabel)) && (
             <Label className="flex flex-1 items-center text-wrap text-xs text-neutral-500 mb-1">
-              <Icon className="size-4 mr-1 stroke-neutral-600" /> {fieldLabel}{" "}
-              {!fieldIsOptional && "*"}
+              <Icon className="size-4 mr-1 stroke-neutral-600" />{" "}
+              {fieldItem.fieldLabel}
+              {!fieldItem.isOptional && "*"}
             </Label>
           )}
           {descriptionDisplayed && (
@@ -162,46 +125,48 @@ const FormFieldBlockPreview = ({
         {/* Input Preview (+ Placeholder | + Description) */}
         <div className="w-full">
           {/* Dropdown: Selection */}
-          {fieldType === "primitive/text" && fieldValueToPickFrom && (
-            <div>
-              <Select
-                onValueChange={(val) =>
-                  setEnteredValue(extractTextFromHTML(val))
-                }
-                value={enteredValue}
-              >
-                <SelectTrigger className="h-[1.9rem] w-full !bg-white">
-                  <SelectValue className="text-xs" placeholder="Select..." />
-                </SelectTrigger>
+          {fieldItem.fieldType === "primitive/text" &&
+            fieldItem.fieldValueToPickFrom && (
+              <div>
+                <Select
+                  onValueChange={(val) =>
+                    setEnteredValue(extractTextFromHTML(val))
+                  }
+                  value={enteredValue}
+                >
+                  <SelectTrigger className="h-[1.9rem] w-full !bg-white">
+                    <SelectValue className="text-xs" placeholder="Select..." />
+                  </SelectTrigger>
 
-                <SelectContent className="max-h-64 w-full">
-                  {fieldValueToPickFrom.length > 0 &&
-                    fieldValueToPickFrom
-                      .map((val) => extractTextFromHTML(toStringSafe(val)))
-                      .filter((v) => v.length > 0)
-                      .map((choice) => {
-                        return (
-                          <SelectItem
-                            className="text-xs"
-                            key={choice}
-                            value={choice}
-                          >
-                            {capitalizeFirstLetter(choice)}
-                          </SelectItem>
-                        );
-                      })}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+                  <SelectContent className="max-h-64 w-full">
+                    {fieldItem.fieldValueToPickFrom.length > 0 &&
+                      fieldItem.fieldValueToPickFrom
+                        .map((val) => extractTextFromHTML(toStringSafe(val)))
+                        .filter((v) => v.length > 0)
+                        .map((choice) => {
+                          return (
+                            <SelectItem
+                              className="text-xs"
+                              key={choice}
+                              value={choice}
+                            >
+                              {capitalizeFirstLetter(choice)}
+                            </SelectItem>
+                          );
+                        })}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
           {/* Text Input Type */}
-          {(fieldType === "primitive/text" && !fieldValueToPickFrom) ||
-          fieldType === "primitive/emailUrl" ||
-          fieldType === "primitive/tel" ||
-          fieldType === "primitive/number" ? (
+          {(fieldItem.fieldType === "primitive/text" &&
+            !fieldItem.fieldValueToPickFrom) ||
+          fieldItem.fieldType === "primitive/emailUrl" ||
+          fieldItem.fieldType === "primitive/tel" ||
+          fieldItem.fieldType === "primitive/number" ? (
             <div className="flex flex-1 w-full">
-              {fieldIsMultiline && (
+              {fieldItem.isMultiline && (
                 <Textarea
                   defaultValue={undefined}
                   className="bg-white mb-0 resize-none w-full !h-20"
@@ -210,7 +175,7 @@ const FormFieldBlockPreview = ({
                   maxLength={2000}
                 />
               )}
-              {!fieldIsMultiline && (
+              {!fieldItem.isMultiline && (
                 <Input
                   type={narrowedFieldType}
                   defaultValue={undefined}
@@ -225,13 +190,13 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Radio: Selection */}
-          {fieldType === "primitive/radio" && (
+          {fieldItem.fieldType === "primitive/radio" && (
             <div className="ml-1">
-              {fieldValueToPickFrom && (
+              {fieldItem.fieldValueToPickFrom && (
                 <RadioInput
                   onSelect={(val) => setEnteredValue(extractTextFromHTML(val))}
                   selectedValue={enteredValue}
-                  valuesToSelect={fieldValueToPickFrom.map((v) =>
+                  valuesToSelect={fieldItem.fieldValueToPickFrom.map((v) =>
                     extractTextFromHTML(toStringSafe(v))
                   )}
                 />
@@ -240,15 +205,15 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Checkbox: Selection */}
-          {fieldType === "primitive/checkbox" && (
+          {fieldItem.fieldType === "primitive/checkbox" && (
             <div className="ml-1 -mt-2">
-              {fieldValueToPickFrom && (
+              {fieldItem.fieldValueToPickFrom && (
                 <CheckboxInput
                   onSelect={(val) =>
                     setEnteredValue(val.map((v) => extractTextFromHTML(v)))
                   }
                   selectedValues={enteredValue}
-                  valuesToSelect={fieldValueToPickFrom.map((v) =>
+                  valuesToSelect={fieldItem.fieldValueToPickFrom.map((v) =>
                     extractTextFromHTML(toStringSafe(v))
                   )}
                 />
@@ -257,7 +222,7 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Date Picker */}
-          {fieldType === "primitive/dateTime" && (
+          {fieldItem.fieldType === "primitive/dateTime" && (
             <div className="w-28">
               <DateInput
                 hasError={false}
@@ -276,7 +241,7 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Time Picker */}
-          {fieldType === "primitive/milliseconds" && (
+          {fieldItem.fieldType === "primitive/milliseconds" && (
             <div className="w-28">
               <DurationInput
                 hasError={false}
@@ -295,7 +260,7 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Yes/No Toggle */}
-          {fieldType === "primitive/switch" && (
+          {fieldItem.fieldType === "primitive/switch" && (
             <div>
               <SimpleSwitchInput
                 isChecked={!!enteredValue}
@@ -305,14 +270,14 @@ const FormFieldBlockPreview = ({
           )}
 
           {/* Hidden Field */}
-          {fieldType === "primitive/hidden" && (
+          {fieldItem.fieldType === "primitive/hidden" && (
             <div className="text-xs text-neutral-500 h-6 flex justify-start items-center">
               This field won't appear on the form.
             </div>
           )}
 
           {/* File Upload */}
-          {isAFile(fieldType) ? (
+          {isAFile(fieldItem.fieldType) ? (
             <button
               ref={fieldBlockPreviewFileUploadContainerRef}
               onDragOver={(e) => {
@@ -379,7 +344,7 @@ const FormFieldBlockPreview = ({
                     : "1 file uploaded"}
                 </div>
               ) : (
-                <div className="w-[70%]  scale-[0.9]">
+                <div className="w-[70%] scale-[0.9]">
                   <span>{placeHolderDisplayed}</span>
                 </div>
               )}
@@ -388,7 +353,10 @@ const FormFieldBlockPreview = ({
                 type="file"
                 id="field_block_preview_file_upload"
                 className="hidden"
-                accept={getExtensionNamesJoinned(fieldAcceptedExtensions)}
+                accept={
+                  fieldItem.acceptedFileExtensions &&
+                  getExtensionNamesJoinned(fieldItem.acceptedFileExtensions)
+                }
                 onChange={(e) => {
                   if (!e.target.files || e.target.files.length === 0) return;
                   const file = e.target.files[0];

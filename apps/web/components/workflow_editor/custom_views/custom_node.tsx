@@ -9,35 +9,36 @@ import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { hexToRgba } from "@/lib/colors_utils";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
-import { VsNode } from "@/lib/workflow_editor/classes/node";
+import { VsNode, VsNodeBlockType } from "@/lib/workflow_editor/classes/node";
 import { capitalizeFirstLetter } from "@/lib/string_utils";
 import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
 import { WaitBlock } from "@/lib/workflow_editor/classes/wait_block";
 import { formatDurationFromMs } from "@/lib/date_time_utils";
 import { SetVariablesBlock } from "@/lib/workflow_editor/classes/setVariables_block";
+import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
+import { FormBlock } from "@/lib/workflow_editor/classes/form_field_block";
+import { entryPointNodesLabels } from "@/lib/workflow_editor/utils/w_utils";
+import { cloneDeep } from "lodash";
 
 const CustomNode = ({
-  data: node,
+  data,
   emit,
 }: {
   data: VsNode;
   emit: Presets.classic.RenderEmit<Schemes>;
 }) => {
-  const Icon = node.icon as LucideIcon;
+  const [node, setNode] = useState(data);
 
+  const Icon = node.icon as LucideIcon;
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [nodeBlocks, setNodeBlocks] = useState(
-    node ? (node.blocks as any) : undefined
-  );
+  const [nodeBlock, setNodeBlock] = useState(node.block);
   // Special to Wait Block
   const [nodeBlockDuration, setNodeBlockDuration] = useState(
-    nodeBlocks instanceof WaitBlock ? nodeBlocks.durationMs : undefined
+    nodeBlock instanceof WaitBlock ? nodeBlock.durationMs : undefined
   );
   // Special to SetVariables Block
   const [variablesAssignations, setVariablesAssignations] = useState(
-    nodeBlocks instanceof SetVariablesBlock
-      ? nodeBlocks.variableAssignations
-      : []
+    nodeBlock instanceof SetVariablesBlock ? nodeBlock.variableAssignations : []
   );
 
   // Store
@@ -48,17 +49,24 @@ const CustomNode = ({
 
   useEffect(() => {
     const sub = node.stream$().subscribe((newData) => {
-      setNodeBlocks(newData.blocks);
+      setNode(cloneDeep(newData));
+      setNodeBlock(newData.block);
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!node.block) return;
+    const sub = (node.block as any).stream$().subscribe((newData: any) => {
+      setNodeBlock(cloneDeep(newData));
 
       // Update Node DurationMs if it's a WaitBlock
-      if (nodeBlocks instanceof WaitBlock)
-        setNodeBlockDuration(nodeBlocks.durationMs);
-
+      if (newData instanceof WaitBlock)
+        setNodeBlockDuration(newData.durationMs);
       // Update Node Variable Assignations if it's a SetVariablesBlock
-      if (newData.blocks instanceof SetVariablesBlock) {
-        setVariablesAssignations(
-          (newData.blocks as SetVariablesBlock).variableAssignations
-        );
+      if (newData instanceof SetVariablesBlock) {
+        setVariablesAssignations(newData.variableAssignations);
       }
     });
 
@@ -67,8 +75,12 @@ const CustomNode = ({
 
   const getNodeTerminology = () => {
     const getFullTerm = (term: string) => {
-      const areBlocksArray = Array.isArray(nodeBlocks);
-      const blocksLength = areBlocksArray ? nodeBlocks.length : 0;
+      const blocksLength =
+        nodeBlock instanceof OperationBlock
+          ? nodeBlock.items.length
+          : nodeBlock instanceof FormBlock
+            ? nodeBlock.fields.length
+            : 0;
 
       return `${blocksLength} ${capitalizeFirstLetter(term)}${
         blocksLength > 1 ? "s" : ""
@@ -80,7 +92,7 @@ const CustomNode = ({
       case "formField":
         return getFullTerm("field");
       case "cron":
-        return nodeBlocks instanceof CronBlock ? "Scheduled" : "Not Scheduled";
+        return nodeBlock instanceof CronBlock ? "Scheduled" : "Not Scheduled";
       case "manual":
         return "Trigger";
       case "webhook":
@@ -219,7 +231,8 @@ const CustomNode = ({
               {getNodeTerminology()}
             </p>
             {/* Button: Duplicate */}
-            {node.blockType !== "preview" && (
+            {node.blockType !== "preview" &&
+            !entryPointNodesLabels.includes(node.label) ? (
               <SimpleTooltip tooltipText="Duplicate" side="bottom">
                 <Button
                   variant={"ghost"}
@@ -240,6 +253,8 @@ const CustomNode = ({
                   <Copy className="stroke-neutral-400" />
                 </Button>
               </SimpleTooltip>
+            ) : (
+              <></>
             )}
           </div>
         </div>

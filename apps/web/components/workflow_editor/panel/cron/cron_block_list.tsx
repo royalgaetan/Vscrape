@@ -1,39 +1,35 @@
-import { NodeBlockType, useWorkflowEditorStore } from "@/stores/workflowStore";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   AlarmCheckIcon,
   AlarmClockPlusIcon,
-  ChevronDown,
-  ChevronUp,
   PenLineIcon,
   Trash2,
 } from "lucide-react";
-import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import construe from "cronstrue";
 import { CronBlock } from "@/lib/workflow_editor/classes/cron_block";
 import { cn } from "@/lib/utils";
-import { fakeUsers } from "@/lib/fake_data";
 
 const CronBlockList = ({
   onCronEdit,
   onCronDelete,
 }: {
   onCronEdit: (cronBlock: CronBlock | undefined) => void;
-  onCronDelete: (cronBlockId: string) => void;
+  onCronDelete: () => void;
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
   // End Store
   const [cronBlock, setCronBlock] = useState(
-    currentNode ? (currentNode.blocks as CronBlock) : undefined
+    currentNode ? (currentNode.block as CronBlock) : undefined
   );
 
   useEffect(() => {
     if (!currentNode) return;
     const sub = currentNode.stream$().subscribe((newData) => {
-      setCronBlock(newData.blocks as CronBlock);
+      setCronBlock(newData.block as CronBlock);
     });
 
     return () => sub.unsubscribe();
@@ -111,7 +107,7 @@ const CronBlockList = ({
                   className={cn(
                     "!h-5 px-2 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
                   )}
-                  onClick={() => onCronDelete(cronBlock.id)}
+                  onClick={() => onCronDelete()}
                 >
                   <Trash2 className="!size-3" /> Delete
                 </Button>

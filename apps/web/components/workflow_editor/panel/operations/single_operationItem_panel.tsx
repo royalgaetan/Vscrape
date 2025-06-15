@@ -3,7 +3,7 @@ import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
-import { workflowOperations } from "@/lib/workflow_editor/constants/workflows_operations_definition";
+import { workflowOperationItems } from "@/lib/workflow_editor/constants/workflow_operationItems_definition";
 import {
   delay,
   generateHexRandomString,
@@ -11,9 +11,8 @@ import {
 } from "@/lib/numbers_utils";
 import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
 import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
-import { NodeBlockType } from "@/stores/workflowStore";
 import FieldLabel from "../field_label";
-import OperationParamCard from "./operation_param_card";
+import OperationItemParamCard from "./operation_param_card";
 import PanelHeader from "../panel_header";
 import {
   Check,
@@ -26,7 +25,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
+import { OperationItem } from "@/lib/workflow_editor/classes/operation_block";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { cloneDeep } from "lodash";
 import { toast } from "sonner";
@@ -34,32 +33,73 @@ import { getTypeBigCategory } from "@/lib/workflow_editor/utils/get_criterias";
 import {
   extractTextFromHTML,
   isPureVariableOnly,
-  stripMustacheBraces,
   toCleanHTML,
   toStringSafe,
 } from "@/lib/string_utils";
 import { resolveInputTypeFromReference } from "../../inputs/filter_input_row";
 import { isRecord } from "@/lib/utils";
-import { isAFile } from "../form_fields/form_field_block_preview";
 
-const SingleOperationPanel = ({
-  nodeOrigin,
-  operationOrigin,
+export const shouldExcludeItem = (
+  item: any,
+  idx?: number,
+  arr?: any[]
+): boolean => {
+  const itemAsString = toCleanHTML(toStringSafe(item));
+
+  // Exclude if empty and is 1st element
+  if (itemAsString.length === 0 && idx === 0) {
+    return true;
+  }
+
+  // Exclude if empty and not the last item
+  if (
+    (arr && idx && itemAsString.length === 0 && idx !== arr.length - 1) ||
+    (!arr && itemAsString.length === 0)
+  ) {
+    return true;
+  }
+
+  const typeCategory = getItemTypeCategory(item);
+
+  // Exclude if not one of the allowed types
+  return !["string", "number", "Strings", "Numbers"].includes(typeCategory);
+};
+
+export const getItemTypeCategory = (item: any): string => {
+  if (isPureVariableOnly(item)) {
+    const resolvedType = resolveInputTypeFromReference(
+      extractTextFromHTML(item)
+    );
+    return getTypeBigCategory(resolvedType) ?? "";
+  }
+  if (typeof item === "boolean") {
+    return "boolean";
+  }
+  if (isReallyNumber(item)) {
+    return "number";
+  }
+  return typeof item;
+};
+
+const SingleOperationItemPanel = ({
+  initialNode,
+  initialOperationItem,
   onBack,
   onSave,
   onDelete,
   displayBackButton,
 }: {
-  nodeOrigin: VsNode;
-  operationOrigin?: OperationBlock;
+  initialNode: VsNode;
+  initialOperationItem?: OperationItem;
   onBack?: () => void;
-  onSave: (block?: NodeBlockType) => void;
-  onDelete: (operationId: string) => void;
+  onSave: (operationItem: OperationItem) => void;
+  onDelete: (operationItemId: string) => void;
   displayBackButton?: boolean;
 }) => {
-  const [currentBlock, setCurrentBlock] = useState(operationOrigin);
-  const availableOperations = workflowOperations.filter(
-    (operation) => operation.nodeName === nodeOrigin.label
+  const [currentOperationItem, setCurrentOperationItem] =
+    useState(initialOperationItem);
+  const availableOperationItems = workflowOperationItems.filter(
+    (operation) => operation.nodeName === initialNode.label
   );
 
   const [errorFields, setErrorFields] = useState<string[]>([]);
@@ -77,7 +117,7 @@ const SingleOperationPanel = ({
     await delay(400);
 
     try {
-      if (!currentBlock)
+      if (!currentOperationItem)
         throw new Error("Can't save this Operation! Try again.");
 
       // Errors Checking
@@ -87,7 +127,7 @@ const SingleOperationPanel = ({
       setSavingOperationResultIcon(Check);
       await delay(150);
       setSavingOperationResultIcon(undefined);
-      onSave(currentBlock);
+      onSave(currentOperationItem);
     } catch (e) {
       toast.error("Invalid Operation! Try again.", {
         position: "bottom-center",
@@ -106,47 +146,72 @@ const SingleOperationPanel = ({
     const errFields: string[] = [];
 
     const paramFlatted =
-      currentBlock?.params && currentBlock?.params.flatMap((p) => p);
+      currentOperationItem?.itemParams &&
+      currentOperationItem?.itemParams.flatMap((p) => p);
     paramFlatted &&
       paramFlatted.forEach((param) => {
         const paramValueCleaned = extractTextFromHTML(
           toStringSafe(param.value)
         );
-        const paramType = isPureVariableOnly(paramValueCleaned)
-          ? resolveInputTypeFromReference(param.value)
-          : param.type;
+        const paramValueType = isPureVariableOnly(paramValueCleaned)
+          ? resolveInputTypeFromReference(paramValueCleaned)
+          : typeof param.value;
+        const paramExpectedType = getTypeBigCategory(param.type);
 
         if (param.isOptional) {
         } else {
+          console.log(
+            param.paramName,
+            "\nparamExpectedType",
+            paramExpectedType,
+            "\nparamValueType",
+            paramValueType,
+            "\n(BIG) paramValueType",
+            getTypeBigCategory(paramValueType)
+          );
+
           // STRINGS CHECKER
-          if (
-            (getTypeBigCategory(paramType) === "Strings" ||
-              paramType === "primitive/customSwitch") &&
-            (typeof param.value !== "string" || paramValueCleaned.length === 0)
-          ) {
-            errFields.push(param.paramName);
+          if (paramExpectedType === "Strings") {
+            if (
+              (paramValueType === "string" ||
+                getTypeBigCategory(paramValueType) === "Strings") &&
+              paramValueCleaned.length > 0
+            ) {
+              // Value is Valid here...
+            } else {
+              errFields.push(param.paramName);
+            }
           }
 
           // NUMBER CHECKER
-          if (
-            getTypeBigCategory(paramType) === "Numbers" &&
-            (paramValueCleaned.length === 0 ||
-              isNaN(Number(paramValueCleaned.trim())))
-          ) {
-            errFields.push(param.paramName);
+          if (paramExpectedType === "Numbers") {
+            if (
+              (!isNaN(Number(param.value)) ||
+                paramValueType === "number" ||
+                getTypeBigCategory(paramValueType) === "Numbers") &&
+              paramValueCleaned.length > 0
+            ) {
+              // Value is Valid here...
+            } else {
+              errFields.push(param.paramName);
+            }
           }
 
           // BOOLEANS CHECKER
-          if (
-            getTypeBigCategory(paramType) === "Booleans" &&
-            typeof param.value !== "boolean"
-          ) {
-            errFields.push(param.paramName);
+          if (paramExpectedType === "Booleans") {
+            if (
+              paramValueType === "boolean" ||
+              getTypeBigCategory(paramValueType) === "Booleans"
+            ) {
+              // Value is Valid here...
+            } else {
+              errFields.push(param.paramName);
+            }
           }
 
           // Radio CHECKER
           if (
-            paramType === "primitive/radio" &&
+            param.type === "primitive/radio" &&
             (typeof param.value !== "string" || param.value.length === 0)
           ) {
             errFields.push(param.paramName);
@@ -154,7 +219,7 @@ const SingleOperationPanel = ({
 
           // Array CHECKER
           if (
-            paramType === "primitive/array" &&
+            param.type === "primitive/array" &&
             (!Array.isArray(param.value) ||
               param.value.some((item, idx, arr) =>
                 shouldExcludeItem(item, idx, arr)
@@ -165,7 +230,7 @@ const SingleOperationPanel = ({
 
           // Record CHECKER
           if (
-            paramType === "primitive/record" &&
+            param.type === "primitive/record" &&
             (!Array.isArray(param.value) ||
               (param.value as any[]).some((el, idx, arr) => {
                 const isLast = idx === arr.length - 1;
@@ -180,7 +245,8 @@ const SingleOperationPanel = ({
                 const isMissingValue = Object.values(el).some((val) =>
                   shouldExcludeItem(val)
                 );
-                if (!isRecord) return true;
+                if (!isRecord(el)) return true;
+                if (idx === 0) return isMissingKey || isMissingValue || isEmpty;
                 if (isLast) {
                   if (isEmpty) return false;
                   else return isMissingKey || isMissingValue;
@@ -191,7 +257,7 @@ const SingleOperationPanel = ({
             errFields.push(param.paramName);
           }
 
-          // Raw CHECKER: Non-existant in Operation Definition List
+          // Raw CHECKER: Non-existant in Operations Definition List
         }
       });
 
@@ -203,13 +269,16 @@ const SingleOperationPanel = ({
   };
 
   useEffect(() => {
-    if (availableOperations.length === 1) {
-      setCurrentBlock(new OperationBlock(cloneDeep(availableOperations[0])));
+    if (availableOperationItems.length === 1) {
+      const singleOperationItem = new OperationItem(
+        cloneDeep(availableOperationItems[0])
+      );
+      setCurrentOperationItem(singleOperationItem);
     }
 
-    if (!currentBlock) return;
-    const sub = currentBlock.stream$().subscribe((newData) => {
-      setCurrentBlock(newData as OperationBlock);
+    if (!currentOperationItem) return;
+    const sub = currentOperationItem.stream$().subscribe((newData) => {
+      setCurrentOperationItem(newData as OperationItem);
     });
 
     return () => sub.unsubscribe();
@@ -222,22 +291,22 @@ const SingleOperationPanel = ({
           {/* Header */}
           <div className="px-4 w-full">
             <PanelHeader
-              nodeOrigin={nodeOrigin}
+              nodeOrigin={initialNode}
               displayBackButton={displayBackButton}
               onBack={() => onBack && onBack()}
-              description={currentBlock?.operationDescription}
+              description={currentOperationItem?.operationItemDescription}
             />
           </div>
 
           {/* Content */}
           <div className="mt-4 pb-6 space-y-4">
             {/* Operation Selector */}
-            {availableOperations.length > 1 && (
+            {availableOperationItems.length > 1 && (
               <>
                 <div className="flex flex-col justify-start items-start px-4 pr-4">
                   <FieldLabel
                     label={
-                      operationOrigin
+                      initialOperationItem
                         ? "Change operation type"
                         : "Select an operation"
                     }
@@ -245,48 +314,51 @@ const SingleOperationPanel = ({
                   />
 
                   <MultiSelect
-                    isTriggerDisabled={availableOperations.length === 0}
+                    isTriggerDisabled={availableOperationItems.length === 0}
                     triggerClassName="h-9 w-[15.7rem] flex flex-1 mb-1"
                     popoverAlignment="center"
                     selectionMode="single"
                     popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
-                    label={currentBlock?.operationName ?? "Pick an operation"}
+                    label={
+                      currentOperationItem?.operationItemName ??
+                      "Pick an operation"
+                    }
                     itemTooltipClassname="w-52"
                     data={{
-                      "": availableOperations.map((op) => ({
-                        label: op.operationName,
-                        value: op.operationName,
-                        icon: nodeOrigin.icon ?? Star,
+                      "": availableOperationItems.map((op) => ({
+                        label: op.operationItemName,
+                        value: op.operationItemName,
+                        icon: initialNode.icon ?? Star,
                         disabled: op.isDisabled,
                         iconClassName: "stroke-neutral-400 fill-transparent",
-                        tooltipContent: op.operationDescription,
+                        tooltipContent: op.operationItemDescription,
                         tooltipAlign: "end",
                         tooltipSide: "left",
                       })),
                     }}
                     selectedValues={
-                      currentBlock?.operationName
-                        ? [currentBlock.operationName]
+                      currentOperationItem?.operationItemName
+                        ? [currentOperationItem.operationItemName]
                         : []
                     }
                     handleSelect={(opSelected) => {
                       setErrorFields([]);
                       if (
-                        currentBlock &&
-                        opSelected === currentBlock.operationName
+                        currentOperationItem &&
+                        opSelected === currentOperationItem.operationItemName
                       ) {
-                        setCurrentBlock(undefined);
+                        setCurrentOperationItem(undefined);
                       } else {
-                        const operationDefinition = workflowOperations.find(
+                        const operationDefinition = workflowOperationItems.find(
                           (op) =>
-                            op.operationName === opSelected &&
-                            op.nodeName === nodeOrigin?.label
+                            op.operationItemName === opSelected &&
+                            op.nodeName === initialNode?.label
                         );
                         if (!operationDefinition) return;
-                        const operation = new OperationBlock(
+                        const operation = new OperationItem(
                           cloneDeep(operationDefinition)
                         );
-                        setCurrentBlock(operation);
+                        setCurrentOperationItem(operation);
                       }
                     }}
                   />
@@ -297,11 +369,11 @@ const SingleOperationPanel = ({
 
             {/* Parameters List */}
             <div className="flex flex-col justify-start items-start">
-              {currentBlock &&
-              currentBlock.params &&
-              currentBlock.params.length > 0 ? (
+              {currentOperationItem &&
+              currentOperationItem.itemParams &&
+              currentOperationItem.itemParams.length > 0 ? (
                 <div className="flex flex-col w-full gap-4">
-                  {currentBlock.params.map((params, id) => {
+                  {currentOperationItem.itemParams.map((params, id) => {
                     // If Params is an Array: meaning it contains "nested" params
                     // => Display all of them in the same line
                     // Else Params is a Param: Display it in the 1 line
@@ -319,8 +391,8 @@ const SingleOperationPanel = ({
                                   maxWidth: `${90 / params.length}%`,
                                 }}
                               >
-                                <OperationParamCard
-                                  currentOperationBlock={currentBlock}
+                                <OperationItemParamCard
+                                  currentOperationItem={currentOperationItem}
                                   isWithinAGroup={true}
                                   hasError={errorFields.includes(
                                     param.paramName
@@ -345,11 +417,11 @@ const SingleOperationPanel = ({
                           </div>
                         ) : (
                           <div className="flex flex-1 w-full px-4 pr-4">
-                            <OperationParamCard
-                              hasError={errorFields.includes(params.paramName)}
-                              currentOperationBlock={currentBlock}
+                            <OperationItemParamCard
+                              currentOperationItem={currentOperationItem}
                               paramData={params}
                               isWithinAGroup={false}
+                              hasError={errorFields.includes(params.paramName)}
                             />
                           </div>
                         )}
@@ -364,9 +436,9 @@ const SingleOperationPanel = ({
             </div>
 
             {/* More Options List: Detect Duplicate, Enable Loop */}
-            {currentBlock &&
-              (currentBlock.loopThrough !== undefined ||
-                currentBlock.skipDuplicate) && (
+            {currentOperationItem &&
+              (currentOperationItem.loopThrough !== undefined ||
+                currentOperationItem.skipDuplicate) && (
                 <div>
                   <div className="flex flex-col justify-start items-start  px-4 pr-4">
                     <div className="mb-2">
@@ -377,18 +449,18 @@ const SingleOperationPanel = ({
                     </div>
 
                     {/* Loop Through */}
-                    {currentBlock.loopThrough !== undefined && (
+                    {currentOperationItem.loopThrough !== undefined && (
                       <MoreOptionInput
                         optionType="loopThrough"
-                        currentBlock={currentBlock}
+                        currentOperationItem={currentOperationItem}
                       />
                     )}
 
                     {/* Skip Duplicates */}
-                    {currentBlock.skipDuplicate && (
+                    {currentOperationItem.skipDuplicate && (
                       <MoreOptionInput
                         optionType="skipDuplicate"
-                        currentBlock={currentBlock}
+                        currentOperationItem={currentOperationItem}
                       />
                     )}
 
@@ -399,7 +471,7 @@ const SingleOperationPanel = ({
               )}
 
             {/* Filters */}
-            {currentBlock && (
+            {currentOperationItem && (
               <div className="mt-1 flex flex-col justify-start items-start">
                 <MoreOptionInput
                   isEditting={(state) => setIsEdittingAField(state)}
@@ -410,7 +482,7 @@ const SingleOperationPanel = ({
                       setErrorFields((prev) => prev.filter((e) => e !== field));
                   }}
                   optionType="filters"
-                  currentBlock={currentBlock}
+                  currentOperationItem={currentOperationItem}
                 />
               </div>
             )}
@@ -422,7 +494,7 @@ const SingleOperationPanel = ({
       </div>
 
       {/* Fixed Bottom Bar */}
-      {currentBlock && (
+      {currentOperationItem && (
         <div className="flex flex-col w-[var(--workflowPanelWidth)] bg-white z-10 fixed bottom-[7vh]">
           {/* Shared Outputs DnD Buttons */}
           <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
@@ -453,7 +525,7 @@ const SingleOperationPanel = ({
           {/* Action Buttons: Delete | Save Operation */}
           <div className="flex flex-1 justify-end items-center py-1 px-3 border-t">
             {/* Delete Button: only if we're in [UPDATE Mode] */}
-            {operationOrigin && (
+            {initialOperationItem && (
               <div className="flex flex-1 justify-start">
                 <SimpleTooltip tooltipText={"Delete Operation"}>
                   <Button
@@ -464,7 +536,7 @@ const SingleOperationPanel = ({
                     className="w-fit"
                     onClick={() => {
                       // Delete Operation
-                      onDelete(operationOrigin.id);
+                      onDelete(currentOperationItem.id);
                     }}
                   >
                     <Trash2 />
@@ -500,41 +572,4 @@ const SingleOperationPanel = ({
   );
 };
 
-export default SingleOperationPanel;
-
-export const shouldExcludeItem = (
-  item: any,
-  idx?: number,
-  arr?: any[]
-): boolean => {
-  const itemAsString = toCleanHTML(toStringSafe(item));
-
-  // Exclude if empty and not the last item
-  if (
-    (arr && idx && itemAsString.length === 0 && idx !== arr.length - 1) ||
-    (!arr && itemAsString.length === 0)
-  ) {
-    return true;
-  }
-
-  const typeCategory = getItemTypeCategory(item);
-
-  // Exclude if not one of the allowed types
-  return !["string", "number", "Strings", "Numbers"].includes(typeCategory);
-};
-
-export const getItemTypeCategory = (item: any): string => {
-  if (isPureVariableOnly(item)) {
-    const resolvedType = resolveInputTypeFromReference(
-      extractTextFromHTML(item)
-    );
-    return getTypeBigCategory(resolvedType) ?? "";
-  }
-  if (typeof item === "boolean") {
-    return "boolean";
-  }
-  if (isReallyNumber(item)) {
-    return "number";
-  }
-  return typeof item;
-};
+export default SingleOperationItemPanel;

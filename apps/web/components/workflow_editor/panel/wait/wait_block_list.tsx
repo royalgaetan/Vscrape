@@ -15,13 +15,13 @@ const WaitBlockList = ({
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
   // End Store
   const [waitBlockDurationMs, setWaitBlockDurationMs] = useState(
-    currentNode ? (currentNode.blocks as WaitBlock).durationMs : undefined
+    currentNode ? (currentNode.block as WaitBlock).durationMs : undefined
   );
 
   useEffect(() => {
     if (!currentNode) return;
     const sub = currentNode.stream$().subscribe((newData) => {
-      setWaitBlockDurationMs((newData.blocks as WaitBlock).durationMs);
+      setWaitBlockDurationMs((newData.block as WaitBlock).durationMs);
     });
 
     return () => sub.unsubscribe();
@@ -38,11 +38,11 @@ const WaitBlockList = ({
       onSelect={(timePicked) => {
         if (
           typeof timePicked !== "number" ||
-          !(currentNode.blocks instanceof WaitBlock)
+          !(currentNode.block instanceof WaitBlock)
         )
           return;
-        currentNode.blocks.durationMs = timePicked;
-        onSave(currentNode.blocks);
+        currentNode.block.durationMs = timePicked;
+        onSave(currentNode.block);
       }}
     >
       <div className="flex flex-col gap-6 mt-[3rem] cursor-pointer hover:opacity-70 transition-all duration-300 origin-center active:scale-[0.99]">

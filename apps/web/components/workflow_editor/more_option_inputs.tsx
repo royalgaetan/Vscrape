@@ -4,39 +4,42 @@ import React, { useEffect, useState } from "react";
 import SimpleSwitchInput from "./inputs/simple_switch_input";
 import { LucideIcon } from "lucide-react";
 import FilterInput from "./inputs/filter_input";
-import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
+import {
+  OperationBlock,
+  OperationItem,
+} from "@/lib/workflow_editor/classes/operation_block";
 
 const getInitialOptionValues = ({
   optionType,
-  currentBlock,
+  currentOperationItem,
 }: {
   optionType: OperationMoreOptionType;
-  currentBlock?: OperationBlock;
+  currentOperationItem?: OperationItem;
 }): any => {
-  if (!currentBlock) return;
+  if (!currentOperationItem) return;
   switch (optionType) {
     case "skipDuplicate":
-      return currentBlock.skipDuplicate;
+      return currentOperationItem.skipDuplicate;
     case "loopThrough":
-      return currentBlock.loopThrough;
+      return currentOperationItem.loopThrough;
     case "filters":
-      return currentBlock.inputFilters;
+      return currentOperationItem.itemInputFilters;
     default:
       break;
   }
 };
 
 type Props = {
+  currentOperationItem: OperationItem;
   optionType: OperationMoreOptionType;
-  currentBlock: OperationBlock;
   hasError?: boolean;
   onError?: (val: boolean) => void;
   isEditting?: (state: boolean) => void;
 };
 
 const MoreOptionInput = ({
+  currentOperationItem,
   optionType,
-  currentBlock,
   hasError,
   onError,
   isEditting,
@@ -44,7 +47,7 @@ const MoreOptionInput = ({
   const [internalValue, setInternalValue] = useState<any>(
     getInitialOptionValues({
       optionType: optionType,
-      currentBlock: currentBlock,
+      currentOperationItem,
     })
   );
 
@@ -55,17 +58,17 @@ const MoreOptionInput = ({
   }, [hasError]);
 
   const updateValue = (newValue: any) => {
-    if (!currentBlock) return;
+    if (!currentOperationItem) return;
     setInternalValue(newValue);
     switch (optionType) {
       case "skipDuplicate":
-        currentBlock.skipDuplicate = newValue;
+        currentOperationItem.skipDuplicate = newValue;
         break;
       case "loopThrough":
-        currentBlock.loopThrough = newValue;
+        currentOperationItem.loopThrough = newValue;
         break;
       case "filters":
-        currentBlock.inputFilters = newValue;
+        currentOperationItem.itemInputFilters = newValue;
         break;
       default:
         break;

@@ -1,4 +1,4 @@
-import { VsNodeBlockType } from "../types/w_types";
+import { VsCronBlockType } from "../types/w_types";
 import { ObservableMixin } from "./mixins";
 
 /* {
@@ -37,7 +37,7 @@ export class CronBlock extends ObservableMixin() {
   private _configStartDate?: Date;
   private _configEndDate?: Date;
 
-  constructor(cron: Omit<VsNodeBlockType, "id">) {
+  constructor(cron: Omit<VsCronBlockType, "id">) {
     super();
     this._id = crypto.randomUUID();
     this._configMinute = cron.configMinute;
@@ -132,10 +132,20 @@ export class CronBlock extends ObservableMixin() {
     this.notifyAll();
   }
 
-  // To JSON
-  toJSON(): object {
+  // To Object
+  toObject(): object {
     return {
-      CronBlock: "CronBlock",
+      id: this._id,
+      configMinute: this._configMinute,
+      configHour: this._configHour,
+
+      configDayOfMonth: this._configDayOfMonth,
+      configMonth: this._configMonth,
+      configDayOfWeek: this._configDayOfWeek,
+
+      configTimezone: this._configTimezone,
+      configStartDate: this._configStartDate,
+      configEndDate: this._configEndDate,
     };
   }
 }

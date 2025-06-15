@@ -1,6 +1,20 @@
 import { Environment, ExecutionPlan, OrchestratorMode } from "../types/types";
 import { createEnvironment } from "./environment";
 
+// const fakeExecutionPlan: ExecutionPlan = {
+//   phase1: [JSON.stringify({ node: "Manual", isEntryPoint: true })],
+//   phase2: [
+//     JSON.stringify({
+//       node: "Scrape a page",
+//       inputs: { browserInstance: "Bwsr", value: "www.vscrape.com" },
+//     }),
+//     JSON.stringify({
+//       node: "Extract Element",
+//       inputs: { element: "Extract", value: "texxxxxt here!" },
+//     }),
+//   ],
+// };
+
 const orchestrator = async ({
   executionPlan,
   mode,
@@ -11,7 +25,7 @@ const orchestrator = async ({
   console.log(
     "Orchestrator Launched",
     `\nMode: ${mode}`,
-    `\nWith: ${executionPlan}`
+    `\nWith: ${JSON.stringify(executionPlan)}`
   );
 
   // Setup Environment

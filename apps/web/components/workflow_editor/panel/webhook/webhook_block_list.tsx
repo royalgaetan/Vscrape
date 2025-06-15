@@ -16,7 +16,7 @@ const WebhookBlockList = ({
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
   // End Store
   const [webhookBlock, setWebhookBlock] = useState(
-    currentNode ? (currentNode.blocks as WebhookBlock) : undefined
+    currentNode ? (currentNode.block as WebhookBlock) : undefined
   );
 
   // States
@@ -29,7 +29,7 @@ const WebhookBlockList = ({
   useEffect(() => {
     if (!currentNode) return;
     const sub = currentNode.stream$().subscribe((newData) => {
-      setWebhookBlock(newData.blocks as WebhookBlock);
+      setWebhookBlock(newData.block as WebhookBlock);
     });
 
     return () => sub.unsubscribe();

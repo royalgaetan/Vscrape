@@ -9,7 +9,7 @@ import {
   workflowEditorNodes,
   workflowEditorSections,
 } from "../constants/w_constants";
-import { NodeTest, VsNodeType } from "../types/w_types";
+import { NodeTest, OperationItemParam, VsNodeType } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
 import { VsNode } from "../classes/node";
 import { cloneDeep } from "lodash";
@@ -73,6 +73,10 @@ export const getNodeTestIcon = (
   }
 };
 
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
 export const buildAdjacency = (
   editor: NodeEditor<Schemes>
 ): Map<string, Set<string>> => {
@@ -128,3 +132,7 @@ export const hasAlreadyEntryPoint = (editor: NodeEditor<Schemes>): boolean => {
   if (found.length >= 1) return true;
   else return false;
 };
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------

@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { toCleanUrl } from "@/lib/string_utils";
 import CustomSwitchInput from "../../inputs/custom_switch_input";
 import { cn } from "@/lib/utils";
+import { cloneDeep } from "lodash";
 
 const SingleWebhookEditorPanel = ({
   nodeOrigin,
@@ -31,8 +32,9 @@ const SingleWebhookEditorPanel = ({
   onSave: (block?: WebhookBlock) => void;
   displayBackButton?: boolean;
 }) => {
-  const [currentBlock, setCurrentBlock] =
-    useState<WebhookBlock>(webhookBlockOrigin);
+  const [currentBlock, setCurrentBlock] = useState<WebhookBlock>(
+    cloneDeep(webhookBlockOrigin)
+  );
 
   // State Values:
   const [errorFields, setErrorFields] = useState<string[]>([]);

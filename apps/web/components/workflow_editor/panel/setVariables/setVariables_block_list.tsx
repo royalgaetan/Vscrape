@@ -4,12 +4,10 @@ import { Plus } from "lucide-react";
 import {
   generateNewVariableAssignationValues,
   SetVariablesBlock,
-  SingleVariableAssignation,
 } from "@/lib/workflow_editor/classes/setVariables_block";
 import SetVariablesBlockCard from "./setVariables_block_card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { filter } from "lodash";
 import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { extractTextFromHTML, toStringSafe } from "@/lib/string_utils";
@@ -24,7 +22,7 @@ const SetVariablesBlockList = ({
   // End Store
   const [variableAssignations, setVariableAssignations] = useState(
     currentNode
-      ? (currentNode.blocks as SetVariablesBlock).variableAssignations
+      ? (currentNode.block as SetVariablesBlock).variableAssignations
       : []
   );
   const [fieldCurrentlyEditted, setFieldCurrentlyEditted] = useState<number>();
@@ -33,7 +31,7 @@ const SetVariablesBlockList = ({
     if (!currentNode) return;
     const sub = currentNode.stream$().subscribe((newData) => {
       setVariableAssignations(
-        (newData.blocks as SetVariablesBlock).variableAssignations.filter(
+        (newData.block as SetVariablesBlock).variableAssignations.filter(
           (v) =>
             v.varName !== "" ||
             extractTextFromHTML(toStringSafe(v.varValue)).length !== 0
@@ -71,23 +69,23 @@ const SetVariablesBlockList = ({
                 setFieldCurrentlyEditted(idx);
               }}
               onDelete={() => {
-                if (!(currentNode.blocks instanceof SetVariablesBlock)) return;
+                if (!(currentNode.block instanceof SetVariablesBlock)) return;
                 setFieldCurrentlyEditted(undefined);
 
                 const updatedArr = [...variableAssignations];
-                currentNode.blocks.variableAssignations = updatedArr.filter(
+                currentNode.block.variableAssignations = updatedArr.filter(
                   (v, i) => i !== idx
                 );
-                onSave(currentNode.blocks);
+                onSave(currentNode.block);
               }}
               onSave={(newAssign) => {
-                if (!(currentNode.blocks instanceof SetVariablesBlock)) return;
+                if (!(currentNode.block instanceof SetVariablesBlock)) return;
                 setFieldCurrentlyEditted(undefined);
 
                 const updatedArr = [...variableAssignations];
                 updatedArr[idx] = newAssign;
-                currentNode.blocks.variableAssignations = updatedArr;
-                onSave(currentNode.blocks);
+                currentNode.block.variableAssignations = updatedArr;
+                onSave(currentNode.block);
               }}
             />
           );
@@ -102,7 +100,7 @@ const SetVariablesBlockList = ({
             )}
             onClick={() => {
               // Add New Var Assignation
-              if (!(currentNode.blocks instanceof SetVariablesBlock)) return;
+              if (!(currentNode.block instanceof SetVariablesBlock)) return;
               // Add New Assignation to currently edited fields
               setFieldCurrentlyEditted(variableAssignations.length);
 

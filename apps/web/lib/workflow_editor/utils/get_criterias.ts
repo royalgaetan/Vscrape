@@ -17,7 +17,7 @@ import {
   isVideoMimeType,
 } from "../types/mime_types";
 
-type T = (vsAnyPrimitives | vsAnyRawTypes)["type"];
+type T = (vsAnyPrimitives | vsAnyRawTypes)["type"] | any;
 export const getTypeBigCategory = (
   type?: T
 ): BigCriteriaCategory | undefined => {
@@ -25,7 +25,8 @@ export const getTypeBigCategory = (
     type === "primitive/text" ||
     type === "primitive/url" ||
     type === "primitive/emailUrl" ||
-    type === "primitive/tel"
+    type === "primitive/tel" ||
+    type === "primitive/customSwitch"
   ) {
     return "Strings";
   } else if (type === "primitive/dateTime") {
@@ -219,7 +220,7 @@ export const getCriteriaSelection = ({
 export type GetFilterValueInput = "text" | "number" | "date" | "undefined";
 export type GetFilterValueInputs = [
   GetFilterValueInput,
-  ...GetFilterValueInput[]
+  ...GetFilterValueInput[],
 ];
 
 export const getFilterValueInputs = ({

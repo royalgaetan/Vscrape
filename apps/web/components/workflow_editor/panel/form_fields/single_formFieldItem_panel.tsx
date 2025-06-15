@@ -2,25 +2,15 @@ import React, { useEffect, useState } from "react";
 import MultiSelect from "@/components/global/multi_select";
 import { Separator } from "@/components/ui/separator";
 import { delay } from "@/lib/numbers_utils";
-import { NodeBlockType } from "@/stores/workflowStore";
 import FieldLabel from "../field_label";
 import PanelHeader from "../panel_header";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
-import {
-  PossibleFieldBlockType as FieldBlockType,
-  FormFieldFileUpload,
-  FormFieldTextInput,
-  getFormFieldBlockByName,
-  workflowFormFieldBlocks,
-} from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import FormFieldBlockCard from "./form_field_block_card";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { Button } from "@/components/ui/button";
-import FormFieldBlockPreview, { isAFile } from "./form_field_block_preview";
+import FormFieldBlockPreview from "./form_field_block_preview";
 import {
   Check,
-  FileType,
-  Hash,
   Loader2,
   LucideIcon,
   PenLine,
@@ -29,25 +19,32 @@ import {
   X,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { VsFormInputFieldTypeUnion } from "@/lib/workflow_editor/types/w_types";
 import { toast } from "sonner";
 import { extractTextFromHTML, toStringSafe } from "@/lib/string_utils";
+import { FormFieldItem } from "@/lib/workflow_editor/classes/form_field_block";
+import { cloneDeep } from "lodash";
+import { workflowFormFieldItems } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
+import { isAFile } from "@/lib/workflow_editor/types/mime_types";
 
-const SingleFormFieldPanel = ({
-  nodeOrigin,
-  fieldBlockOrigin,
+const SingleFormFieldItemPanel = ({
+  initialNode,
+  initialFieldItem,
   onBack,
   onSave,
   onDelete,
   displayBackButton,
 }: {
-  nodeOrigin: VsNode;
-  fieldBlockOrigin?: FieldBlockType;
+  initialNode: VsNode;
+  initialFieldItem?: FormFieldItem;
   onBack?: () => void;
-  onSave: (block?: NodeBlockType) => void;
-  onDelete: (fieldBlockId: string) => void;
+  onSave: (fieldItem: FormFieldItem) => void;
+  onDelete: (fieldItemId: string) => void;
   displayBackButton?: boolean;
 }) => {
+  const [currentFieldItem, setCurrentFieldItem] = useState(
+    initialFieldItem ?? cloneDeep(initialFieldItem)
+  );
+
   const [isLoadingBlock, setIsLoadingBlock] = useState(false);
   const [isSavingFormFieldBlock, setIsSavingFormFieldBlock] = useState(false);
   const [SavingFormFieldBlockResultIcon, setSavingFormFieldBlockResultIcon] =
@@ -55,30 +52,6 @@ const SingleFormFieldPanel = ({
 
   // States
   const [errorFields, setErrorFields] = useState<string[]>([]);
-  const [fieldName, setFieldName] = useState<string>();
-  const [fieldType, setFieldType] = useState<
-    VsFormInputFieldTypeUnion["type"] | undefined
-  >();
-  const [fieldLabel, setFieldLabel] = useState<string>();
-  const [fieldValue, setFieldValue] = useState<any>();
-  const [fieldIsOptional, setFieldIsOptional] = useState<boolean>();
-  const [isFieldHidden, setIsFieldHidden] = useState<boolean>();
-
-  const [fieldDescription, setFieldDescription] = useState<string>();
-  const [fieldPlaceholder, setFieldPlaceholder] = useState<string>();
-
-  const [fieldDefaultDescription, setFieldDefaultDescription] =
-    useState<string>();
-  const [fieldDefaultPlaceholder, setFieldDefaultPlaceholder] =
-    useState<string>();
-
-  const [fieldValueToPickFrom, setFieldValueToPickFrom] = useState<string[]>();
-
-  // Specifics
-  const [fieldIsMultiline, setFieldIsMultiline] = useState<boolean>();
-  const [fieldAcceptedExtensions, setFieldAcceptedExtensions] = useState<
-    string[]
-  >([]);
 
   const saveFormFieldBlock = async () => {
     setErrorFields([]);
@@ -87,20 +60,19 @@ const SingleFormFieldPanel = ({
     await delay(400);
 
     try {
+      // Save values to original block
+      if (!currentFieldItem)
+        throw new Error("An error occured while saving this field.");
+
       // Errors Checking
       errorChecker();
-
-      // Save values to original block
-      const blockUpdated = saveFields();
-      if (!blockUpdated)
-        throw new Error("An error occured while saving this field.");
 
       setIsSavingFormFieldBlock(false);
       setSavingFormFieldBlockResultIcon(Check);
       await delay(150);
       setSavingFormFieldBlockResultIcon(undefined);
 
-      onSave(blockUpdated);
+      onSave(currentFieldItem);
     } catch (e) {
       console.log("Err", e);
       toast.error(
@@ -118,58 +90,16 @@ const SingleFormFieldPanel = ({
     }
   };
 
-  const setValueStates = (block?: FieldBlockType) => {
-    if (block) {
-      // Update with new selected block values
-      setFieldName(block.fieldName);
-      setFieldLabel(block.fieldLabel);
-      setFieldValue(block.fieldValue);
-      setFieldType(block.fieldType);
-
-      setFieldDescription(block.fieldDescription);
-      setFieldPlaceholder(block.fieldPlaceholder);
-
-      setFieldDefaultDescription(block.fieldDefaultDescription);
-      setFieldDefaultPlaceholder(block.fieldDefaultPlaceholder);
-
-      setFieldIsOptional(block.isOptional);
-      setIsFieldHidden(block.isHidden);
-
-      setFieldValueToPickFrom(block.fieldValueToPickFrom);
-      setFieldIsMultiline(
-        block instanceof FormFieldTextInput ? block.isMultiline : undefined
-      );
-      setFieldAcceptedExtensions(
-        block instanceof FormFieldFileUpload
-          ? block.acceptedExtensions
-          : ([] as string[])
-      );
-    } else {
-      setFieldName(undefined);
-      setFieldLabel(undefined);
-      setFieldValue(undefined);
-      setFieldType(undefined);
-      setFieldDescription(undefined);
-      setFieldPlaceholder(undefined);
-
-      setFieldDefaultDescription(undefined);
-      setFieldDefaultPlaceholder(undefined);
-
-      setFieldValueToPickFrom(undefined);
-      setFieldIsMultiline(undefined);
-      setFieldAcceptedExtensions([]);
-
-      setFieldIsOptional(undefined);
-      setIsFieldHidden(undefined);
-    }
-  };
-
   const errorChecker = () => {
     const errFields: string[] = [];
-    if (!fieldName || !fieldType) {
+    if (!currentFieldItem) return;
+    if (!currentFieldItem.fieldName || !currentFieldItem.fieldType) {
       errFields.push("fieldName");
     }
-    if (typeof fieldLabel === "string" && fieldLabel.length === 0) {
+    if (
+      typeof currentFieldItem.fieldLabel === "string" &&
+      currentFieldItem.fieldLabel.length === 0
+    ) {
       errFields.push("fieldLabel");
     }
     // if (typeof fieldDescription === "string" && fieldDescription.length === 0) {
@@ -182,30 +112,34 @@ const SingleFormFieldPanel = ({
     //   errFields.push("fieldIsOptional");
     // }
     if (
-      fieldValueToPickFrom !== undefined &&
-      Array.isArray(fieldValueToPickFrom) &&
-      fieldValueToPickFrom.filter((a) => extractTextFromHTML(a).length > 0)
-        .length < 2
+      currentFieldItem.fieldValueToPickFrom !== undefined &&
+      Array.isArray(currentFieldItem.fieldValueToPickFrom) &&
+      currentFieldItem.fieldValueToPickFrom.filter(
+        (a) => extractTextFromHTML(a).length > 0
+      ).length < 2
     ) {
       errFields.push("fieldValueToPickFrom");
     }
 
-    if (isFieldHidden !== undefined && toStringSafe(fieldValue).length === 0) {
+    if (
+      currentFieldItem.isHidden !== undefined &&
+      toStringSafe(currentFieldItem.fieldValue).length === 0
+    ) {
       errFields.push("fieldValue");
     }
 
     if (
-      fieldType === "primitive/text" &&
-      fieldValueToPickFrom === undefined &&
-      fieldIsMultiline === undefined
+      currentFieldItem.fieldType === "primitive/text" &&
+      currentFieldItem.fieldValueToPickFrom === undefined &&
+      currentFieldItem.isMultiline === undefined
     ) {
       errFields.push("fieldIsMultiline");
     }
 
     if (
-      fieldType &&
-      isAFile(fieldType) &&
-      fieldAcceptedExtensions === undefined
+      currentFieldItem.fieldType &&
+      isAFile(currentFieldItem.fieldType) &&
+      currentFieldItem.acceptedFileExtensions === undefined
     ) {
       errFields.push("fieldAcceptedExtensions");
     }
@@ -217,55 +151,14 @@ const SingleFormFieldPanel = ({
     }
   };
 
-  const saveFields = (): FieldBlockType | undefined => {
-    //
-    if (!fieldBlockOrigin || fieldBlockOrigin.fieldType !== fieldType) {
-      const newFieldBlock = getFormFieldBlockByName(fieldName ?? "");
-      if (!newFieldBlock) return;
-
-      if (fieldBlockOrigin) newFieldBlock.updateId = fieldBlockOrigin.id;
-      if (fieldLabel) newFieldBlock.fieldLabel = fieldLabel;
-      if (fieldValue) newFieldBlock.fieldValue = fieldValue;
-
-      if (fieldDescription) newFieldBlock.fieldDescription = fieldDescription;
-      if (fieldPlaceholder) newFieldBlock.fieldPlaceholder = fieldPlaceholder;
-
-      if (fieldValueToPickFrom)
-        newFieldBlock.fieldValueToPickFrom = fieldValueToPickFrom;
-      if (fieldIsOptional) newFieldBlock.isOptional = fieldIsOptional;
-
-      if (newFieldBlock instanceof FormFieldTextInput && fieldIsMultiline)
-        newFieldBlock.isMultiline = fieldIsMultiline;
-      if (newFieldBlock instanceof FormFieldFileUpload)
-        newFieldBlock.acceptedExtensions = fieldAcceptedExtensions;
-
-      return newFieldBlock;
-    }
-    // Update Mode
-    else if (fieldBlockOrigin) {
-      if (fieldLabel) fieldBlockOrigin.fieldLabel = fieldLabel;
-      if (fieldValue) fieldBlockOrigin.fieldValue = fieldValue;
-
-      if (fieldDescription)
-        fieldBlockOrigin.fieldDescription = fieldDescription;
-      if (fieldPlaceholder)
-        fieldBlockOrigin.fieldPlaceholder = fieldPlaceholder;
-      if (fieldValueToPickFrom)
-        fieldBlockOrigin.fieldValueToPickFrom = fieldValueToPickFrom;
-
-      if (fieldIsOptional) fieldBlockOrigin.isOptional = fieldIsOptional;
-      if (fieldBlockOrigin instanceof FormFieldTextInput && fieldIsMultiline)
-        fieldBlockOrigin.isMultiline = fieldIsMultiline;
-      if (fieldBlockOrigin instanceof FormFieldFileUpload)
-        fieldBlockOrigin.acceptedExtensions = fieldAcceptedExtensions;
-
-      return fieldBlockOrigin;
-    }
-  };
-
   useEffect(() => {
-    setValueStates(fieldBlockOrigin);
-  }, []);
+    if (!currentFieldItem) return;
+    const sub = currentFieldItem.stream$().subscribe((newData) => {
+      setCurrentFieldItem(newData);
+    });
+
+    return () => sub.unsubscribe();
+  }, [currentFieldItem]);
 
   return (
     <div className="flex flex-col w-full max-h-full relative">
@@ -273,7 +166,7 @@ const SingleFormFieldPanel = ({
         {/* Header */}
         <div className="px-4 w-full">
           <PanelHeader
-            nodeOrigin={nodeOrigin}
+            nodeOrigin={initialNode}
             displayBackButton={displayBackButton}
             onBack={() => onBack && onBack()}
           />
@@ -285,7 +178,7 @@ const SingleFormFieldPanel = ({
           <div className="flex flex-col justify-start items-start px-4 pr-4">
             <FieldLabel
               label={
-                fieldBlockOrigin
+                currentFieldItem
                   ? "Change Form Field Type"
                   : "Select a Form Field"
               }
@@ -293,7 +186,7 @@ const SingleFormFieldPanel = ({
             />
 
             <MultiSelect
-              isTriggerDisabled={workflowFormFieldBlocks.length < 1}
+              isTriggerDisabled={workflowFormFieldItems.length < 1}
               triggerClassName={`h-9 w-[15.7rem] flex flex-1 mb-1  ${
                 errorFields.includes("fieldName") &&
                 "border-destructive/70 ring-2 ring-destructive/60"
@@ -301,34 +194,44 @@ const SingleFormFieldPanel = ({
               popoverAlignment="center"
               selectionMode="single"
               popoverClassName="max-h-60 min-h-fit w-[15.7rem]"
-              label={fieldName ?? "Pick a Form Field"}
+              label={currentFieldItem?.fieldName ?? "Pick a Form Field"}
               itemTooltipClassname="w-52"
               data={{
-                "": workflowFormFieldBlocks.map((fieldBlock) => ({
+                "": workflowFormFieldItems.map((fieldBlock) => ({
                   label: fieldBlock.fieldName,
                   value: fieldBlock.fieldName,
-                  icon: Hash,
+                  icon: fieldBlock.fieldIcon,
                   iconClassName: "stroke-neutral-400 fill-transparent",
                   tooltipContent: fieldBlock.fieldTooltipContent,
                   tooltipAlign: "end",
                   tooltipSide: "left",
                 })),
               }}
-              selectedValues={fieldName ? [fieldName] : []}
+              selectedValues={
+                currentFieldItem?.fieldName ? [currentFieldItem.fieldName] : []
+              }
               handleSelect={(fieldNameSelected) => {
                 // Clean Error
                 setErrorFields([]);
                 // Save new changes
-                if (!fieldBlockOrigin && fieldNameSelected === fieldName) {
-                  setValueStates(undefined);
-                } else if (fieldNameSelected !== fieldName) {
-                  const newFormFieldBlock =
-                    getFormFieldBlockByName(fieldNameSelected);
-                  if (!newFormFieldBlock) return;
-                  setValueStates(undefined);
+                if (fieldNameSelected === currentFieldItem?.fieldName) {
+                  setCurrentFieldItem(undefined);
+                } else if (fieldNameSelected !== currentFieldItem?.fieldName) {
+                  const fieldDefinition = workflowFormFieldItems.find(
+                    (f) => f.fieldName === fieldNameSelected
+                  );
+                  if (!fieldDefinition) return;
+                  // Flush
+                  setCurrentFieldItem(undefined);
                   setIsLoadingBlock(true);
 
-                  setValueStates(newFormFieldBlock);
+                  const fieldItem = new FormFieldItem(
+                    cloneDeep({ ...fieldDefinition, id: initialFieldItem?.id })
+                  );
+
+                  setCurrentFieldItem(fieldItem);
+
+                  // Reassign
                   setTimeout(() => {
                     setIsLoadingBlock(false);
                   }, 300);
@@ -346,183 +249,178 @@ const SingleFormFieldPanel = ({
           )}
 
           {/* Content */}
-          {!isLoadingBlock && (
+          {!isLoadingBlock && currentFieldItem && (
             <div className="flex flex-col justify-start items-start">
               {/* Edit Field Block: Parameters List */}
               <div className="flex flex-col gap-5 w-full px-4 pr-4">
                 {/* Field Label */}
-                {fieldLabel !== undefined &&
-                  typeof fieldLabel === "string" &&
-                  !isFieldHidden && (
+                {currentFieldItem.fieldLabel !== undefined &&
+                  typeof currentFieldItem.fieldLabel === "string" &&
+                  !currentFieldItem.isHidden && (
                     <FormFieldBlockCard
-                      key={`${fieldBlockOrigin?.id}_fieldLabel`}
+                      key={`${currentFieldItem.id}_fieldLabel`}
                       fieldAttrName="Field Label"
                       fieldAttrPlaceholder={"Enter the field label..."}
                       fieldAttrType={"text"}
                       hasError={errorFields.includes("fieldLabel")}
-                      initialValue={fieldLabel}
+                      initialValue={currentFieldItem.fieldLabel}
                       onChange={(newVal) => {
                         // Clean Error
                         setErrorFields((prev) =>
                           prev.filter((f) => f !== "fieldLabel")
                         );
                         // Save new changes
-                        setFieldLabel(newVal);
+                        // setFieldLabel(newVal);
+                        currentFieldItem.fieldLabel = newVal;
                       }}
                     />
                   )}
-
                 {/* Field Placeholder */}
-                {fieldPlaceholder !== undefined &&
-                  typeof fieldPlaceholder === "string" &&
-                  !isFieldHidden && (
+                {currentFieldItem.fieldPlaceholder !== undefined &&
+                  typeof currentFieldItem.fieldPlaceholder === "string" &&
+                  !currentFieldItem.isHidden && (
                     <FormFieldBlockCard
-                      key={`${fieldBlockOrigin?.id}_fieldPlaceholder`}
+                      key={`${currentFieldItem?.id}_fieldPlaceholder`}
                       fieldAttrName="Field Placeholder"
                       fieldAttrPlaceholder={"Enter the field placeholder..."}
                       fieldAttrType={"text"}
                       hasError={errorFields.includes("fieldPlaceholder")}
-                      initialValue={fieldPlaceholder}
+                      initialValue={currentFieldItem.fieldPlaceholder}
                       onChange={(newVal) => {
                         // Clean Error
                         setErrorFields((prev) =>
                           prev.filter((f) => f !== "fieldPlaceholder")
                         );
                         // Save new changes
-                        setFieldPlaceholder(newVal);
+                        currentFieldItem.fieldPlaceholder = newVal;
                       }}
                     />
                   )}
-
                 {/* Field Description */}
-                {fieldDescription !== undefined &&
-                  typeof fieldDescription === "string" &&
-                  !isFieldHidden && (
+                {currentFieldItem.fieldDescription !== undefined &&
+                  typeof currentFieldItem.fieldDescription === "string" &&
+                  !currentFieldItem.isHidden && (
                     <FormFieldBlockCard
-                      key={`${fieldBlockOrigin?.id}_fieldDescription`}
+                      key={`${currentFieldItem?.id}_fieldDescription`}
                       fieldAttrName="Field Description"
                       fieldAttrPlaceholder={"Enter the field description..."}
                       fieldAttrType={"text"}
                       hasError={errorFields.includes("fieldDescription")}
-                      initialValue={fieldDescription}
+                      initialValue={currentFieldItem.fieldDescription}
                       onChange={(newVal) => {
                         // Clean Error
                         setErrorFields((prev) =>
                           prev.filter((f) => f !== "fieldDescription")
                         );
                         // Save new changes
-                        setFieldDescription(newVal);
+                        currentFieldItem.fieldDescription = newVal;
                       }}
                     />
                   )}
-
                 {/* SPECIFIC */}
                 {/* Field Value: only for "Hidden Fields" */}
-                {isFieldHidden !== undefined && (
+                {currentFieldItem.isHidden !== undefined && (
                   <FormFieldBlockCard
-                    key={`${fieldBlockOrigin?.id}_fieldValue`}
+                    key={`${currentFieldItem?.id}_fieldValue`}
                     fieldAttrName="Field Value"
                     fieldAttrPlaceholder={"Enter the field value..."}
                     fieldAttrType={"text"}
                     hasError={errorFields.includes("fieldValue")}
-                    initialValue={fieldValue}
+                    initialValue={currentFieldItem.fieldValue}
                     onChange={(newVal) => {
                       // Clean Error
                       setErrorFields((prev) =>
                         prev.filter((f) => f !== "fieldValue")
                       );
                       // Save new changes
-                      setFieldValue(newVal);
+                      currentFieldItem.fieldValue = newVal;
                     }}
                   />
                 )}
-
                 {/* SPECIFIC */}
                 {/* Field isTextarea: Only for Input Text */}
-                {fieldIsMultiline !== undefined && !isFieldHidden && (
-                  <FormFieldBlockCard
-                    key={`${fieldBlockOrigin?.id}_fieldEnableTextarea`}
-                    fieldAttrName="Is Multi-line"
-                    fieldAttrType={"switch"}
-                    hasError={errorFields.includes("fieldIsMultiline")}
-                    initialValue={fieldIsMultiline}
-                    onChange={(newVal) => {
-                      // Clean Error
-                      setErrorFields((prev) =>
-                        prev.filter((f) => f !== "fieldIsMultiline")
-                      );
-                      // Save new changes
-                      setFieldIsMultiline(newVal);
-                    }}
-                  />
-                )}
-
+                {currentFieldItem.isMultiline !== undefined &&
+                  !currentFieldItem.isHidden && (
+                    <FormFieldBlockCard
+                      key={`${currentFieldItem?.id}_fieldEnableTextarea`}
+                      fieldAttrName="Is Multi-line"
+                      fieldAttrType={"switch"}
+                      hasError={errorFields.includes("fieldIsMultiline")}
+                      initialValue={currentFieldItem.isMultiline}
+                      onChange={(newVal) => {
+                        // Clean Error
+                        setErrorFields((prev) =>
+                          prev.filter((f) => f !== "fieldIsMultiline")
+                        );
+                        // Save new changes
+                        currentFieldItem.isMultiline = newVal;
+                      }}
+                    />
+                  )}
                 {/* SPECIFIC */}
                 {/* Field Accepted Extensions: only for "File Upload" */}
-                {isAFile(fieldType ?? "") && !isFieldHidden && (
-                  <FormFieldBlockCard
-                    key={`${fieldBlockOrigin?.id}_fieldExtensionAllowed`}
-                    fieldAttrName="Extensions Allowed"
-                    fieldAttrPlaceholder={"Select allowed extensions..."}
-                    fieldAttrType={"fileExtensions"}
-                    hasError={errorFields.includes("fieldAcceptedExtensions")}
-                    initialValue={fieldAcceptedExtensions}
-                    onChange={(mimeArr) => {
-                      // Clean Error
-                      setErrorFields((prev) =>
-                        prev.filter((f) => f !== "fieldAcceptedExtensions")
-                      );
-                      // Save new changes
-                      setFieldAcceptedExtensions(mimeArr);
-                    }}
-                  />
-                )}
-
-                {/* Field Optionality */}
-                {fieldIsOptional !== undefined &&
-                  typeof fieldIsOptional === "boolean" &&
-                  !isFieldHidden && (
+                {Array.isArray(currentFieldItem.acceptedFileExtensions) &&
+                  !currentFieldItem.isHidden && (
                     <FormFieldBlockCard
-                      key={`${fieldBlockOrigin?.id}_fieldOptionality`}
+                      key={`${currentFieldItem?.id}_fieldExtensionAllowed`}
+                      fieldAttrName="Extensions Allowed"
+                      fieldAttrPlaceholder={"Select allowed extensions..."}
+                      fieldAttrType={"fileExtensions"}
+                      hasError={errorFields.includes("fieldAcceptedExtensions")}
+                      initialValue={currentFieldItem.acceptedFileExtensions}
+                      onChange={(mimeArr) => {
+                        // Clean Error
+                        setErrorFields((prev) =>
+                          prev.filter((f) => f !== "fieldAcceptedExtensions")
+                        );
+                        // Save new changes
+                        currentFieldItem.acceptedFileExtensions = mimeArr;
+                      }}
+                    />
+                  )}
+                {/* Field Optionality */}
+                {currentFieldItem.isOptional !== undefined &&
+                  typeof currentFieldItem.isOptional === "boolean" &&
+                  !currentFieldItem.isHidden && (
+                    <FormFieldBlockCard
+                      key={`${currentFieldItem?.id}_fieldOptionality`}
                       fieldAttrName="Is Optional"
                       fieldAttrType={"switch"}
                       hasError={errorFields.includes("fieldIsOptional")}
-                      initialValue={fieldIsOptional}
+                      initialValue={currentFieldItem.isOptional}
                       onChange={(newVal) => {
                         // Clean Error
                         setErrorFields((prev) =>
                           prev.filter((f) => f !== "fieldIsOptional")
                         );
                         // Save new changes
-                        setFieldIsOptional(newVal);
+                        currentFieldItem.isOptional = newVal;
                       }}
                     />
                   )}
-
                 {/* Field Values To Pick From */}
-                {fieldValueToPickFrom !== undefined &&
-                  Array.isArray(fieldValueToPickFrom) &&
-                  !isFieldHidden && (
+                {currentFieldItem.fieldValueToPickFrom !== undefined &&
+                  Array.isArray(currentFieldItem.fieldValueToPickFrom) &&
+                  !currentFieldItem.isHidden && (
                     <FormFieldBlockCard
-                      key={`${fieldBlockOrigin?.id}_fieldValuesToPickFrom`}
+                      key={`${currentFieldItem?.id}_fieldValuesToPickFrom`}
                       fieldAttrName="Possible Choices"
                       fieldAttrType={"array"}
                       hasError={errorFields.includes("fieldValueToPickFrom")}
-                      initialValue={fieldValueToPickFrom}
+                      initialValue={currentFieldItem.fieldValueToPickFrom}
                       onChange={(newArr) => {
                         // Clean Error
                         setErrorFields((prev) =>
                           prev.filter((f) => f !== "fieldValueToPickFrom")
                         );
                         // Save new changes
-                        setFieldValueToPickFrom(newArr);
+                        currentFieldItem.fieldValueToPickFrom = newArr;
                       }}
                     />
                   )}
               </div>
-
               {/* Field Block Preview */}
-              {fieldName !== undefined && fieldType !== undefined && (
+              {currentFieldItem && (
                 <>
                   {/* Separator */}
                   <Separator className="mt-6 mb-[0.5px]" />
@@ -532,25 +430,11 @@ const SingleFormFieldPanel = ({
                       Field Preview
                     </Label>
                     <div className="flex flex-1">
-                      <FormFieldBlockPreview
-                        fieldName={fieldName}
-                        fieldLabel={fieldLabel ?? ""}
-                        fieldValue={fieldValue}
-                        fieldDescription={fieldDescription}
-                        fieldPlaceholder={fieldPlaceholder}
-                        fieldDefaultPlaceholder={fieldDefaultPlaceholder}
-                        fieldDefaultDescription={fieldDefaultDescription}
-                        fieldValueToPickFrom={fieldValueToPickFrom}
-                        fieldIsOptional={fieldIsOptional}
-                        fieldType={fieldType}
-                        fieldIsMultiline={fieldIsMultiline}
-                        fieldAcceptedExtensions={fieldAcceptedExtensions}
-                      />
+                      <FormFieldBlockPreview fieldItem={currentFieldItem} />
                     </div>
                   </div>
                 </>
               )}
-
               {/* Spacer */}
               <div className="h-20"></div>
             </div>
@@ -559,12 +443,12 @@ const SingleFormFieldPanel = ({
       </div>
 
       {/* Fixed Bottom Bar */}
-      {fieldName && (
+      {currentFieldItem && (
         <div className="flex flex-col w-[var(--workflowPanelWidth)] bg-white z-10 fixed bottom-[7vh]">
           {/* Action Buttons: Delete | Save Field */}
           <div className="flex flex-1 justify-end items-center py-1 px-3 border-t">
             {/* Delete Button: only if we're in [UPDATE Mode] */}
-            {fieldBlockOrigin && (
+            {initialFieldItem && (
               <div className="flex flex-1 justify-start">
                 <SimpleTooltip tooltipText={"Delete Field"}>
                   <Button
@@ -574,7 +458,7 @@ const SingleFormFieldPanel = ({
                     className="w-fit"
                     onClick={() => {
                       // Delete Field
-                      onDelete(fieldBlockOrigin.id);
+                      onDelete(initialFieldItem.id);
                     }}
                   >
                     <Trash2 />
@@ -611,4 +495,4 @@ const SingleFormFieldPanel = ({
   );
 };
 
-export default SingleFormFieldPanel;
+export default SingleFormFieldItemPanel;

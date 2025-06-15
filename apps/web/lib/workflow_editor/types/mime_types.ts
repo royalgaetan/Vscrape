@@ -71,6 +71,12 @@ export const getExtensionNameFromMime = (mime: string) => {
   return match?.[0];
 };
 
+export const isAFile = (fieldType: string) =>
+  isImageMimeType(fieldType) ||
+  isVideoMimeType(fieldType) ||
+  isAudioMimeType(fieldType) ||
+  isDocumentMimeType(fieldType);
+
 export const vsPrimitiveMIMETypes = {
   text: "primitive/text",
   array: "primitive/array",

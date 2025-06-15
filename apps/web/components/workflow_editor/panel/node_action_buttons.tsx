@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { formatLargeNumber } from "@/lib/date_time_utils";
 import { cn } from "@/lib/utils";
 import { NodeTest } from "@/lib/workflow_editor/types/w_types";
-import { getNodeTestIcon } from "@/lib/workflow_editor/utils/w_utils";
+import {
+  entryPointNodesLabels,
+  getNodeTestIcon,
+} from "@/lib/workflow_editor/utils/w_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import {
   Bell,
@@ -104,26 +107,28 @@ const NodeActionButtons = () => {
       </SimpleTooltip>
 
       {/* Duplicate Node */}
-      <SimpleTooltip tooltipText="Duplicate Node" side="bottom">
-        <Button
-          variant={"ghost"}
-          className={cn(
-            "flex truncate px-2 min-w-fit border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
-          )}
-          onClick={() => {
-            // Handle Node Duplication
-            if (!currentNode) return;
-            setElementIdToActOn({
-              type: "Node",
-              elementId: currentNode.id,
-              operation: "Duplicate",
-            });
-          }}
-        >
-          {/* Icon */}
-          <Copy className="group-hover/deleleNodeBtn:stroke-destructive-foreground !size-3 stroke-[2.5px] translate-y-[1px] stroke-neutral-500" />
-        </Button>
-      </SimpleTooltip>
+      {!entryPointNodesLabels.includes(currentNode?.label ?? "") && (
+        <SimpleTooltip tooltipText="Duplicate Node" side="bottom">
+          <Button
+            variant={"ghost"}
+            className={cn(
+              "flex truncate px-2 min-w-fit border border-border/20 text-neutral-500 h-6 transition-all duration-300 justify-start items-center gap-1 hover:bg-neutral-200/40 bg-transparent cursor-pointer rounded-sm"
+            )}
+            onClick={() => {
+              // Handle Node Duplication
+              if (!currentNode) return;
+              setElementIdToActOn({
+                type: "Node",
+                elementId: currentNode.id,
+                operation: "Duplicate",
+              });
+            }}
+          >
+            {/* Icon */}
+            <Copy className="group-hover/deleleNodeBtn:stroke-destructive-foreground !size-3 stroke-[2.5px] translate-y-[1px] stroke-neutral-500" />
+          </Button>
+        </SimpleTooltip>
+      )}
 
       {/* Delete Node */}
       <SimpleTooltip tooltipText="Delete Node" side="bottom">

@@ -21,14 +21,15 @@ import {
 } from "../constants/w_constants";
 import { Nullable } from "@/lib/types";
 import { OperationBlock } from "../classes/operation_block";
-import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import { CronBlock } from "../classes/cron_block";
 import { ManualBlock } from "../classes/manual_block";
 import { WebhookBlock } from "../classes/webhook_block";
 import { WaitBlock } from "../classes/wait_block";
 import { SetVariablesBlock } from "../classes/setVariables_block";
+import { FormBlock } from "../classes/form_field_block";
 
 export type VsNodeType = {
+  id?: string;
   label: string;
   iconColor: string;
   icon?: LucideIcon;
@@ -37,14 +38,14 @@ export type VsNodeType = {
   isDisabled?: boolean;
   sectionName: keyof typeof workflowEditorSections;
 } & (
-  | NodeWithOperationBlocks
-  | NodeWithFormFieldBlocks
+  | NodeWithOperationBlock
+  | NodeWithFormFieldBlock
   | NodeWithCronBlock
   | NodeWithManualBlock
   | NodeWithWebhookBlock
   | NodeWithWaitBlock
   | NodeWithSetVarialbesBlock
-  | NodeWithBranchBlocks
+  | NodeWithBranchBlock
   | NodeWithPreviewBlock
 );
 export const nodeBlockTypeNames = [
@@ -55,50 +56,50 @@ export const nodeBlockTypeNames = [
   "webhook",
   "wait",
   "setVariables",
-  "branches",
+  "branch",
   "preview",
 ] as const;
 
-export type NodeWithOperationBlocks = {
+export type NodeWithOperationBlock = {
   blockType: (typeof nodeBlockTypeNames)["0"];
-  blocks: OperationBlock[];
+  block: OperationBlock;
 };
 
-export type NodeWithFormFieldBlocks = {
+export type NodeWithFormFieldBlock = {
   blockType: (typeof nodeBlockTypeNames)["1"];
-  blocks: FieldBlockType[];
+  block: FormBlock;
 };
 
 export type NodeWithCronBlock = {
   blockType: (typeof nodeBlockTypeNames)["2"];
-  blocks: CronBlock | undefined;
+  block: CronBlock | undefined;
 };
 
 export type NodeWithManualBlock = {
   blockType: (typeof nodeBlockTypeNames)["3"];
-  blocks: ManualBlock;
+  block: ManualBlock;
 };
 
 export type NodeWithWebhookBlock = {
   blockType: (typeof nodeBlockTypeNames)["4"];
-  blocks: WebhookBlock;
+  block: WebhookBlock;
 };
 
 export type NodeWithWaitBlock = {
   blockType: (typeof nodeBlockTypeNames)["5"];
-  blocks: WaitBlock;
+  block: WaitBlock;
 };
 export type NodeWithSetVarialbesBlock = {
   blockType: (typeof nodeBlockTypeNames)["6"];
-  blocks: SetVariablesBlock;
+  block: SetVariablesBlock;
 };
-export type NodeWithBranchBlocks = {
+export type NodeWithBranchBlock = {
   blockType: (typeof nodeBlockTypeNames)["7"];
-  blocks: undefined;
+  block: OperationBlock; // as BranchBlock
 };
 export type NodeWithPreviewBlock = {
   blockType: (typeof nodeBlockTypeNames)["8"];
-  blocks: OperationBlock[];
+  block: OperationBlock; // as PreviewBlock
 };
 
 // ---------------------------------------------------------
@@ -106,27 +107,27 @@ export type NodeWithPreviewBlock = {
 // ---------------------------------------------------------
 // ---------------------------------------------------------
 
-export type VsOperationBlockType = {
-  operationName: string;
-  operationDescription: string;
+export type VsOperationItemType = {
+  id?: string;
+  //
+  operationItemName: string;
+  operationItemDescription: string;
   nodeName: (typeof workflowEditorNodes)[number]["label"];
-  params?: (OperationParamItem | OperationParamItem[])[];
-  inputs?: {
-    // An Input key here can be: previousOperationData OR previousNodeData OR variables
-    previousOperationData?: OperationThroughput;
-    previousNodeData?: OperationThroughput;
-    variables?: OperationThroughput;
-  };
-  inputFilters?: OperationFilterType<
+  itemParams?: (OperationItemParam | OperationItemParam[])[];
+  itemInputFilters?: OperationFilterType<
     (vsAnyPrimitives | vsAnyRawTypes)["type"]
   >[]; // Many filters can be applied to many (incoming) inputs
-  outputs?: OperationThroughput; // An Output here can be: of any type
+  itemOutputs?: OperationThroughput; // An Output here can be: of any type
   skipDuplicate?: boolean;
   isDisabled?: boolean;
   loopThrough?: "All items" | number | boolean;
 };
 
-export type VsFormInputFieldType = {
+export type VsFormFieldItemType = {
+  id?: string;
+  fieldTooltipContent: string;
+  fieldIcon: LucideIcon;
+  //
   fieldName: string;
   fieldLabel: string;
   fieldDescription?: string;
@@ -136,6 +137,8 @@ export type VsFormInputFieldType = {
   fieldValueToPickFrom?: string[];
   isOptional?: boolean;
   isHidden?: boolean;
+  isMultiline?: boolean;
+  acceptedFileExtensions?: string[];
 } & VsFormInputFieldTypeUnion;
 export type VsFormInputFieldTypeUnion =
   | vsText
@@ -150,8 +153,8 @@ export type VsFormInputFieldTypeUnion =
   | vsHidden
   | vsAnyRawTypes;
 
-export type VsNodeBlockType = {
-  id: string;
+export type VsCronBlockType = {
+  id?: string;
   configMinute: string;
   configHour: string;
   configDayOfMonth: string;
@@ -169,7 +172,8 @@ export type VsNodeBlockType = {
 
 export type OperationThroughput = vsStructuredData;
 
-export type OperationParamItem = {
+export type OperationItemParam = {
+  id?: string;
   paramName: string;
   paramInputPlaceholder?: string;
   paramDescription: string;
@@ -185,6 +189,7 @@ export type DroppedToolItem = {
   label: string;
   position?: nodeDropPosition;
 };
+export type MoveBlockDirection = "Up" | "Down";
 
 export type SharedOutputSelectedItem = {
   fullPath: string;
@@ -201,7 +206,7 @@ export type ExtendedOperationFilterType = OperationFilterType<
 >;
 
 export type OperationFilterType<
-  T extends (vsAnyPrimitives | vsAnyRawTypes)["type"]
+  T extends (vsAnyPrimitives | vsAnyRawTypes)["type"],
 > = {
   inputID: any;
   keyId: string;

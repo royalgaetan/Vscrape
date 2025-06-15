@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { VsOperationBlockType } from "./workflow_editor/types/w_types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -36,35 +35,35 @@ export const deepFreeze = <T>(obj: T): T => {
   return obj;
 };
 
-export function deepClone<T>(
-  p0: Omit<VsOperationBlockType, "id">,
-  input: T
-): T {
-  const seen = new WeakMap();
+// export function deepClone<T>(
+//   p0: Omit<VsOperationBlockType, "id">,
+//   input: T
+// ): T {
+//   const seen = new WeakMap();
 
-  const clone = (value: any): any => {
-    if (value === null || typeof value !== "object") return value;
-    if (seen.has(value)) return seen.get(value);
+//   const clone = (value: any): any => {
+//     if (value === null || typeof value !== "object") return value;
+//     if (seen.has(value)) return seen.get(value);
 
-    if (Array.isArray(value)) {
-      const arr = [] as any;
-      seen.set(value, arr);
-      for (const item of value) arr.push(clone(item));
-      return arr;
-    }
+//     if (Array.isArray(value)) {
+//       const arr = [] as any;
+//       seen.set(value, arr);
+//       for (const item of value) arr.push(clone(item));
+//       return arr;
+//     }
 
-    const result: any = {};
-    seen.set(value, result);
+//     const result: any = {};
+//     seen.set(value, result);
 
-    for (const key of Reflect.ownKeys(value)) {
-      if (typeof key === "symbol") continue;
-      const val = value[key as keyof typeof value];
-      if (typeof val === "function") continue;
-      result[key] = clone(val);
-    }
+//     for (const key of Reflect.ownKeys(value)) {
+//       if (typeof key === "symbol") continue;
+//       const val = value[key as keyof typeof value];
+//       if (typeof val === "function") continue;
+//       result[key] = clone(val);
+//     }
 
-    return result;
-  };
+//     return result;
+//   };
 
-  return clone(input);
-}
+//   return clone(input);
+// }

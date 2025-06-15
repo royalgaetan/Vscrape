@@ -1,11 +1,11 @@
 import ParamInput from "@/components/workflow_editor/param_inputs";
 import { cn } from "@/lib/utils";
-import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
-import { OperationParamItem } from "@/lib/workflow_editor/types/w_types";
+import { OperationItem } from "@/lib/workflow_editor/classes/operation_block";
+import { OperationItemParam } from "@/lib/workflow_editor/types/w_types";
 import { useState } from "react";
 
-const OperationParamCard = ({
-  currentOperationBlock,
+const OperationItemParamCard = ({
+  currentOperationItem,
   paramData,
   className,
   inputClassName,
@@ -13,23 +13,23 @@ const OperationParamCard = ({
   isWithinAGroup,
   hasError,
 }: {
-  currentOperationBlock: OperationBlock;
-  paramData: OperationParamItem;
+  currentOperationItem: OperationItem;
+  paramData: OperationItemParam;
   className?: string;
   inputClassName?: string;
   labelClassName?: string;
   isWithinAGroup: boolean;
   hasError?: boolean;
 }) => {
-  const getParam = (): OperationParamItem | undefined => {
-    return currentOperationBlock?.params
+  const getParam = (): OperationItemParam | undefined => {
+    return currentOperationItem?.itemParams
       ?.flatMap((p) => p)
       .find((p) => p.paramName === paramData.paramName);
   };
 
   const [internalValue, setInternalValue] = useState<any>(getParam()?.value);
 
-  const updateParamValue = (param: OperationParamItem, newValue: any) => {
+  const updateParamValue = (param: OperationItemParam, newValue: any) => {
     param.value = newValue;
     return param;
   };
@@ -37,24 +37,26 @@ const OperationParamCard = ({
   const onValueChange = (newValue: any) => {
     setInternalValue(newValue);
 
-    if (!currentOperationBlock || !currentOperationBlock.params) return;
+    if (!currentOperationItem || !currentOperationItem.itemParams) return;
 
-    const updatedOperationParams = currentOperationBlock.params.map((param) => {
-      if (Array.isArray(param)) {
-        return param.map((subParam) => {
-          if (subParam.paramName === paramData.paramName) {
-            return updateParamValue(subParam, newValue);
+    const updatedOperationParams = currentOperationItem.itemParams.map(
+      (param) => {
+        if (Array.isArray(param)) {
+          return param.map((subParam) => {
+            if (subParam.paramName === paramData.paramName) {
+              return updateParamValue(subParam, newValue);
+            }
+            return subParam;
+          });
+        } else {
+          if (param.paramName === paramData.paramName) {
+            return updateParamValue(param, newValue);
           }
-          return subParam;
-        });
-      } else {
-        if (param.paramName === paramData.paramName) {
-          return updateParamValue(param, newValue);
+          return param;
         }
-        return param;
       }
-    });
-    currentOperationBlock.params = updatedOperationParams;
+    );
+    currentOperationItem.itemParams = updatedOperationParams;
   };
 
   return (
@@ -95,4 +97,4 @@ const OperationParamCard = ({
   );
 };
 
-export default OperationParamCard;
+export default OperationItemParamCard;
