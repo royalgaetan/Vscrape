@@ -21,6 +21,7 @@ const CronBlockList = ({
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const currentEditor = useWorkflowEditorStore((s) => s.currentEditor);
   // End Store
   const [cronBlock, setCronBlock] = useState(
     currentNode ? (currentNode.block as CronBlock) : undefined
@@ -60,7 +61,11 @@ const CronBlockList = ({
         // /Content
         <div
           key={cronBlock.id}
-          className="relative group/cronBlock flex flex-col w-full px-3 py-4 border border-border overflow-clip rounded-md bg-neutral-100/20 transition-all duration-200"
+          className={cn(
+            "relative group/cronBlock flex flex-col w-full px-3 py-4 ring-2 ring-transparent border border-border overflow-clip rounded-md bg-neutral-100/20 transition-all duration-200",
+            currentEditor.errors?.has(cronBlock.id) &&
+              "border-destructive/90 ring-destructive/40"
+          )}
         >
           {/* Background Icon */}
           <div className="absolute bottom-0 pointer-events-none z-[9]">

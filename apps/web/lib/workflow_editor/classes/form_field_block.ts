@@ -1,8 +1,10 @@
 import {
   MoveBlockDirection,
+  OutputDataType,
   VsFormFieldItemType,
   VsFormInputFieldTypeUnion,
 } from "../types/w_types";
+import { getInvalidInputs } from "../utils/w_utils";
 import { ObservableMixin } from "./mixins";
 
 export class FormBlock extends ObservableMixin() {
@@ -87,6 +89,31 @@ export class FormBlock extends ObservableMixin() {
     this.notifyAll();
   }
 
+  // ---------------------------------------------------------------------------
+
+  // OutputData
+  get outputData(): OutputDataType | undefined {
+    const merged = this._fields.reduce((acc, f) => {
+      const key = f.fieldLabel;
+      const fieldValue = f.fieldValue;
+      const fieldType = f.fieldType;
+      if (fieldValue !== undefined) {
+        acc[key] = {
+          type: fieldType as any,
+          value: fieldValue,
+        };
+      }
+      return acc;
+    }, {} as OutputDataType);
+
+    return Object.keys(merged).length > 0 ? merged : undefined;
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return this._fields.every((f) => f.hasValidInputs());
+  }
+
   // To Object
   toObject(): object {
     return {
@@ -117,6 +144,8 @@ export class FormFieldItem extends ObservableMixin() {
   // Special
   private _isMultiline?: boolean;
   private _acceptedFileExtensions?: string[];
+
+  private _fieldOutputData?: OutputDataType;
 
   constructor(formField: VsFormFieldItemType) {
     super();
@@ -255,6 +284,20 @@ export class FormFieldItem extends ObservableMixin() {
   // -----------------------------------------------
   // ---------------- End Specials -----------------
   // -----------------------------------------------
+
+  // Output: Add getter + setter
+  get fieldOutputData(): OutputDataType | undefined {
+    return this._fieldOutputData;
+  }
+  set fieldOutputData(outputsVal: OutputDataType) {
+    this._fieldOutputData = outputsVal;
+    this.notifyAll();
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return getInvalidInputs(this).length === 0;
+  }
 
   // To Object
   toObject(): object {

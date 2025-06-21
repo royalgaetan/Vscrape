@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PenLineIcon, Trash2 } from "lucide-react";
 import { cloneDeep } from "lodash";
+import { insertOrRemoveIdsFromCurrentEditorErrors } from "@/lib/workflow_editor/utils/w_utils";
 
 const DataPreviewList = ({
   onPreviewItemEdit,
@@ -20,6 +21,7 @@ const DataPreviewList = ({
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const currentEditor = useWorkflowEditorStore((s) => s.currentEditor);
   // End Store
   const [nodeBlock, setNodeBlock] = useState(
     currentNode ? (currentNode.block as OperationBlock) : undefined
@@ -52,7 +54,11 @@ const DataPreviewList = ({
               return (
                 <div
                   key={previewItem.id}
-                  className="relative flex flex-1 min-h-36 justify-center items-center w-full mb-10 group/dataPreviewItem border border-border ring-0 hover:ring-2 ring-border overflow-clip rounded-md bg-neutral-100/20 transition-all duration-150"
+                  className={cn(
+                    "relative flex flex-1 min-h-36 justify-center items-center w-full mb-10 group/dataPreviewItem border border-border ring-0 hover:ring-2 ring-border overflow-clip rounded-md bg-neutral-100/20 transition-all duration-150",
+                    currentEditor.errors?.has(previewItem.id) &&
+                      "ring-2 border-destructive/90 ring-destructive/40"
+                  )}
                 >
                   {/* Action Buttons: Edit | Delete */}
                   <div className="absolute top-1 right-1 group-hover/dataPreviewItem:flex hidden flex-1 gap-1 justify-start items-center pt-1">
@@ -77,6 +83,11 @@ const DataPreviewList = ({
                           "!h-6 p-2 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
                         )}
                         onClick={() => {
+                          insertOrRemoveIdsFromCurrentEditorErrors({
+                            fromId: previewItem.id,
+                            initialNodeId: currentNode.id,
+                            action: "remove",
+                          });
                           onPreviewItemDelete(previewItem.id);
                         }}
                       >

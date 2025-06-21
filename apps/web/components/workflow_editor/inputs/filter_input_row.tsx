@@ -43,6 +43,9 @@ type SingleFilterRowProps = {
   titleContent?: string;
   onEdit?: () => void;
   onError?: (val: boolean) => void;
+
+  nodeId?: string;
+  itemId?: string;
 };
 
 const SingleFilterRow = ({
@@ -57,6 +60,9 @@ const SingleFilterRow = ({
   isCondition,
   titleContent,
   index,
+
+  nodeId,
+  itemId,
 }: SingleFilterRowProps) => {
   const [isEditing, setIsEditing] = useState<boolean>(
     initialIsEditing
@@ -344,6 +350,8 @@ const SingleFilterRow = ({
             {/* Input ID: let user add the input from which filter will be applied to */}
             <div className="flex !w-1/3 max-w-[5.1rem]">
               <DnDTextInput
+                nodeId={nodeId}
+                itemId={itemId}
                 placeholder={"Input ID..."}
                 inputType="text"
                 hasError={errorInputID}
@@ -422,6 +430,8 @@ const SingleFilterRow = ({
               {valueInputsSchema.map((inputSchema, idx) => {
                 return (
                   <FilterValueInput
+                    nodeId={nodeId}
+                    itemId={itemId}
                     initialValue={
                       Array.isArray(filterObj.filterValue)
                         ? filterObj.filterValue[idx]

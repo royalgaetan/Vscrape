@@ -18,22 +18,26 @@ import { toCleanUrl } from "@/lib/string_utils";
 import CustomSwitchInput from "../../inputs/custom_switch_input";
 import { cn } from "@/lib/utils";
 import { cloneDeep } from "lodash";
+import {
+  getInvalidInputs,
+  insertOrRemoveIdsFromCurrentEditorErrors,
+} from "@/lib/workflow_editor/utils/w_utils";
 
 const SingleWebhookEditorPanel = ({
-  nodeOrigin,
-  webhookBlockOrigin,
+  initialNode,
+  initialWebhookBlock,
   onBack,
   onSave,
   displayBackButton,
 }: {
-  nodeOrigin: VsNode;
-  webhookBlockOrigin: WebhookBlock;
+  initialNode: VsNode;
+  initialWebhookBlock: WebhookBlock;
   onBack?: () => void;
   onSave: (block?: WebhookBlock) => void;
   displayBackButton?: boolean;
 }) => {
   const [currentBlock, setCurrentBlock] = useState<WebhookBlock>(
-    cloneDeep(webhookBlockOrigin)
+    cloneDeep(initialWebhookBlock)
   );
 
   // State Values:
@@ -58,13 +62,13 @@ const SingleWebhookEditorPanel = ({
     await delay(400);
 
     try {
-      // Errors Checking
-      errorChecker();
-
       // Save entered values to original block
       currentBlock.endpointUrl = endpointURL;
       currentBlock.httpMethod = httpMethod;
       currentBlock.authToken = authToken;
+
+      // Errors Checking
+      errorChecker();
 
       setIsSavingBlock(false);
       setSavingBlockResultIcon(Check);
@@ -87,18 +91,27 @@ const SingleWebhookEditorPanel = ({
   };
 
   const errorChecker = () => {
-    const errFields: string[] = [];
-    if (endpointURL.length < 1) {
-      errFields.push("endpointURL");
-    }
-    if (!httpMethod) {
-      errFields.push("httpMethod");
-    }
+    // Get Invalid Inputs
+    const errFields = getInvalidInputs(currentBlock);
 
     if (errFields.length > 0) {
+      // Add the current "Webhook Id" + "Parent Node Id" among CurrentEditor errors list
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentBlock.id,
+        initialNodeId: initialNode.id,
+        action: "add",
+      });
+
       setErrorFields(errFields);
       console.log("errFields", errFields);
       throw new Error("Invalid Endpoint URL or Http Method");
+    } else {
+      // Remove the current "Webhook Id" + "Parent Node Id" among CurrentEditor errors list
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentBlock.id,
+        initialNodeId: initialNode.id,
+        action: "remove",
+      });
     }
   };
 
@@ -108,9 +121,19 @@ const SingleWebhookEditorPanel = ({
         {/* Header */}
         <div className="px-4 w-full">
           <PanelHeader
-            nodeOrigin={nodeOrigin}
+            nodeOrigin={initialNode}
             displayBackButton={displayBackButton}
-            onBack={() => onBack && onBack()}
+            onBack={() => {
+              if (onBack) {
+                insertOrRemoveIdsFromCurrentEditorErrors({
+                  fromId: currentBlock.id,
+                  initialNodeId: initialNode.id,
+                  action: "remove",
+                });
+
+                onBack();
+              }
+            }}
           />
         </div>
 

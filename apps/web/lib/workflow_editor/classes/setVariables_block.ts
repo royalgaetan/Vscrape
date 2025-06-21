@@ -1,3 +1,5 @@
+import { OutputDataType } from "../types/w_types";
+import { getInvalidInputs } from "../utils/w_utils";
 import { ObservableMixin } from "./mixins";
 
 export type SingleVariableAssignation = { varName: string; varValue: any };
@@ -29,6 +31,28 @@ export class SetVariablesBlock extends ObservableMixin() {
   set variableAssignations(arr: SingleVariableAssignation[]) {
     this._variableAssignations = arr;
     this.notifyAll();
+  }
+
+  // ----------------------------------------------------------------------
+  // OutputData
+  get outputData(): OutputDataType | undefined {
+    const merged = this._variableAssignations.reduce((acc, as) => {
+      const key = as.varName;
+      const value = as.varValue;
+      if ((key && key.length > 0) || value) {
+        acc[key] = { type: "primitive/text", value };
+      }
+      return acc;
+    }, {} as OutputDataType);
+
+    return Object.keys(merged).length > 0 ? merged : undefined;
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return this._variableAssignations.every(
+      (as) => getInvalidInputs(as).length === 0
+    );
   }
 
   // To Object

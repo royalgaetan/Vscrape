@@ -73,9 +73,15 @@ export type vsCustomSwitch = {
   value: string;
   type: (typeof vsPrimitiveMIMETypes)["customSwitch"];
 };
+
 export type vsRecord = {
   value: { key: string; value: any }[];
   type: (typeof vsPrimitiveMIMETypes)["record"];
+};
+
+export type vsCron = {
+  value: string;
+  type: (typeof vsPrimitiveMIMETypes)["cron"];
 };
 
 export type vsAnyPrimitives =
@@ -94,6 +100,7 @@ export type vsAnyPrimitives =
   | vsCheckbox
   | vsCustomSwitch
   | vsHidden
+  | vsCron
   | vsRecord;
 
 // Raw

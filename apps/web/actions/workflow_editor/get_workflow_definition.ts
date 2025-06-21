@@ -1,8 +1,10 @@
+import { WorkflowDefinition } from "@/lib/workflow_editor/types/w_types";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 
-export const getWorkflowDefinition = (): string | undefined => {
+export const getWorkflowDefinition = (): WorkflowDefinition | undefined => {
   // Store
   const editor = useWorkflowEditorStore.getState().currentEditor.editor;
+
   // End Store
   if (!editor) return;
   const nodes = editor.getNodes();
@@ -10,10 +12,10 @@ export const getWorkflowDefinition = (): string | undefined => {
 
   if (!nodes || nodes.length < 1) return;
 
-  const json = {
-    nodes: nodes.map((n) => n.toObject()),
-    connections: connections.map((c) => c.toObject()),
+  const wDefinition: WorkflowDefinition = {
+    nodes: nodes,
+    connections: connections,
   };
 
-  return JSON.stringify(json);
+  return wDefinition;
 };

@@ -27,6 +27,7 @@ const CustomBranchNode = ({
   const setElementIdToActOn = useWorkflowEditorStore(
     (s) => s.setElementIdToActOn
   );
+  const currentEditor = useWorkflowEditorStore((s) => s.currentEditor);
   // End Store
 
   useEffect(() => {
@@ -54,8 +55,10 @@ const CustomBranchNode = ({
         }
       }}
       className={cn(
-        "relative flex flex-col justify-center cursor-pointer items-center group min-w-[6rem] w-[calc(100%+2rem)] max-w-[13rem] gap-3 border-[3px] border-transparent select-none hover:opacity-95 transition-all duration-500",
-        node.selected && "border-border/70 rounded-2xl"
+        "relative flex flex-col justify-center cursor-pointer items-center rounded-3xl ring-4 ring-transparent group min-w-[6rem] w-[calc(100%+2rem)] max-w-[13rem] gap-3 border-[3px] border-transparent select-none hover:opacity-95 transition-all duration-500",
+        node.selected && "border-border/70",
+        currentEditor.errors?.has(node.id) &&
+          "border-destructive/90 ring-destructive/40"
       )}
     >
       {/* All Content */}

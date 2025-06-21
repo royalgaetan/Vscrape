@@ -27,6 +27,8 @@ import { WebhookBlock } from "../classes/webhook_block";
 import { WaitBlock } from "../classes/wait_block";
 import { SetVariablesBlock } from "../classes/setVariables_block";
 import { FormBlock } from "../classes/form_field_block";
+import { VsNode } from "../classes/node";
+import { VsConnection } from "../classes/connections";
 
 export type VsNodeType = {
   id?: string;
@@ -114,10 +116,7 @@ export type VsOperationItemType = {
   operationItemDescription: string;
   nodeName: (typeof workflowEditorNodes)[number]["label"];
   itemParams?: (OperationItemParam | OperationItemParam[])[];
-  itemInputFilters?: OperationFilterType<
-    (vsAnyPrimitives | vsAnyRawTypes)["type"]
-  >[]; // Many filters can be applied to many (incoming) inputs
-  itemOutputs?: OperationThroughput; // An Output here can be: of any type
+  itemOutputData?: OutputDataType; // An Output here can be: of any type
   skipDuplicate?: boolean;
   isDisabled?: boolean;
   loopThrough?: "All items" | number | boolean;
@@ -170,7 +169,7 @@ export type VsCronBlockType = {
 // ---------------------------------------------------------
 // ---------------------------------------------------------
 
-export type OperationThroughput = vsStructuredData;
+export type OutputDataType = vsStructuredData;
 
 export type OperationItemParam = {
   id?: string;
@@ -223,6 +222,7 @@ export type PreviousInputDataType = {
   label: string;
   tooltip: string;
   dataTransfer: string;
+  data?: OutputDataType;
 };
 
 // ---------------------------------------------------------
@@ -271,3 +271,16 @@ export type PhaseLog = {
 };
 
 export type NodeTest = "failed" | "success" | "running";
+
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+// ---------------------------------------------------------
+
+// For: ExecutionPlan = { Phase1: [NodeA_task1, NodeA_task2], Phase2: [NodeB_task1, NodeC_task1], etc... }
+export type ExecutionPlan = Record<number, VsNode[]>;
+
+export type WorkflowDefinition = {
+  nodes: VsNode[];
+  connections: VsConnection<VsNode>[];
+};

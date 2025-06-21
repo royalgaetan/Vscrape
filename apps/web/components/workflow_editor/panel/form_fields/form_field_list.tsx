@@ -35,6 +35,8 @@ const FormFieldsList = ({
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const currentEditor = useWorkflowEditorStore((s) => s.currentEditor);
+  const setCurrentEditor = useWorkflowEditorStore((s) => s.setCurrentEditor);
   // End Store
   const [nodeFormBlock, setNodeFormBlock] = useState(
     currentNode ? (currentNode.block as FormBlock) : new FormBlock()
@@ -109,7 +111,11 @@ const FormFieldsList = ({
                 return (
                   <div
                     key={field.id}
-                    className="group/fieldItem flex flex-col w-full mb-1 px-3 py-1 hover:bg-neutral-200/20 transition-all duration-200"
+                    className={cn(
+                      "group/fieldItem flex flex-col w-full mb-1 px-3 py-1 border-[3px] border-transparent hover:bg-neutral-200/20 transition-all duration-200",
+                      currentEditor.errors?.has(field.id) &&
+                        "border-destructive/70 rounded-sm"
+                    )}
                   >
                     <FormFieldBlockPreview key={field.id} fieldItem={field} />
                     {/* Action Buttons: Edit | Delete | Move Up | Move Down */}
@@ -137,7 +143,21 @@ const FormFieldsList = ({
                             className={cn(
                               "!w-5 !h-5 p-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
                             )}
-                            onClick={() => onFieldItemDelete(field.id)}
+                            onClick={() => {
+                              // Remove the current "Operation Item Id" + "Parent Node Id" among CurrentEditor errors list
+                              const updSet = currentEditor.errors;
+                              if (updSet) {
+                                updSet?.delete(field.id);
+                                updSet?.delete(currentNode.id);
+                              }
+                              setCurrentEditor({
+                                editor: currentEditor.editor,
+                                state: currentEditor.state,
+                                errors: updSet,
+                              });
+                              // Then delete the Field Item
+                              onFieldItemDelete(field.id);
+                            }}
                           >
                             <Trash2 className="!size-3" />
                           </Button>

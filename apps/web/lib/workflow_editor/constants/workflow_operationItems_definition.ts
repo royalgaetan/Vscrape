@@ -70,7 +70,6 @@ export const workflowOperationItems: VsOperationItemType[] = [
           },
         ],
       },
-
       [
         {
           paramName: "Render JS",
@@ -96,8 +95,51 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {
+      // The URL that was scraped
+      url: {
+        type: "primitive/url",
+        value: "",
+      },
+      // HTTP status
+      statusCode: {
+        type: "primitive/number",
+        value: "" as any,
+      },
+      // "text/html", "application/json", etc.
+      contentType: {
+        type: "primitive/text",
+        value: "",
+      },
+      // The raw HTML of the page
+      rawHtml: {
+        type: "primitive/text",
+        value: "",
+      },
+      // Parsed DOM (optional, if using jsdom/cheerio)
+      document: {
+        type: "text/html",
+        name: "",
+        sizeInBytes: 0,
+        value: null,
+        url: "",
+      },
+      // Document Metadata
+      metadata: {
+        title: {
+          type: "primitive/text",
+          value: "",
+        },
+        description: {
+          type: "primitive/text",
+          value: "",
+        },
+        ogImage: {
+          type: "primitive/text",
+          value: "",
+        },
+      },
+    },
   },
   {
     operationItemName: "Auto-Paginate and Scrape",
@@ -142,8 +184,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -200,8 +241,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Parse CSV",
@@ -248,8 +288,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Parse PDF",
@@ -304,8 +343,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Read Image File",
@@ -331,8 +369,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "AI-Powered File Summary",
@@ -366,8 +403,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -406,8 +442,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Add to Knowledge Base",
@@ -444,8 +479,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -509,8 +543,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -585,8 +618,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -653,8 +685,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Send SMS",
@@ -687,8 +718,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Send Chat Message",
@@ -706,8 +736,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
     ],
     isDisabled: true,
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Initiate Phone Call",
@@ -739,8 +768,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Send Voice Message (TTS)",
@@ -811,8 +839,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -855,8 +882,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Extract with Regex",
@@ -893,8 +919,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Extract Table from HTML",
@@ -923,8 +948,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Extract Named Entities",
@@ -981,8 +1005,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -1031,8 +1054,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Keyword-Based Tagging",
@@ -1065,8 +1087,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -1111,8 +1132,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Flatten Nested Structure",
@@ -1146,8 +1166,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Rebuild Nested Structure",
@@ -1174,8 +1193,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
 
   //
@@ -1201,8 +1219,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Change Case",
@@ -1234,8 +1251,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Replace Subtext",
@@ -1268,8 +1284,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Split Text",
@@ -1303,8 +1318,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Subtext",
@@ -1340,8 +1354,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Sanitize Text",
@@ -1379,8 +1392,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Normalize Accents",
@@ -1400,8 +1412,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Slugify",
@@ -1433,8 +1444,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Limit Length",
@@ -1466,8 +1476,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Remove Duplicates (Words or Lines)",
@@ -1498,8 +1507,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Translate Text",
@@ -1527,8 +1535,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Count Words/Characters",
@@ -1555,8 +1562,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Obfuscate / Mask Text",
@@ -1598,8 +1604,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Strip Punctuation",
@@ -1626,8 +1631,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Add Prefix / Suffix",
@@ -1662,8 +1666,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Pluralize or Singularize",
@@ -1689,8 +1692,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Randomize Text",
@@ -1725,8 +1727,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -1775,8 +1776,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Summarize or Rewrite Content",
@@ -1812,8 +1812,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Generate Metadata (SEO, Tags, Titles)",
@@ -1849,8 +1848,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Generate Image",
@@ -1900,8 +1898,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Generate Video (Short Loop)",
@@ -1935,8 +1932,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Generate Voice / Audio",
@@ -1979,8 +1975,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -2013,8 +2008,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Sentiment Scoring",
@@ -2040,8 +2034,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Emotion Detection",
@@ -2067,8 +2060,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Intent Classification",
@@ -2094,8 +2086,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Tone Classification",
@@ -2113,8 +2104,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Sentiment from Image",
@@ -2139,8 +2129,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -2163,8 +2152,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Company Info Lookup",
@@ -2182,8 +2170,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Social Profile Extraction",
@@ -2200,8 +2187,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "IP to Geo & ISP Info",
@@ -2219,8 +2205,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Phone Number Lookup",
@@ -2238,8 +2223,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Zip/Postal Code Enrichment",
@@ -2266,8 +2250,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -2318,8 +2301,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Crop Image",
@@ -2394,8 +2376,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Compress Image",
@@ -2426,8 +2407,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Blur Image",
@@ -2457,8 +2437,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Overlay Text / Watermark",
@@ -2523,8 +2502,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Rotate / Flip Image",
@@ -2561,8 +2539,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Remove Background",
@@ -2596,8 +2573,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Enhance Image (Super Resolution)",
@@ -2629,8 +2605,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Image Quality Enhancer",
@@ -2675,8 +2650,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Extract Dominant Colors",
@@ -2699,8 +2673,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Detect Faces and Objects",
@@ -2729,8 +2702,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Generate Thumbnail",
@@ -2768,8 +2740,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Add Shape & Border",
@@ -2826,8 +2797,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Apply Filters",
@@ -2882,8 +2852,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Image Fusion",
@@ -2938,8 +2907,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -2974,8 +2942,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Resize Video",
@@ -3013,8 +2980,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Overlay Text / Watermark",
@@ -3096,8 +3062,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Generate Thumbnail",
@@ -3139,8 +3104,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Compress Video",
@@ -3175,8 +3139,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Add Captions / Subtitles",
@@ -3227,8 +3190,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Speed Adjustment",
@@ -3261,8 +3223,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Smart Video Stitcher",
@@ -3316,8 +3277,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Auto Clean Audio",
@@ -3359,8 +3319,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Smart Highlights (AI)",
@@ -3411,8 +3370,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Apply Color Grade",
@@ -3461,8 +3419,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Smart Audio Mixer",
@@ -3506,8 +3463,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -3542,8 +3498,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Clean & Adjust Audio",
@@ -3588,8 +3543,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Add Background Music",
@@ -3629,8 +3583,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Auto-Censor & Filler Cutter",
@@ -3674,8 +3627,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Speed Adjustment",
@@ -3715,8 +3667,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Fade In / Fade Out",
@@ -3748,8 +3699,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Merge Audio",
@@ -3772,8 +3722,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Voice Isolation",
@@ -3798,8 +3747,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Compress Audio",
@@ -3832,8 +3780,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Transcribe Audio (AI)",
@@ -3871,8 +3818,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Summarize Audio (AI)",
@@ -3903,8 +3849,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Apply Styles",
@@ -3944,8 +3889,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -3992,8 +3936,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to CSV",
@@ -4023,8 +3966,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to Excel (XLSX)",
@@ -4054,8 +3996,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to Plain Text",
@@ -4078,8 +4019,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -4115,8 +4055,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to PNG",
@@ -4139,8 +4078,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to WebP",
@@ -4170,8 +4108,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to AVIF",
@@ -4202,8 +4139,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to TIFF",
@@ -4227,8 +4163,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to BMP",
@@ -4252,8 +4187,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to ICO",
@@ -4277,8 +4211,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to SVG",
@@ -4309,8 +4242,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -4365,8 +4297,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to WebM",
@@ -4432,8 +4363,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to MOV",
@@ -4499,8 +4429,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to AVI",
@@ -4566,8 +4495,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to MKV",
@@ -4633,8 +4561,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to GIF",
@@ -4673,8 +4600,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -4718,8 +4644,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to WAV",
@@ -4758,8 +4683,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to AAC",
@@ -4798,8 +4722,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to OGG",
@@ -4838,8 +4761,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to FLAC",
@@ -4878,8 +4800,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to M4A",
@@ -4918,8 +4839,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to Opus",
@@ -4958,8 +4878,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to AMR",
@@ -4998,8 +4917,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -5029,8 +4947,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to Hexadecimal",
@@ -5055,8 +4972,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to Binary",
@@ -5081,8 +4997,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to QR Code",
@@ -5132,8 +5047,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       ],
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -5169,8 +5083,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to HTML",
@@ -5246,8 +5159,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to Markdown",
@@ -5287,8 +5199,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to XML",
@@ -5326,8 +5237,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to YAML",
@@ -5358,8 +5268,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   {
     operationItemName: "Convert to LaTeX",
@@ -5395,8 +5304,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
 
   //
@@ -5463,8 +5371,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -5516,8 +5423,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -5566,8 +5472,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -5619,8 +5524,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -5678,8 +5582,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //
@@ -5728,8 +5631,7 @@ export const workflowOperationItems: VsOperationItemType[] = [
       },
     ],
 
-    itemInputFilters: [],
-    itemOutputs: {},
+    itemOutputData: {},
   },
   //
   //

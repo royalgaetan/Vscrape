@@ -107,7 +107,7 @@ const NodeActionButtons = () => {
       </SimpleTooltip>
 
       {/* Duplicate Node */}
-      {!entryPointNodesLabels.includes(currentNode?.label ?? "") && (
+      {!entryPointNodesLabels().includes(currentNode?.label ?? "") && (
         <SimpleTooltip tooltipText="Duplicate Node" side="bottom">
           <Button
             variant={"ghost"}

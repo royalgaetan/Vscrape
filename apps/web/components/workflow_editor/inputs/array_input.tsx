@@ -12,10 +12,15 @@ const ArrayInput = ({
   initialArray,
   onChange,
   hasError,
+  nodeId,
+  itemId,
 }: {
   initialArray: RecordArray;
   onChange?: (newArray: any[]) => void;
   hasError?: boolean;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const [localArray, setLocalArray] = useState<any[]>(initialArray);
 
@@ -40,6 +45,8 @@ const ArrayInput = ({
             <DnDTextInput
               key={"value"}
               placeholder={"Value..."}
+              nodeId={nodeId}
+              itemId={itemId}
               inputType="text"
               className="min-w-[var(--dndInputWidth)] !max-w-[var(--dndInputWidth)] mb-0"
               inputValue={arrItem}

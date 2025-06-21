@@ -6,6 +6,10 @@ import { Check, PenLineIcon, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import DnDTextInput from "../../inputs/dnd_text_input";
 import { extractTextFromHTML, toStringSafe } from "@/lib/string_utils";
+import {
+  getInvalidInputs,
+  insertOrRemoveIdsFromCurrentEditorErrors,
+} from "@/lib/workflow_editor/utils/w_utils";
 
 const SetVariablesBlockCard = ({
   initialAssignation,
@@ -14,6 +18,8 @@ const SetVariablesBlockCard = ({
   onSave,
   onDelete,
   onEdit,
+  nodeId,
+  itemId,
 }: {
   initialAssignation: SingleVariableAssignation;
   initialEditingValue?: boolean;
@@ -21,6 +27,9 @@ const SetVariablesBlockCard = ({
   onSave(newAssign: SingleVariableAssignation): void;
   onDelete: () => void;
   onEdit: () => void;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(
     initialEditingValue ?? false
@@ -62,6 +71,8 @@ const SetVariablesBlockCard = ({
               placeholder={"Name..."}
               inputType="text"
               hasError={errorFields.includes("varNameField")}
+              nodeId={nodeId}
+              itemId={itemId}
               disableDnD={true}
               inputValue={localVarName}
               className={cn(
@@ -81,6 +92,8 @@ const SetVariablesBlockCard = ({
               placeholder={"Value..."}
               inputType="text"
               hasError={errorFields.includes("varValueField")}
+              nodeId={nodeId}
+              itemId={itemId}
               inputValue={localVarValue}
               className={cn(
                 "!text-xs flex-1 w-full !h-7 rounded-sm placeholder:font-semibold placeholder:text-muted-foreground/70"
@@ -103,25 +116,38 @@ const SetVariablesBlockCard = ({
                   "!w-7 !h-7 px-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
                 )}
                 onClick={() => {
-                  const errFields: string[] = [];
                   // Error Checker
-                  if (localVarName.length === 0) {
-                    errFields.push("varNameField");
-                  }
-                  if (
-                    extractTextFromHTML(toStringSafe(localVarValue)).length ===
-                    0
-                  ) {
-                    errFields.push("varValueField");
-                  }
+                  // Get Invalid Inputs
+                  const errFields = getInvalidInputs({
+                    varName: localVarName,
+                    varValue: localVarValue,
+                  });
+
                   if (errFields.length > 0) {
+                    // Add the current "Item Id" + "Parent Node Id" among CurrentEditor errors list
+                    if (nodeId) {
+                      insertOrRemoveIdsFromCurrentEditorErrors({
+                        fromId: "",
+                        initialNodeId: nodeId,
+                        action: "add",
+                      });
+                    }
                     setErrorFields(errFields);
                     return;
-                  }
+                  } else {
+                    // Remove the current "Item Id" + "Parent Node Id" among CurrentEditor errors list
+                    if (nodeId) {
+                      insertOrRemoveIdsFromCurrentEditorErrors({
+                        fromId: "",
+                        initialNodeId: nodeId,
+                        action: "remove",
+                      });
+                    }
 
-                  // Proceed to saving...
-                  onSave({ varName: localVarName, varValue: localVarValue });
-                  setIsEditing(false);
+                    // Proceed to saving...
+                    onSave({ varName: localVarName, varValue: localVarValue });
+                    setIsEditing(false);
+                  }
                 }}
               >
                 <Check className="stroke-[3px]" />
@@ -136,6 +162,13 @@ const SetVariablesBlockCard = ({
                   "!w-7 !h-7 px-0 flex items-center justify-center hover:bg-neutral-200/60 bg-transparent text-neutral-500 cursor-pointer rounded-sm transition-all duration-300"
                 )}
                 onClick={() => {
+                  if (nodeId) {
+                    insertOrRemoveIdsFromCurrentEditorErrors({
+                      fromId: "",
+                      initialNodeId: nodeId,
+                      action: "remove",
+                    });
+                  }
                   onDelete();
                 }}
               >

@@ -1,3 +1,4 @@
+import { OutputDataType } from "../types/w_types";
 import { ObservableMixin } from "./mixins";
 
 export class WaitBlock extends ObservableMixin() {
@@ -22,6 +23,22 @@ export class WaitBlock extends ObservableMixin() {
   set durationMs(value: number) {
     this._durationMs = value;
     this.notifyAll();
+  }
+
+  // --------------------------------------------------
+  // OutputData
+  get outputData(): OutputDataType | undefined {
+    return {
+      duration: {
+        type: "primitive/milliseconds",
+        value: this._durationMs,
+      },
+    };
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return true;
   }
 
   // To Object

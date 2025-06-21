@@ -12,6 +12,9 @@ const OperationItemParamCard = ({
   labelClassName,
   isWithinAGroup,
   hasError,
+
+  nodeId,
+  itemId,
 }: {
   currentOperationItem: OperationItem;
   paramData: OperationItemParam;
@@ -20,6 +23,9 @@ const OperationItemParamCard = ({
   labelClassName?: string;
   isWithinAGroup: boolean;
   hasError?: boolean;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const getParam = (): OperationItemParam | undefined => {
     return currentOperationItem?.itemParams
@@ -81,6 +87,8 @@ const OperationItemParamCard = ({
         )}
       >
         <ParamInput
+          nodeId={nodeId}
+          itemId={itemId}
           isWithinAGroup={isWithinAGroup}
           initialValue={internalValue}
           inputType={paramData.type}

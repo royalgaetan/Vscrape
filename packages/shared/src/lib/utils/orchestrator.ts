@@ -1,4 +1,4 @@
-import { Environment, ExecutionPlan, OrchestratorMode } from "../types/types";
+import { Environment, OrchestratorMode } from "../types/types";
 import { createEnvironment } from "./environment";
 
 // const fakeExecutionPlan: ExecutionPlan = {
@@ -19,13 +19,13 @@ const orchestrator = async ({
   executionPlan,
   mode,
 }: {
-  executionPlan: ExecutionPlan;
+  executionPlan: any;
   mode: OrchestratorMode;
 }): Promise<boolean> => {
   console.log(
     "Orchestrator Launched",
-    `\nMode: ${mode}`,
-    `\nWith: ${JSON.stringify(executionPlan)}`
+    `\nMode: ${mode}`
+    // `\nWith: ${JSON.stringify(executionPlan)}`
   );
 
   // Setup Environment

@@ -45,6 +45,7 @@ const CustomNode = ({
   const setElementIdToActOn = useWorkflowEditorStore(
     (s) => s.setElementIdToActOn
   );
+  const currentEditor = useWorkflowEditorStore((s) => s.currentEditor);
   // End Store
 
   useEffect(() => {
@@ -125,8 +126,10 @@ const CustomNode = ({
         }
       }}
       className={cn(
-        "relative flex flex-col justify-center cursor-pointer items-center group min-w-[6rem] w-[calc(100%+2rem)] max-w-[13rem] py-4 gap-3 border-[3px] border-transparent select-none hover:opacity-95 transition-all duration-0",
-        node.selected && "border-border/70 rounded-2xl"
+        "relative flex flex-col justify-center cursor-pointer items-center rounded-3xl ring-4 ring-transparent group min-w-[6rem] w-[calc(100%+2rem)] max-w-[13rem] py-4 gap-3 border-[3px] border-transparent select-none hover:opacity-95 transition-all duration-0",
+        node.selected && "border-border/70",
+        currentEditor.errors?.has(node.id) &&
+          "border-destructive/90 ring-destructive/40"
       )}
     >
       {/* Button: Grab (Move Node) */}
@@ -232,7 +235,7 @@ const CustomNode = ({
             </p>
             {/* Button: Duplicate */}
             {node.blockType !== "preview" &&
-            !entryPointNodesLabels.includes(node.label) ? (
+            !entryPointNodesLabels().includes(node.label) ? (
               <SimpleTooltip tooltipText="Duplicate" side="bottom">
                 <Button
                   variant={"ghost"}

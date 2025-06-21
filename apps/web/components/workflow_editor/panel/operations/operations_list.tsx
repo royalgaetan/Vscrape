@@ -19,6 +19,7 @@ const OperationsList = ({
 }) => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
+  const currentEditor = useWorkflowEditorStore((s) => s.currentEditor);
   // End Store
 
   if (!currentNode || !(currentNode.block instanceof OperationBlock)) {
@@ -49,7 +50,9 @@ const OperationsList = ({
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "group/operationItemButton relative flex flex-1 h-4 !py-[0.3rem] !w-full px-2 border border-border/50 transition-all duration-300 justify-center items-center gap-1 hover:bg-white bg-white cursor-pointer rounded-sm"
+                    "group/operationItemButton relative flex flex-1 h-4 !py-[0.3rem] !w-full px-2 ring-2 ring-transparent border border-border/50 transition-all duration-300 justify-center items-center gap-1 hover:bg-white bg-white cursor-pointer rounded-sm",
+                    currentEditor.errors?.has(operation.id) &&
+                      "border-destructive/90 ring-destructive/40"
                   )}
                   onClick={() => onOperationItemSelect(operation)}
                 >

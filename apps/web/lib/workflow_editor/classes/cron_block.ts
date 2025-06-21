@@ -1,4 +1,5 @@
-import { VsCronBlockType } from "../types/w_types";
+import { OutputDataType, VsCronBlockType } from "../types/w_types";
+import { getInvalidInputs } from "../utils/w_utils";
 import { ObservableMixin } from "./mixins";
 
 /* {
@@ -130,6 +131,19 @@ export class CronBlock extends ObservableMixin() {
   set configEndDate(value: Date) {
     this._configEndDate = value;
     this.notifyAll();
+  }
+
+  // --------------------------------------------------
+  // OutputData
+  get outputData(): OutputDataType | undefined {
+    return {
+      "Cron Expression": { type: "primitive/cron", value: this.cronExp },
+    };
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return getInvalidInputs(this).length === 0;
   }
 
   // To Object

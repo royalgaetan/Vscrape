@@ -12,10 +12,15 @@ const RecordInput = ({
   initialRecords,
   onChange,
   hasError,
+  nodeId,
+  itemId,
 }: {
   hasError?: boolean;
   initialRecords: RecordArray;
   onChange?: (newRecords: RecordArray) => void;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const [localRecords, setLocalRecords] = useState<RecordArray>(initialRecords);
 
@@ -35,6 +40,8 @@ const RecordInput = ({
           <SingleRecordRow
             initialRecordKey={record.key}
             initialRecordValue={record.value}
+            nodeId={nodeId}
+            itemId={itemId}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -77,6 +84,9 @@ type SingleRecordRowProps = {
   isLast: boolean;
   initialRecordKey: any;
   initialRecordValue: any;
+
+  nodeId?: string;
+  itemId?: string;
 };
 
 const SingleRecordRow = ({
@@ -88,6 +98,9 @@ const SingleRecordRow = ({
   isLast,
   initialRecordKey,
   initialRecordValue,
+
+  nodeId,
+  itemId,
 }: SingleRecordRowProps) => {
   const [recordkey, setRecordkey] = useState<string>(initialRecordKey);
   const [recordValue, setRecordValue] = useState<string>(initialRecordValue);
@@ -103,6 +116,8 @@ const SingleRecordRow = ({
         placeholder={"Name..."}
         className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
         inputType="text"
+        nodeId={nodeId}
+        itemId={itemId}
         inputValue={recordkey}
         onKeyDown={onKeyDown}
         // onBlur={(text) => {
@@ -125,6 +140,8 @@ const SingleRecordRow = ({
         key={"value"}
         placeholder={"Value..."}
         inputType="text"
+        nodeId={nodeId}
+        itemId={itemId}
         className="min-w-[var(--dndInputWidth)] max-w-[var(--dndInputWidth)]"
         inputValue={recordValue}
         onKeyDown={onKeyDown}

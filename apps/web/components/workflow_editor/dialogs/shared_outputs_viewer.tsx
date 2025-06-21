@@ -2,28 +2,35 @@ import { generateHexRandomString } from "@/lib/numbers_utils";
 import { humanize, toStringSafe } from "@/lib/string_utils";
 import { cn, isRecord } from "@/lib/utils";
 import { describeMIME } from "@/lib/workflow_editor/types/mime_types";
-import { SharedOutputSelectedItem } from "@/lib/workflow_editor/types/w_types";
+import {
+  OutputDataType,
+  SharedOutputSelectedItem,
+} from "@/lib/workflow_editor/types/w_types";
 import React from "react";
 
 const SharedOutputsViewer = ({
-  object,
+  prevElements,
   onObjectSelected,
 }: {
-  object: Record<string, any>;
+  prevElements?: OutputDataType;
   onObjectSelected: (elementSelected: SharedOutputSelectedItem) => void;
 }) => {
   return (
     <div className="flex flex-col w-full h-[65vh] p-4 bg-neutral-100 border border-border rounded-sm overflow-y-auto scrollbar-hide">
-      <div>
+      {!prevElements ? (
+        <div className="flex flex-1 items-center justify-center text-neutral-500 font-semibold !text-xs h-24">
+          Nothing to pick.
+        </div>
+      ) : (
         <ObjectChildren
           level={0}
           path=""
-          obj={object}
+          obj={prevElements}
           onObjectSelected={(elementSelected) => {
             onObjectSelected(elementSelected);
           }}
         />
-      </div>
+      )}
     </div>
   );
 };

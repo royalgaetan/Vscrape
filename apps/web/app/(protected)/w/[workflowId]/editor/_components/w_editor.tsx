@@ -19,6 +19,7 @@ import {
   getVsNodeFromLabel,
   hasAlreadyEntryPoint,
   hasCycleInAdjacency,
+  rebuildExecutionPlan,
 } from "@/lib/workflow_editor/utils/w_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { VsConnection } from "@/lib/workflow_editor/classes/connections";
@@ -240,7 +241,7 @@ const WorkflowEditor = ({
     editor.use(area);
     area.use(connection);
     area.use(render);
-    setCurrentEditor(editor);
+    setCurrentEditor({ editor: editor });
 
     // Restrict Zoom
     AreaExtensions.restrictor(area, {
@@ -282,7 +283,7 @@ const WorkflowEditor = ({
 
     // Listen to Workflow Editor Store
     const unsub = useWorkflowEditorStore.subscribe((state) => {
-      // Listen to OptionBar Display State
+      // Listen to WorkflowPanel Display State
       if (state.isWorkflowPanelOpen === false) {
         selectorRef.current && selectorRef.current?.unselectAll();
       }
@@ -340,12 +341,14 @@ const WorkflowEditor = ({
     );
 
     area.addPipe((context) => {
-      // On New Connection: Check for Cycles (D.A.G)
+      // On New Connection
       if (context.type === "connectioncreated") {
+        // Rebuild the ExecutionPlan (to propagate Shared outputData)
+        rebuildExecutionPlan();
+
+        // Check for Cycles (D.A.G)
         const adj = buildAdjacency(editor);
         if (hasCycleInAdjacency(adj)) {
-          const editor = editorInstanceRef.current;
-          if (!editor) throw new Error("Can't load editor...");
           editor.removeConnection(context.data.id);
           toast.error(
             "Oops! Looks like your workflow loops back on itself—We've removed your last connection.",
@@ -357,7 +360,13 @@ const WorkflowEditor = ({
           return;
         }
       }
-      // Picked: Node "full" Clicked
+      // On Connection removed
+      if (context.type === "connectionremoved") {
+        // Rebuild the ExecutionPlan (to propagate Shared outputData)
+        rebuildExecutionPlan();
+      }
+
+      // Picked: Node "fully" Clicked
       if (context.type === "nodepicked") {
         isTranslatingCurrentNode.current = false;
         selectableNodes.unselect(context.data.id);
@@ -415,7 +424,7 @@ const WorkflowEditor = ({
 
     // Check for Double EntryPoints
     if (
-      entryPointNodesLabels.includes(droppedItem.label) &&
+      entryPointNodesLabels().includes(droppedItem.label) &&
       hasAlreadyEntryPoint(editor)
     ) {
       toast.error("Only one starting point allowed in a workflow.", {
@@ -453,7 +462,7 @@ const WorkflowEditor = ({
 
     if (dx < threshold && dy < threshold) {
       // Click
-      toggleWorkflowPanel(false);
+      // toggleWorkflowPanel(false);
     } else {
       // Pan / Drag
     }
@@ -482,7 +491,7 @@ const WorkflowEditor = ({
 
               const editor = editorInstanceRef.current;
               if (!editor) return;
-              setCurrentEditor(editor, "rendered");
+              setCurrentEditor({ editor, state: "rendered" });
             }}
           />
         </div>

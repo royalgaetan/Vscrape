@@ -20,24 +20,28 @@ import { cronPresets } from "@/lib/date_time_utils";
 import { isValidCron } from "cron-validator";
 import { toast } from "sonner";
 import { cloneDeep } from "lodash";
+import {
+  getInvalidInputs,
+  insertOrRemoveIdsFromCurrentEditorErrors,
+} from "@/lib/workflow_editor/utils/w_utils";
 
 const SingleCronEditorPanel = ({
-  nodeOrigin,
-  cronBlockOrigin,
+  initialNode,
+  initialCronBlock,
   onBack,
   onSave,
   onDelete,
   displayBackButton,
 }: {
-  nodeOrigin: VsNode;
-  cronBlockOrigin?: CronBlock;
+  initialNode: VsNode;
+  initialCronBlock?: CronBlock;
   onBack?: () => void;
   onSave: (block?: CronBlock) => void;
   onDelete: () => void;
   displayBackButton?: boolean;
 }) => {
   const [currentBlock, setCurrentBlock] = useState<CronBlock | undefined>(
-    cloneDeep(cronBlockOrigin) ?? getNewCronBlock()
+    cloneDeep(initialCronBlock) ?? getNewCronBlock()
   );
   const [isLoadingBlock, setIsLoadingBlock] = useState(false);
   const [errorFields, setErrorFields] = useState<string[]>([]);
@@ -83,9 +87,6 @@ const SingleCronEditorPanel = ({
     try {
       if (!currentBlock) throw new Error("Can't save this Cron! Try again.");
 
-      // Errors Checking
-      errorChecker();
-
       // Save Entered Values to Original Block
       if (configMinute) currentBlock.configMinute = configMinute;
       if (configHour) currentBlock.configHour = configHour;
@@ -96,6 +97,9 @@ const SingleCronEditorPanel = ({
       if (configStartDate) currentBlock.configStartDate = configStartDate;
       if (configEndDate) currentBlock.configEndDate = configEndDate;
       if (configTimezone) currentBlock.configTimezone = configTimezone;
+
+      // Error Checking
+      errorChecker(currentBlock);
 
       // Cron Validation
       if (!isValidCron(currentBlock.cronExp, { allowSevenAsSunday: true }))
@@ -121,64 +125,48 @@ const SingleCronEditorPanel = ({
     }
   };
 
-  const errorChecker = () => {
-    const errFields: string[] = [];
-
-    // Minute
-    if (isValidCronSection(configMinute ?? "", "Minute", "main") === false) {
-      errFields.push("configMinuteMain");
-    }
-    if (isValidCronSection(configMinute ?? "", "Minute", "step") === false) {
-      errFields.push("configMinuteStep");
-    }
-    // Hour
-    if (isValidCronSection(configHour ?? "", "Hour", "main") === false) {
-      errFields.push("configHourMain");
-    }
-    if (isValidCronSection(configHour ?? "", "Hour", "step") === false) {
-      errFields.push("configHourStep");
-    }
-
-    // Day Of Month
-    if (
-      isValidCronSection(configDayOfMonth ?? "", "Day of Month", "main") ===
-      false
-    ) {
-      errFields.push("configDayOfMonthMain");
-    }
-    if (
-      isValidCronSection(configDayOfMonth ?? "", "Day of Month", "step") ===
-      false
-    ) {
-      errFields.push("configDayOfMonthStep");
-    }
-
-    // Month
-    if (isValidCronSection(configMonth ?? "", "Month", "main") === false) {
-      errFields.push("configMonthMain");
-    }
-    if (isValidCronSection(configMonth ?? "", "Month", "step") === false) {
-      errFields.push("configMonthStep");
-    }
-
-    // Day Of Week
-    if (
-      isValidCronSection(configDayOfWeek ?? "", "Day of Week", "main") === false
-    ) {
-      errFields.push("configDayOfWeekMain");
-    }
-    if (
-      isValidCronSection(configDayOfWeek ?? "", "Day of Week", "step") === false
-    ) {
-      errFields.push("configDayOfWeekStep");
-    }
+  const errorChecker = (currentBlock: CronBlock) => {
+    // Get Invalid Inputs
+    const errFields = getInvalidInputs(currentBlock);
 
     if (errFields.length > 0) {
+      // Add the current "Cron Id" + "Parent Node Id" among CurrentEditor errors list
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentBlock.id,
+        initialNodeId: initialNode.id,
+        action: "add",
+      });
+
       setErrorFields(errFields);
       console.log("errFields", errFields);
       throw new Error("Invalid Cron!");
+    } else {
+      // Remove the current "Cron Id" + "Parent Node Id" among CurrentEditor errors list
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentBlock.id,
+        initialNodeId: initialNode.id,
+        action: "remove",
+      });
     }
   };
+
+  useEffect(() => {
+    // Run Errors Checking if on Update Mode
+    if (initialCronBlock) {
+      try {
+        errorChecker(initialCronBlock);
+      } catch (e) {
+        console.log("Err", e);
+        toast.error(
+          e instanceof Error ? e.message : "An error occured. Try again.",
+          {
+            position: "bottom-center",
+            richColors: true,
+          }
+        );
+      }
+    }
+  }, []);
 
   return (
     <div className="flex flex-col w-full max-h-full relative">
@@ -186,9 +174,20 @@ const SingleCronEditorPanel = ({
         {/* Header */}
         <div className="px-4 w-full">
           <PanelHeader
-            nodeOrigin={nodeOrigin}
+            nodeOrigin={initialNode}
             displayBackButton={displayBackButton}
-            onBack={() => onBack && onBack()}
+            onBack={() => {
+              if (onBack) {
+                if (currentBlock) {
+                  insertOrRemoveIdsFromCurrentEditorErrors({
+                    fromId: currentBlock.id,
+                    initialNodeId: initialNode.id,
+                    action: "remove",
+                  });
+                }
+                onBack();
+              }
+            }}
           />
         </div>
 
@@ -226,6 +225,7 @@ const SingleCronEditorPanel = ({
               setConfigDayOfMonth(undefined);
               setConfigMonth(undefined);
               setConfigDayOfWeek(undefined);
+              setErrorFields([]);
 
               setTimeout(() => {
                 const newBlock = getNewCronBlock(presetSelected);
@@ -449,6 +449,14 @@ const SingleCronEditorPanel = ({
                   size={"sm"}
                   className="w-fit"
                   onClick={() => {
+                    if (currentBlock) {
+                      insertOrRemoveIdsFromCurrentEditorErrors({
+                        fromId: currentBlock.id,
+                        initialNodeId: initialNode.id,
+                        action: "remove",
+                      });
+                    }
+
                     // Delete Field
                     onDelete();
                   }}

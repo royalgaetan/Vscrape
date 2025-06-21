@@ -78,7 +78,7 @@ const EditorGettingStartedButton = ({
               })}
           </div>
           {/* Skip Button */}
-          <div className="flex justify-center items-center mt-4">
+          {/* <div className="flex justify-center items-center mt-4">
             <Button
               onClick={() => onEntryPointSelected(undefined)}
               variant={"link"}
@@ -86,7 +86,7 @@ const EditorGettingStartedButton = ({
             >
               Skip
             </Button>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

@@ -16,6 +16,9 @@ const DurationInput = ({
   isTimePicker,
   placeholder,
   className,
+
+  nodeId,
+  itemId,
 }: {
   initialValue: any;
   onSave: (val: any) => void;
@@ -25,6 +28,9 @@ const DurationInput = ({
   hasError?: boolean;
   placeholder?: string;
   className?: string;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const [openDurationPicker, setOpenDurationPicker] = useState(false);
 
@@ -60,6 +66,8 @@ const DurationInput = ({
         }}
         readOnly={true}
         hasError={hasError}
+        nodeId={nodeId}
+        itemId={itemId}
         className={
           "cursor-pointer relative !text-xs flex-1 w-full rounded-sm placeholder:font-semibold placeholder:text-muted-foreground/70"
         }

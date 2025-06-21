@@ -60,9 +60,9 @@ export const previousInputData: PreviousInputDataType[] = [
     tooltip: "Previous Node Data",
   },
   {
-    label: "Last Operation",
-    dataTransfer: "{{ Last Operation }}",
-    tooltip: "Previous Operation Data",
+    label: "Last Item",
+    dataTransfer: "{{ Last Item }}",
+    tooltip: "Previous Item Data",
   },
 ];
 

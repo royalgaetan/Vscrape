@@ -1,5 +1,7 @@
 import ShortUniqueId from "short-unique-id";
 import { ObservableMixin } from "./mixins";
+import { OutputDataType } from "../types/w_types";
+import { getInvalidInputs } from "../utils/w_utils";
 
 const { randomUUID } = new ShortUniqueId({ length: 15 });
 export const httpMethodsList = ["GET", "POST"] as const;
@@ -49,6 +51,32 @@ export class WebhookBlock extends ObservableMixin() {
   set authToken(value: string | undefined) {
     this._authToken = value;
     this.notifyAll();
+  }
+
+  // --------------------------------------------------
+  // OutputData
+  get outputData(): OutputDataType | undefined {
+    return {
+      endpointUrl: {
+        type: "primitive/url",
+        value: this._endpointUrl,
+      },
+      httpMethod: {
+        type: "primitive/customSwitch",
+        value: this._httpMethod,
+      },
+      ...(this._authToken && {
+        authToken: {
+          type: "primitive/text",
+          value: this._authToken,
+        },
+      }),
+    };
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return getInvalidInputs(this).length === 0;
   }
 
   // To Object

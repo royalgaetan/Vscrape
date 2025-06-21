@@ -13,11 +13,17 @@ const FilterInput = ({
   onBlur,
   onError,
   isEditting,
+
+  nodeId,
+  itemId,
 }: {
   initialFilters: ExtendedOperationFilterType[];
   onBlur: (newFilters: ExtendedOperationFilterType[]) => void;
   onError?: (val: boolean) => void;
   isEditting?: (state: boolean) => void;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const [localFilters, setLocalFilters] = useState<
     ExtendedOperationFilterType[]
@@ -76,6 +82,8 @@ const FilterInput = ({
               localFilters.map((filter, idx) => {
                 return (
                   <SingleFilterRow
+                    nodeId={nodeId}
+                    itemId={itemId}
                     onError={(err) => {
                       onError && onError(err);
                     }}

@@ -31,6 +31,9 @@ const ParamInput = ({
   isWithinAGroup,
   isTextarea,
   hasError,
+
+  nodeId,
+  itemId,
 }: {
   inputType: vsAnyPrimitives["type"] | vsAnyRawTypes["type"];
   placeHolder?: string;
@@ -40,6 +43,9 @@ const ParamInput = ({
   isWithinAGroup: boolean;
   isTextarea?: boolean;
   hasError?: boolean;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const [hasInternalError, setHasInternalError] = useState(hasError ?? false);
 
@@ -133,6 +139,8 @@ const ParamInput = ({
             isTextarea={typeof initialValue === "string" && isTextarea}
             inputValue={initialValue}
             hasError={hasInternalError}
+            nodeId={nodeId}
+            itemId={itemId}
             onTextChange={(text) => {
               onChange(text);
             }}
@@ -149,6 +157,8 @@ const ParamInput = ({
         <DnDTextInput
           inputType="email"
           hasError={hasInternalError}
+          nodeId={nodeId}
+          itemId={itemId}
           inputValue={initialValue}
           onTextChange={(text) => {
             onChange(text);
@@ -165,6 +175,8 @@ const ParamInput = ({
         <DnDTextInput
           inputType="url"
           hasError={hasInternalError}
+          nodeId={nodeId}
+          itemId={itemId}
           inputValue={initialValue}
           onTextChange={(text) => {
             onChange(text);
@@ -180,6 +192,8 @@ const ParamInput = ({
       return (
         <DnDTextInput
           hasError={hasInternalError}
+          nodeId={nodeId}
+          itemId={itemId}
           inputType="number"
           inputValue={initialValue}
           onTextChange={(text) => {
@@ -197,6 +211,8 @@ const ParamInput = ({
         <DnDTextInput
           inputType="tel"
           hasError={hasInternalError}
+          nodeId={nodeId}
+          itemId={itemId}
           inputValue={initialValue}
           onTextChange={(text) => {
             onChange(text);
@@ -223,6 +239,8 @@ const ParamInput = ({
       return (
         <ArrayInput
           hasError={hasInternalError}
+          nodeId={nodeId}
+          itemId={itemId}
           initialArray={initialValue}
           onChange={(newArray) => {
             onChange(newArray);
@@ -233,6 +251,8 @@ const ParamInput = ({
     case "primitive/record":
       return (
         <RecordInput
+          nodeId={nodeId}
+          itemId={itemId}
           hasError={hasInternalError}
           initialRecords={initialValue}
           onChange={(newRecords) => {

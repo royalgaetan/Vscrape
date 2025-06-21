@@ -7,54 +7,71 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fakeInputs } from "@/lib/fake_data";
 import { humanizeKey } from "@/lib/string_utils";
 import React, { useEffect, useState } from "react";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import SharedOutputsViewer from "./shared_outputs_viewer";
+import { getPreviousInputData } from "@/lib/workflow_editor/utils/w_utils";
 
 const SelectInputDataDialog = () => {
   const [currentKeyTab, setCurrentKeyTab] = useState("");
 
   // Store
+  const currentEditor = useWorkflowEditorStore((s) => s.currentEditor);
   const isSharedOutputsDialogOpen = useWorkflowEditorStore(
     (s) => s.isSharedOutputsDialogOpen
   );
   const toggleSharedOutputsDialog = useWorkflowEditorStore(
     (s) => s.toggleSharedOutputsDialog
   );
-  const inputToken = useWorkflowEditorStore((s) => s.inputToken);
-  const setSharedOutputSelected = useWorkflowEditorStore(
-    (s) => s.setSharedOutputSelected
+  const sharedOutputInputToken = useWorkflowEditorStore(
+    (s) => s.sharedOutputInputToken
+  );
+  const sharedOutputInitialNodeId = useWorkflowEditorStore(
+    (s) => s.sharedOutputInitialNodeId
+  );
+  const sharedOutputInitialItemId = useWorkflowEditorStore(
+    (s) => s.sharedOutputInitialItemId
   );
   // End Store
 
+  const previousInputs = getPreviousInputData({
+    nodeId: sharedOutputInitialNodeId ?? "",
+    itemId: sharedOutputInitialItemId ?? "",
+    currentEditor,
+  });
+  console.log("previousInputs$*#?!", previousInputs);
+
   useEffect(() => {
-    const inputTokenValue = inputToken?.inputTokenValue;
+    const sharedOutputInputTokenValue = sharedOutputInputToken?.inputTokenValue;
     if (
-      typeof inputTokenValue === "string" &&
-      (inputTokenValue.toLocaleLowerCase().includes("lastnode") ||
-        inputTokenValue.toLocaleLowerCase().includes("last node"))
+      typeof sharedOutputInputTokenValue === "string" &&
+      (sharedOutputInputTokenValue.toLocaleLowerCase().includes("lastnode") ||
+        sharedOutputInputTokenValue.toLocaleLowerCase().includes("last node"))
     ) {
-      setCurrentKeyTab("LastNode");
+      setCurrentKeyTab("Last Node");
     } else if (
-      typeof inputTokenValue === "string" &&
-      (inputTokenValue.toLocaleLowerCase().includes("lastoperation") ||
-        inputTokenValue.toLocaleLowerCase().includes("last operation"))
+      typeof sharedOutputInputTokenValue === "string" &&
+      (sharedOutputInputTokenValue.toLocaleLowerCase().includes("lastitem") ||
+        sharedOutputInputTokenValue.toLocaleLowerCase().includes("last item"))
     ) {
-      setCurrentKeyTab("LastOperation");
+      setCurrentKeyTab("Last Item");
     } else {
       setCurrentKeyTab("Variables");
     }
-  }, [inputToken?.inputTokenValue]);
+  }, [sharedOutputInputToken?.inputTokenValue]);
 
   return (
     <Dialog
       open={isSharedOutputsDialogOpen}
-      onOpenChange={(open) => toggleSharedOutputsDialog(open)}
+      onOpenChange={(open) =>
+        toggleSharedOutputsDialog({ isSharedOutputsDialogOpen: open })
+      }
     >
       <DialogContent
-        onInteractOutside={() => toggleSharedOutputsDialog(false)}
+        onInteractOutside={() =>
+          toggleSharedOutputsDialog({ isSharedOutputsDialogOpen: false })
+        }
         className="h-[90vh] w-[50vw] flex flex-col max-w-none overflow-clip"
       >
         <Tabs
@@ -74,14 +91,14 @@ const SelectInputDataDialog = () => {
               </DialogDescription>
             </div>
             <TabsList className="bg-transparent border-b-2 border-neutral-400/20 pb-0 pl-0 rounded-none justify-start w-full gap-3">
-              {Object.keys(fakeInputs).map((key) => {
+              {previousInputs.map((prev) => {
                 return (
                   <TabsTrigger
                     className="rounded-none pb-2 border-b-4 border-transparent data-[state=active]:border-primary font-medium focus-visible:ring-0 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:font-semibold data-[state=active]:shadow-none"
-                    key={key}
-                    value={key}
+                    key={prev.label}
+                    value={prev.label}
                   >
-                    {humanizeKey(key)}
+                    {humanizeKey(prev.label)}
                   </TabsTrigger>
                 );
               })}
@@ -90,20 +107,29 @@ const SelectInputDataDialog = () => {
 
           <div className="pt-2 pb-6 min-h-[65vh] w-full">
             {/* Tab Content */}
-            {Object.entries(fakeInputs).map(([key, values]) => {
-              return (
-                <TabsContent key={key} value={key} className="h-full mt-2 px-6">
-                  <SharedOutputsViewer
-                    key={key}
-                    object={{ [key]: values }}
-                    onObjectSelected={(obj) => {
-                      setSharedOutputSelected(obj);
-                      toggleSharedOutputsDialog(false, inputToken);
-                    }}
-                  />
-                </TabsContent>
-              );
-            })}
+            {previousInputs
+              .filter((p) => p.label === currentKeyTab)
+              .map((prev) => {
+                return (
+                  <TabsContent
+                    key={prev.label}
+                    value={prev.label}
+                    className="h-full mt-2 px-6"
+                  >
+                    <SharedOutputsViewer
+                      key={prev.label}
+                      prevElements={prev.data}
+                      onObjectSelected={(obj) => {
+                        toggleSharedOutputsDialog({
+                          isSharedOutputsDialogOpen: false,
+                          sharedOutputSelectedItem: obj,
+                          sharedOutputInputToken: sharedOutputInputToken,
+                        });
+                      }}
+                    />
+                  </TabsContent>
+                );
+              })}
           </div>
         </Tabs>
       </DialogContent>

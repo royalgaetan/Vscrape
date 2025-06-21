@@ -25,6 +25,11 @@ import { FormFieldItem } from "@/lib/workflow_editor/classes/form_field_block";
 import { cloneDeep } from "lodash";
 import { workflowFormFieldItems } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import { isAFile } from "@/lib/workflow_editor/types/mime_types";
+import {
+  getInvalidInputs,
+  insertOrRemoveIdsFromCurrentEditorErrors,
+} from "@/lib/workflow_editor/utils/w_utils";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 
 const SingleFormFieldItemPanel = ({
   initialNode,
@@ -65,7 +70,7 @@ const SingleFormFieldItemPanel = ({
         throw new Error("An error occured while saving this field.");
 
       // Errors Checking
-      errorChecker();
+      errorChecker(currentFieldItem);
 
       setIsSavingFormFieldBlock(false);
       setSavingFormFieldBlockResultIcon(Check);
@@ -90,64 +95,30 @@ const SingleFormFieldItemPanel = ({
     }
   };
 
-  const errorChecker = () => {
-    const errFields: string[] = [];
-    if (!currentFieldItem) return;
-    if (!currentFieldItem.fieldName || !currentFieldItem.fieldType) {
-      errFields.push("fieldName");
-    }
-    if (
-      typeof currentFieldItem.fieldLabel === "string" &&
-      currentFieldItem.fieldLabel.length === 0
-    ) {
-      errFields.push("fieldLabel");
-    }
-    // if (typeof fieldDescription === "string" && fieldDescription.length === 0) {
-    //   errFields.push("fieldDescription");
-    // }
-    // if (typeof fieldPlaceholder === "string" && fieldPlaceholder.length === 0) {
-    //   errFields.push("fieldPlaceholder");
-    // }
-    // if (fieldIsOptional === undefined) {
-    //   errFields.push("fieldIsOptional");
-    // }
-    if (
-      currentFieldItem.fieldValueToPickFrom !== undefined &&
-      Array.isArray(currentFieldItem.fieldValueToPickFrom) &&
-      currentFieldItem.fieldValueToPickFrom.filter(
-        (a) => extractTextFromHTML(a).length > 0
-      ).length < 2
-    ) {
-      errFields.push("fieldValueToPickFrom");
-    }
+  const errorChecker = (currentFieldItem: FormFieldItem) => {
+    // Get Invalid Inputs
+    const errFields = getInvalidInputs(currentFieldItem);
 
-    if (
-      currentFieldItem.isHidden !== undefined &&
-      toStringSafe(currentFieldItem.fieldValue).length === 0
-    ) {
-      errFields.push("fieldValue");
-    }
-
-    if (
-      currentFieldItem.fieldType === "primitive/text" &&
-      currentFieldItem.fieldValueToPickFrom === undefined &&
-      currentFieldItem.isMultiline === undefined
-    ) {
-      errFields.push("fieldIsMultiline");
-    }
-
-    if (
-      currentFieldItem.fieldType &&
-      isAFile(currentFieldItem.fieldType) &&
-      currentFieldItem.acceptedFileExtensions === undefined
-    ) {
-      errFields.push("fieldAcceptedExtensions");
-    }
-
+    // If found
     if (errFields.length > 0) {
+      // Add the current "FieldItem Id" + "Parent Node Id" among CurrentEditor errors list
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentFieldItem.id,
+        initialNodeId: initialNode.id,
+        action: "add",
+      });
+
       setErrorFields(errFields);
       console.log("errFields", errFields);
       throw new Error("Can't save this field.");
+    } else {
+      // Remove the current "Operation Item Id" + "Parent Node Id" among CurrentEditor errors list
+
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentFieldItem.id,
+        initialNodeId: initialNode.id,
+        action: "remove",
+      });
     }
   };
 
@@ -160,6 +131,24 @@ const SingleFormFieldItemPanel = ({
     return () => sub.unsubscribe();
   }, [currentFieldItem]);
 
+  useEffect(() => {
+    // Run Errors Checking if on Update Mode
+    if (initialFieldItem) {
+      try {
+        errorChecker(initialFieldItem);
+      } catch (e) {
+        console.log("Err", e);
+        toast.error(
+          e instanceof Error ? e.message : "An error occured. Try again.",
+          {
+            position: "bottom-center",
+            richColors: true,
+          }
+        );
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-col w-full max-h-full relative">
       <div className="flex flex-col w-full max-h-full overflow-x-clip overflow-y-scroll scrollbar-hide">
@@ -168,7 +157,18 @@ const SingleFormFieldItemPanel = ({
           <PanelHeader
             nodeOrigin={initialNode}
             displayBackButton={displayBackButton}
-            onBack={() => onBack && onBack()}
+            onBack={() => {
+              if (onBack) {
+                if (currentFieldItem) {
+                  insertOrRemoveIdsFromCurrentEditorErrors({
+                    fromId: currentFieldItem.id,
+                    initialNodeId: initialNode.id,
+                    action: "remove",
+                  });
+                }
+                onBack();
+              }
+            }}
           />
         </div>
 
@@ -457,6 +457,13 @@ const SingleFormFieldItemPanel = ({
                     size={"sm"}
                     className="w-fit"
                     onClick={() => {
+                      if (currentFieldItem) {
+                        insertOrRemoveIdsFromCurrentEditorErrors({
+                          fromId: currentFieldItem.id,
+                          initialNodeId: initialNode.id,
+                          action: "remove",
+                        });
+                      }
                       // Delete Field
                       onDelete(initialFieldItem.id);
                     }}

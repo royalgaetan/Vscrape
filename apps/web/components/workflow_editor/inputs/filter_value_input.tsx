@@ -12,12 +12,18 @@ const FilterValueInput = ({
   onSave,
   isDisabled,
   hasError,
+
+  nodeId,
+  itemId,
 }: {
   isDisabled: boolean;
   hasError: boolean;
   initialValue: any;
   onSave: (inputValue: any) => void;
   inputSchema: GetFilterValueInput;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   const currentDate = (() => {
     if (inputSchema === "date") {
@@ -42,6 +48,8 @@ const FilterValueInput = ({
               ? formatDate(new Date(currentValue), "MMM dd, yyyy")
               : ""
           }
+          nodeId={nodeId}
+          itemId={itemId}
           placeholder={"Date..."}
           isDisabled={isDisabled}
           onSave={(selectedDate) => {
@@ -56,6 +64,8 @@ const FilterValueInput = ({
         <DnDTextInput
           placeholder={"Value..."}
           inputType={"text"}
+          nodeId={nodeId}
+          itemId={itemId}
           inputValue={
             typeof currentValue === "number"
               ? currentValue

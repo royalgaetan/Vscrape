@@ -16,6 +16,9 @@ const DateInput = ({
   isDisabled,
   disabledDnd,
   hasError,
+
+  nodeId,
+  itemId,
 }: {
   initialValue: any;
   onSave: (val: any) => void;
@@ -23,11 +26,16 @@ const DateInput = ({
   placeholder?: string;
   hasError: boolean;
   disabledDnd?: boolean;
+
+  nodeId?: string;
+  itemId?: string;
 }) => {
   return (
     <div className="!h-[var(--input-height)] flex flex-1 relative group/dateInput">
       <DnDTextInput
         readOnly={true}
+        nodeId={nodeId}
+        itemId={itemId}
         inputValue={
           isValidISODateString(initialValue)
             ? formatDate(new Date(initialValue), "MMM dd, yyyy")

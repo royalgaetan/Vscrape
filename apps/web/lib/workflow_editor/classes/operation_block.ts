@@ -2,11 +2,12 @@ import { workflowEditorNodes } from "../constants/w_constants";
 import { vsAnyPrimitives, vsAnyRawTypes } from "../types/data_types";
 import {
   OperationItemParam,
-  OperationThroughput,
   OperationFilterType,
   VsOperationItemType,
   MoveBlockDirection,
+  OutputDataType,
 } from "../types/w_types";
+import { getInvalidInputs } from "../utils/w_utils";
 import { ObservableMixin } from "./mixins";
 
 export class OperationBlock extends ObservableMixin() {
@@ -73,12 +74,34 @@ export class OperationBlock extends ObservableMixin() {
     this.notifyAll();
   }
 
+  // -----------------------------------------------------------------------------
+
+  // OutputData
+  get outputData(): OutputDataType | undefined {
+    const merged = this._items.reduce((acc, it) => {
+      const key = it.operationItemName;
+      const value = it.itemOutputData;
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as OutputDataType);
+
+    return Object.keys(merged).length > 0 ? merged : undefined;
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return this._items.every((it) => it.hasValidInputs());
+  }
+
   // To Object
   toObject(): object {
     return {
       id: this._id,
       nodeName: this._nodeName,
       items: this._items.map((it) => it.toObject()),
+      outputData: this._items.map((it) => ({ [it.id]: it.itemOutputData })),
     };
   }
 }
@@ -90,10 +113,7 @@ export class OperationItem extends ObservableMixin() {
   private _nodeName: (typeof workflowEditorNodes)[number]["label"];
 
   private _itemParams?: (OperationItemParam | OperationItemParam[])[];
-  private _itemInputFilters?: OperationFilterType<
-    (vsAnyPrimitives | vsAnyRawTypes)["type"]
-  >[];
-  private _itemOutputs?: OperationThroughput;
+  private _itemOutputData?: OutputDataType;
 
   private _skipDuplicate?: boolean;
   private _loopThrough?: "All items" | number | boolean;
@@ -106,8 +126,7 @@ export class OperationItem extends ObservableMixin() {
     this._operationItemName = operationItem.operationItemName;
     this._operationItemDescription = operationItem.operationItemDescription;
     this._itemParams = operationItem.itemParams;
-    this._itemInputFilters = operationItem.itemInputFilters;
-    this._itemOutputs = operationItem.itemOutputs;
+    this._itemOutputData = operationItem.itemOutputData;
     this._skipDuplicate = operationItem.skipDuplicate;
     this._loopThrough = operationItem.loopThrough;
   }
@@ -155,30 +174,21 @@ export class OperationItem extends ObservableMixin() {
     this.notifyAll();
   }
 
-  // Output: Add getter + setter
-  get itemOutputs(): OperationThroughput | undefined {
-    return this._itemOutputs;
-  }
-  set itemOutputs(outputsVal: OperationThroughput) {
-    this._itemOutputs = outputsVal;
-    this.notifyAll();
-  }
-
-  // Input Filters: Add getter + setter
-  get itemInputFilters():
-    | OperationFilterType<(vsAnyPrimitives | vsAnyRawTypes)["type"]>[]
-    | undefined {
-    return this._itemInputFilters;
-  }
-  set itemInputFilters(
-    filters: OperationFilterType<(vsAnyPrimitives | vsAnyRawTypes)["type"]>[]
-  ) {
-    if (!this._itemInputFilters) this._itemInputFilters = [];
-    this._itemInputFilters = filters;
-    this.notifyAll();
-  }
-
   // ------------------------------------------------------------
+  // OutputData: Add getter + setter
+  get itemOutputData(): OutputDataType | undefined {
+    return this._itemOutputData;
+  }
+  set itemOutputData(outputsVal: OutputDataType | undefined) {
+    this._itemOutputData = outputsVal;
+    this.notifyAll();
+  }
+
+  // Input Validation
+  hasValidInputs(): boolean {
+    return getInvalidInputs(this).length === 0;
+  }
+
   // To Object
   toObject(): object {
     return {
@@ -187,12 +197,7 @@ export class OperationItem extends ObservableMixin() {
       operationItemName: this._operationItemName,
       skipDuplicate: this._skipDuplicate,
       loopThrough: this._loopThrough,
-
       itemParams: this._itemParams?.flatMap((p) => JSON.stringify(p)),
-      itemInputFilters: this._itemInputFilters?.flatMap((p) =>
-        JSON.stringify(p)
-      ),
-      itemOutputs: JSON.stringify(this._itemOutputs),
     };
   }
 }

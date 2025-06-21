@@ -2,7 +2,11 @@ import { ClassicPreset } from "rete";
 import { LucideIcon } from "lucide-react";
 import { VsInput, VsOutput, VsSocket } from "./sockets";
 import { workflowEditorSections } from "../constants/w_constants";
-import { nodeBlockTypeNames, VsNodeType } from "../types/w_types";
+import {
+  nodeBlockTypeNames,
+  OutputDataType,
+  VsNodeType,
+} from "../types/w_types";
 import { OperationBlock } from "./operation_block";
 import { CronBlock } from "./cron_block";
 import { ObservableMixin } from "./mixins";
@@ -114,6 +118,11 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
     this.notifyAll();
   }
 
+  // Input Validation
+  hasValidInputs(): boolean {
+    return this.block?.hasValidInputs() ?? false;
+  }
+
   duplicate(): VsNode {
     const cloned = new VsNode({
       label: this.label,
@@ -127,6 +136,11 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
     });
 
     return cloned;
+  }
+
+  // OutputData
+  get outputData(): OutputDataType | undefined {
+    return this._block?.outputData;
   }
 
   // To Object

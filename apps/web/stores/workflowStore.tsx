@@ -1,15 +1,20 @@
 import { VsNode } from "@/lib/workflow_editor/classes/node";
-import { OperationBlock } from "@/lib/workflow_editor/classes/operation_block";
 import {
+  ExecutionPlan,
   SharedOutputSelectedItem,
   TokenInputType,
 } from "@/lib/workflow_editor/types/w_types";
 import { create } from "zustand";
-import { PossibleFieldBlockType as FieldBlockType } from "@/lib/workflow_editor/constants/workflow_form_fields_definition";
 import { NodeEditor } from "rete";
 import { Schemes } from "@/app/(protected)/w/[workflowId]/editor/_components/w_editor";
 
-export type NodeBlockType = OperationBlock | FieldBlockType | undefined;
+export type CurrentEditor = {
+  editor: NodeEditor<Schemes> | undefined;
+  state?: currentEditorState;
+  executionPlan?: ExecutionPlan;
+  errors?: Set<string>;
+};
+
 export type ElementToActOn =
   | {
       type: "Node" | "Connection" | "Output";
@@ -19,25 +24,38 @@ export type ElementToActOn =
   | undefined;
 export type currentEditorState = "rendered";
 
+type ToggleSharedOutputsDialogArgs = {
+  isSharedOutputsDialogOpen?: boolean;
+  sharedOutputInputToken?: TokenInputType;
+  sharedOutputInitialNodeId?: string;
+  sharedOutputInitialItemId?: string;
+  sharedOutputSelectedItem?: SharedOutputSelectedItem;
+};
+
 interface WorkflowEditorState {
   // Workflow Chat
   isWorkflowChatOpen: boolean;
   toggleWorkflowChat: (isOpen: boolean) => void;
 
   // Workflow Editor
-  currentEditor: {
-    editor: NodeEditor<Schemes> | undefined;
+  currentEditor: CurrentEditor;
+  setCurrentEditor: ({
+    editor,
+    state,
+    executionPlan,
+    errors,
+  }: {
+    editor?: NodeEditor<Schemes>;
     state?: currentEditorState;
-  };
-  setCurrentEditor: (
-    editor?: NodeEditor<Schemes>,
-    state?: currentEditorState
-  ) => void;
+    executionPlan?: ExecutionPlan;
+    errors?: Set<string>;
+  }) => void;
 
   // Workflow Panel
   isWorkflowPanelOpen: boolean;
   currentNode: VsNode | undefined;
   toggleWorkflowPanel: (isOpen: boolean, node?: VsNode) => void;
+  setisWorkflowPanelOpen: (isOpen: boolean) => void;
 
   // Elements Actions: Duplicate, Delete, Branch Deletion
   setElementIdToActOn: (act: ElementToActOn) => void;
@@ -45,16 +63,17 @@ interface WorkflowEditorState {
 
   // Worfklow Shared Outputs Dialog
   isSharedOutputsDialogOpen: boolean;
-  setisWorkflowPanelOpen: (isOpen: boolean) => void;
-  sharedOutputSelected: SharedOutputSelectedItem | undefined;
-  setSharedOutputSelected: (
-    sharedOutput: SharedOutputSelectedItem | undefined
-  ) => void;
-  inputToken: TokenInputType | undefined;
-  toggleSharedOutputsDialog: (
-    isOpen: boolean,
-    inputToken?: TokenInputType
-  ) => void;
+  sharedOutputInputToken?: TokenInputType;
+  sharedOutputInitialNodeId?: string;
+  sharedOutputInitialItemId?: string;
+  sharedOutputSelectedItem?: SharedOutputSelectedItem;
+  toggleSharedOutputsDialog: ({
+    isSharedOutputsDialogOpen,
+    sharedOutputInputToken,
+    sharedOutputInitialNodeId,
+    sharedOutputInitialItemId,
+    sharedOutputSelectedItem,
+  }: ToggleSharedOutputsDialogArgs) => void;
 }
 
 export const useWorkflowEditorStore = create<WorkflowEditorState>(
@@ -64,11 +83,22 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
     toggleWorkflowChat: (isOpen) => set({ isWorkflowChatOpen: isOpen }),
 
     // Workflow Editor
-    currentEditor: { editor: undefined, state: undefined },
-    setCurrentEditor: (
-      editor?: NodeEditor<Schemes>,
-      state?: currentEditorState
-    ) => set({ currentEditor: { editor, state } }),
+    currentEditor: {
+      editor: undefined,
+      state: undefined,
+      executionPlan: undefined,
+    },
+    setCurrentEditor: ({
+      editor,
+      state,
+      executionPlan,
+      errors,
+    }: {
+      editor?: NodeEditor<Schemes>;
+      state?: currentEditorState;
+      executionPlan?: ExecutionPlan;
+      errors?: Set<string>;
+    }) => set({ currentEditor: { editor, state, executionPlan, errors } }),
 
     // Workflow Panel-related
     isWorkflowPanelOpen: false,
@@ -87,11 +117,24 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
 
     // Shared Output-related
     isSharedOutputsDialogOpen: false,
-    sharedOutputSelected: undefined,
-    inputToken: undefined,
-    setSharedOutputSelected: (sharedOutput) =>
-      set({ sharedOutputSelected: sharedOutput }),
-    toggleSharedOutputsDialog: (isOpen, inputToken) =>
-      set({ isSharedOutputsDialogOpen: isOpen, inputToken: inputToken }),
+    sharedOutputInputToken: undefined,
+    sharedOutputInitialNodeId: undefined,
+    sharedOutputInitialItemId: undefined,
+    sharedOutputSelectedItem: undefined,
+
+    toggleSharedOutputsDialog: ({
+      isSharedOutputsDialogOpen,
+      sharedOutputInputToken,
+      sharedOutputInitialNodeId,
+      sharedOutputInitialItemId,
+      sharedOutputSelectedItem,
+    }: ToggleSharedOutputsDialogArgs) =>
+      set({
+        isSharedOutputsDialogOpen,
+        sharedOutputInputToken,
+        sharedOutputInitialNodeId,
+        sharedOutputInitialItemId,
+        sharedOutputSelectedItem,
+      }),
   })
 );

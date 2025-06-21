@@ -10,7 +10,6 @@ import {
   isReallyNumber,
 } from "@/lib/numbers_utils";
 import MoreOptionInput from "@/components/workflow_editor/more_option_inputs";
-import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
 import FieldLabel from "../field_label";
 import OperationItemParamCard from "./operation_param_card";
 import PanelHeader from "../panel_header";
@@ -37,7 +36,12 @@ import {
   toStringSafe,
 } from "@/lib/string_utils";
 import { resolveInputTypeFromReference } from "../../inputs/filter_input_row";
-import { isRecord } from "@/lib/utils";
+import SharedOutputButtons from "../../buttons/shared_output_buttons";
+import {
+  getInvalidInputs,
+  insertOrRemoveIdsFromCurrentEditorErrors,
+} from "@/lib/workflow_editor/utils/w_utils";
+import { useWorkflowEditorStore } from "@/stores/workflowStore";
 
 export const shouldExcludeItem = (
   item: any,
@@ -96,8 +100,9 @@ const SingleOperationItemPanel = ({
   onDelete: (operationItemId: string) => void;
   displayBackButton?: boolean;
 }) => {
-  const [currentOperationItem, setCurrentOperationItem] =
-    useState(initialOperationItem);
+  const [currentOperationItem, setCurrentOperationItem] = useState(
+    cloneDeep(initialOperationItem)
+  );
   const availableOperationItems = workflowOperationItems.filter(
     (operation) => operation.nodeName === initialNode.label
   );
@@ -121,7 +126,7 @@ const SingleOperationItemPanel = ({
         throw new Error("Can't save this Operation! Try again.");
 
       // Errors Checking
-      errorChecker();
+      errorChecker(currentOperationItem);
 
       setIsSavingOperation(false);
       setSavingOperationResultIcon(Check);
@@ -142,129 +147,29 @@ const SingleOperationItemPanel = ({
     }
   };
 
-  const errorChecker = () => {
-    const errFields: string[] = [];
+  const errorChecker = (currentOperationItem: OperationItem) => {
+    // Get Invalid Inputs
+    const errFields = getInvalidInputs(currentOperationItem);
 
-    const paramFlatted =
-      currentOperationItem?.itemParams &&
-      currentOperationItem?.itemParams.flatMap((p) => p);
-    paramFlatted &&
-      paramFlatted.forEach((param) => {
-        const paramValueCleaned = extractTextFromHTML(
-          toStringSafe(param.value)
-        );
-        const paramValueType = isPureVariableOnly(paramValueCleaned)
-          ? resolveInputTypeFromReference(paramValueCleaned)
-          : typeof param.value;
-        const paramExpectedType = getTypeBigCategory(param.type);
-
-        if (param.isOptional) {
-        } else {
-          console.log(
-            param.paramName,
-            "\nparamExpectedType",
-            paramExpectedType,
-            "\nparamValueType",
-            paramValueType,
-            "\n(BIG) paramValueType",
-            getTypeBigCategory(paramValueType)
-          );
-
-          // STRINGS CHECKER
-          if (paramExpectedType === "Strings") {
-            if (
-              (paramValueType === "string" ||
-                getTypeBigCategory(paramValueType) === "Strings") &&
-              paramValueCleaned.length > 0
-            ) {
-              // Value is Valid here...
-            } else {
-              errFields.push(param.paramName);
-            }
-          }
-
-          // NUMBER CHECKER
-          if (paramExpectedType === "Numbers") {
-            if (
-              (!isNaN(Number(param.value)) ||
-                paramValueType === "number" ||
-                getTypeBigCategory(paramValueType) === "Numbers") &&
-              paramValueCleaned.length > 0
-            ) {
-              // Value is Valid here...
-            } else {
-              errFields.push(param.paramName);
-            }
-          }
-
-          // BOOLEANS CHECKER
-          if (paramExpectedType === "Booleans") {
-            if (
-              paramValueType === "boolean" ||
-              getTypeBigCategory(paramValueType) === "Booleans"
-            ) {
-              // Value is Valid here...
-            } else {
-              errFields.push(param.paramName);
-            }
-          }
-
-          // Radio CHECKER
-          if (
-            param.type === "primitive/radio" &&
-            (typeof param.value !== "string" || param.value.length === 0)
-          ) {
-            errFields.push(param.paramName);
-          }
-
-          // Array CHECKER
-          if (
-            param.type === "primitive/array" &&
-            (!Array.isArray(param.value) ||
-              param.value.some((item, idx, arr) =>
-                shouldExcludeItem(item, idx, arr)
-              ))
-          ) {
-            errFields.push(param.paramName);
-          }
-
-          // Record CHECKER
-          if (
-            param.type === "primitive/record" &&
-            (!Array.isArray(param.value) ||
-              (param.value as any[]).some((el, idx, arr) => {
-                const isLast = idx === arr.length - 1;
-                // Is empty: { key: "", value: "" }
-                const isEmpty =
-                  JSON.stringify(el) === JSON.stringify({ key: "", value: "" });
-
-                // Either Key or Value is missing
-                const isMissingKey = Object.keys(el).some((key) =>
-                  shouldExcludeItem(key)
-                );
-                const isMissingValue = Object.values(el).some((val) =>
-                  shouldExcludeItem(val)
-                );
-                if (!isRecord(el)) return true;
-                if (idx === 0) return isMissingKey || isMissingValue || isEmpty;
-                if (isLast) {
-                  if (isEmpty) return false;
-                  else return isMissingKey || isMissingValue;
-                }
-                if (!isLast) return isMissingKey || isMissingValue || isEmpty;
-              }))
-          ) {
-            errFields.push(param.paramName);
-          }
-
-          // Raw CHECKER: Non-existant in Operations Definition List
-        }
+    // If found
+    if (errFields.length > 0) {
+      // Add the current "Operation Item Id" + "Parent Node Id" among CurrentEditor errors list
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentOperationItem.id,
+        initialNodeId: initialNode.id,
+        action: "add",
       });
 
-    if (errFields.length > 0) {
       setErrorFields(errFields);
       console.log("errFields", errFields);
       throw new Error("Invalid Operation!");
+    } else {
+      // Remove the current "Operation Item Id" + "Parent Node Id" among CurrentEditor errors list
+      insertOrRemoveIdsFromCurrentEditorErrors({
+        fromId: currentOperationItem.id,
+        initialNodeId: initialNode.id,
+        action: "remove",
+      });
     }
   };
 
@@ -284,6 +189,24 @@ const SingleOperationItemPanel = ({
     return () => sub.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Run Errors Checking if on Update Mode
+    if (initialOperationItem) {
+      try {
+        errorChecker(initialOperationItem);
+      } catch (e) {
+        console.log("Err", e);
+        toast.error(
+          e instanceof Error ? e.message : "An error occured. Try again.",
+          {
+            position: "bottom-center",
+            richColors: true,
+          }
+        );
+      }
+    }
+  }, []);
+
   return (
     <div>
       <div className="flex flex-col w-full max-h-full relative">
@@ -293,7 +216,19 @@ const SingleOperationItemPanel = ({
             <PanelHeader
               nodeOrigin={initialNode}
               displayBackButton={displayBackButton}
-              onBack={() => onBack && onBack()}
+              onBack={() => {
+                if (onBack) {
+                  if (currentOperationItem) {
+                    insertOrRemoveIdsFromCurrentEditorErrors({
+                      fromId: currentOperationItem.id,
+                      initialNodeId: initialNode.id,
+                      action: "remove",
+                    });
+                  }
+
+                  onBack();
+                }
+              }}
               description={currentOperationItem?.operationItemDescription}
             />
           </div>
@@ -392,6 +327,8 @@ const SingleOperationItemPanel = ({
                                 }}
                               >
                                 <OperationItemParamCard
+                                  nodeId={initialNode.id}
+                                  itemId={currentOperationItem.id}
                                   currentOperationItem={currentOperationItem}
                                   isWithinAGroup={true}
                                   hasError={errorFields.includes(
@@ -418,6 +355,8 @@ const SingleOperationItemPanel = ({
                         ) : (
                           <div className="flex flex-1 w-full px-4 pr-4">
                             <OperationItemParamCard
+                              nodeId={initialNode.id}
+                              itemId={currentOperationItem.id}
                               currentOperationItem={currentOperationItem}
                               paramData={params}
                               isWithinAGroup={false}
@@ -466,26 +405,8 @@ const SingleOperationItemPanel = ({
 
                     {/* Separator */}
                   </div>
-                  <Separator className="my-2" />
                 </div>
               )}
-
-            {/* Filters */}
-            {currentOperationItem && (
-              <div className="mt-1 flex flex-col justify-start items-start">
-                <MoreOptionInput
-                  isEditting={(state) => setIsEdittingAField(state)}
-                  onError={(hasError) => {
-                    const field = "FilterInputs";
-                    if (hasError) setErrorFields((prev) => [...prev, field]);
-                    else
-                      setErrorFields((prev) => prev.filter((e) => e !== field));
-                  }}
-                  optionType="filters"
-                  currentOperationItem={currentOperationItem}
-                />
-              </div>
-            )}
 
             {/* Spacer */}
             <div className="h-[10vh]"></div>
@@ -497,30 +418,11 @@ const SingleOperationItemPanel = ({
       {currentOperationItem && (
         <div className="flex flex-col w-[var(--workflowPanelWidth)] bg-white z-10 fixed bottom-[7vh]">
           {/* Shared Outputs DnD Buttons */}
-          <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
-            {previousInputData.map((inputData) => (
-              <SimpleTooltip
-                key={inputData.label}
-                tooltipText={inputData.tooltip}
-              >
-                <div
-                  role="button"
-                  tabIndex={2}
-                  draggable
-                  onDragStart={(e: React.DragEvent) => {
-                    e.dataTransfer.setData(
-                      "application/workflowEditor_inputdata",
-                      inputData.dataTransfer
-                    );
-                    e.dataTransfer.effectAllowed = "move";
-                  }}
-                  className="w-1/3 h-5 px-1 py-0 line-clamp-1 text-center content-center border-none rounded-sm bg-primary/20 text-primary/80 cursor-grab text-xs font-medium"
-                >
-                  {inputData.label}
-                </div>
-              </SimpleTooltip>
-            ))}
-          </div>
+          <SharedOutputButtons
+            nodeId={initialNode.id}
+            blockId={initialNode.block?.id}
+            itemId={currentOperationItem.id}
+          />
 
           {/* Action Buttons: Delete | Save Operation */}
           <div className="flex flex-1 justify-end items-center py-1 px-3 border-t">
@@ -535,6 +437,14 @@ const SingleOperationItemPanel = ({
                     disabled={isEdittingAField}
                     className="w-fit"
                     onClick={() => {
+                      if (currentOperationItem) {
+                        insertOrRemoveIdsFromCurrentEditorErrors({
+                          fromId: currentOperationItem.id,
+                          initialNodeId: initialNode.id,
+                          action: "remove",
+                        });
+                      }
+
                       // Delete Operation
                       onDelete(currentOperationItem.id);
                     }}

@@ -1,6 +1,5 @@
 import {
   extractTextFromHTML,
-  flattenNodeToString,
   isTrulyEmpty,
   toStringSafe,
 } from "@/lib/string_utils";
@@ -30,6 +29,10 @@ const DnDTextInput = ({
   hasError,
   isDisabled,
   readOnly,
+
+  nodeId,
+  itemId,
+
   onElementDropped,
   reRenderOnInputValueChange,
   replaceContentOnDrop,
@@ -50,6 +53,9 @@ const DnDTextInput = ({
   reRenderOnInputValueChange?: boolean;
   replaceContentOnDrop?: boolean;
 
+  nodeId?: string;
+  itemId?: string;
+
   onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onTextChange?: (text: string | null) => void;
   onElementDropped?: (text: string | null) => void;
@@ -63,12 +69,11 @@ const DnDTextInput = ({
   const toggleSharedOutputsDialog = useWorkflowEditorStore(
     (s) => s.toggleSharedOutputsDialog
   );
-  const inputToken = useWorkflowEditorStore((s) => s.inputToken);
-  const sharedOutputSelected = useWorkflowEditorStore(
-    (s) => s.sharedOutputSelected
+  const sharedOutputInputToken = useWorkflowEditorStore(
+    (s) => s.sharedOutputInputToken
   );
-  const setSharedOutputSelected = useWorkflowEditorStore(
-    (s) => s.setSharedOutputSelected
+  const sharedOutputSelected = useWorkflowEditorStore(
+    (s) => s.sharedOutputSelectedItem
   );
   // End Store
 
@@ -268,12 +273,17 @@ const DnDTextInput = ({
     }
   }, [inputValue]);
 
-  const openSharedOutputsDialog = (inputToken?: TokenInputType) => {
+  const openSharedOutputsDialog = (sharedOutputInputToken?: TokenInputType) => {
     const editor = DnDInputRef.current;
     if (!editor) return;
     onTextChange && onTextChange(editor.innerHTML.trim());
 
-    toggleSharedOutputsDialog(true, inputToken);
+    toggleSharedOutputsDialog({
+      isSharedOutputsDialogOpen: true,
+      sharedOutputInitialNodeId: nodeId,
+      sharedOutputInitialItemId: itemId,
+      sharedOutputInputToken: sharedOutputInputToken,
+    });
   };
 
   useEffect(() => {
@@ -282,8 +292,6 @@ const DnDTextInput = ({
     const handleClick = (e: Event) => {
       const el = e.currentTarget as HTMLElement;
       const tokenId = el.id;
-
-      // console.log("inputValue", inputValue, "tokenId", tokenId);
       openSharedOutputsDialog({
         inputTokenID: tokenId,
         inputTokenValue: extractTextFromHTML(el.innerHTML),
@@ -298,11 +306,16 @@ const DnDTextInput = ({
   }, [html, inputValue]);
 
   useEffect(() => {
-    if (inputToken?.inputTokenID && sharedOutputSelected) {
-      waitForElement("id", inputToken?.inputTokenID).then((el) => {
+    if (sharedOutputInputToken?.inputTokenID && sharedOutputSelected) {
+      waitForElement("id", sharedOutputInputToken?.inputTokenID).then((el) => {
         setTimeout(() => {
-          setSharedOutputSelected(undefined);
-          toggleSharedOutputsDialog(false, undefined);
+          toggleSharedOutputsDialog({
+            isSharedOutputsDialogOpen: false,
+            sharedOutputInitialNodeId: undefined,
+            sharedOutputInitialItemId: undefined,
+            sharedOutputInputToken: undefined,
+            sharedOutputSelectedItem: undefined,
+          });
 
           el.textContent = `{{ ${sharedOutputSelected.fullPath} }}`;
           el.setAttribute("data-type", sharedOutputSelected.type);

@@ -8,9 +8,8 @@ import {
 import SetVariablesBlockCard from "./setVariables_block_card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
-import SimpleTooltip from "@/components/global/simple_tooltip";
 import { extractTextFromHTML, toStringSafe } from "@/lib/string_utils";
+import SharedOutputButtons from "../../buttons/shared_output_buttons";
 
 const SetVariablesBlockList = ({
   onSave,
@@ -65,6 +64,7 @@ const SetVariablesBlockList = ({
               initialAssignation={assignation}
               initialEditingValue={fieldCurrentlyEditted === idx}
               canEdit={fieldCurrentlyEditted === undefined}
+              nodeId={currentNode.id}
               onEdit={() => {
                 setFieldCurrentlyEditted(idx);
               }}
@@ -120,30 +120,7 @@ const SetVariablesBlockList = ({
       {typeof fieldCurrentlyEditted === "number" && (
         <div className="flex flex-col -ml-4 w-[var(--workflowPanelWidth)] !h-10 bg-white z-10 fixed bottom-[7vh]">
           {/* Shared Outputs DnD Buttons */}
-          <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
-            {previousInputData.map((inputData) => (
-              <SimpleTooltip
-                key={inputData.label}
-                tooltipText={inputData.tooltip}
-              >
-                <div
-                  role="button"
-                  tabIndex={2}
-                  draggable
-                  onDragStart={(e: React.DragEvent) => {
-                    e.dataTransfer.setData(
-                      "application/workflowEditor_inputdata",
-                      inputData.dataTransfer
-                    );
-                    e.dataTransfer.effectAllowed = "move";
-                  }}
-                  className="w-1/3 h-5 px-1 py-0 line-clamp-1 text-center content-center border-none rounded-sm bg-primary/20 text-primary/80 cursor-grab text-xs font-medium"
-                >
-                  {inputData.label}
-                </div>
-              </SimpleTooltip>
-            ))}
-          </div>
+          <SharedOutputButtons nodeId={currentNode.id} />
         </div>
       )}
     </div>

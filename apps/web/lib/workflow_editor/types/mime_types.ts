@@ -94,6 +94,7 @@ export const vsPrimitiveMIMETypes = {
   customSwitch: "primitive/customSwitch",
   record: "primitive/record",
   hidden: "primitive/hidden",
+  cron: "primitive/cron",
 } as const;
 
 export const ImageMIMETypes = {

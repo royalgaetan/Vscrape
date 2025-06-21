@@ -22,8 +22,6 @@ const getInitialOptionValues = ({
       return currentOperationItem.skipDuplicate;
     case "loopThrough":
       return currentOperationItem.loopThrough;
-    case "filters":
-      return currentOperationItem.itemInputFilters;
     default:
       break;
   }
@@ -35,6 +33,9 @@ type Props = {
   hasError?: boolean;
   onError?: (val: boolean) => void;
   isEditting?: (state: boolean) => void;
+
+  nodeId?: string;
+  itemId?: string;
 };
 
 const MoreOptionInput = ({
@@ -43,6 +44,9 @@ const MoreOptionInput = ({
   hasError,
   onError,
   isEditting,
+
+  nodeId,
+  itemId,
 }: Props) => {
   const [internalValue, setInternalValue] = useState<any>(
     getInitialOptionValues({
@@ -66,9 +70,6 @@ const MoreOptionInput = ({
         break;
       case "loopThrough":
         currentOperationItem.loopThrough = newValue;
-        break;
-      case "filters":
-        currentOperationItem.itemInputFilters = newValue;
         break;
       default:
         break;
@@ -102,17 +103,19 @@ const MoreOptionInput = ({
         </div>
       );
 
-    case "filters":
-      return (
-        <FilterInput
-          isEditting={(state) => isEditting && isEditting(state)}
-          onError={(err) => {
-            onError && onError(err);
-          }}
-          initialFilters={internalValue}
-          onBlur={(newFilters) => updateValue(newFilters)}
-        />
-      );
+    // case "filters":
+    //   return (
+    //     <FilterInput
+    //       nodeId={nodeId}
+    //       itemId={itemId}
+    //       isEditting={(state) => isEditting && isEditting(state)}
+    //       onError={(err) => {
+    //         onError && onError(err);
+    //       }}
+    //       initialFilters={internalValue}
+    //       onBlur={(newFilters) => updateValue(newFilters)}
+    //     />
+    //   );
 
     default:
       return <div></div>;

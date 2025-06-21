@@ -1,12 +1,12 @@
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import React, { useEffect, useState } from "react";
-import SimpleTooltip from "@/components/global/simple_tooltip";
-import { previousInputData } from "@/lib/workflow_editor/constants/w_constants";
 import { isTrulyEmpty, toStringSafe } from "@/lib/string_utils";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import AddBranchButton from "./add_branch_button";
 import SingleFilterRow from "../../inputs/filter_input_row";
 import { Info } from "lucide-react";
+import SharedOutputButtons from "../../buttons/shared_output_buttons";
+import { insertOrRemoveIdsFromCurrentEditorErrors } from "@/lib/workflow_editor/utils/w_utils";
 
 const BranchesList = () => {
   // Store:
@@ -74,6 +74,7 @@ const BranchesList = () => {
                 return (
                   <div key={`${key}`} className="flex flex-col">
                     <SingleFilterRow
+                      nodeId={currentNode.id}
                       initialFilter={
                         branch.condition ?? {
                           filterCriteria: null,
@@ -113,15 +114,42 @@ const BranchesList = () => {
                         setBranchCurrentlyEditted(undefined);
                         currentNode.deleteOutput(key);
 
+                        insertOrRemoveIdsFromCurrentEditorErrors({
+                          fromId: "",
+                          initialNodeId: currentNode.id,
+                          action: "remove",
+                        });
+
                         setElementIdToActOn({
                           type: "Output",
                           elementId: key,
                           operation: "BranchDeleted",
                         });
                       }}
+                      onError={(hasError) => {
+                        if (hasError) {
+                          insertOrRemoveIdsFromCurrentEditorErrors({
+                            fromId: "",
+                            initialNodeId: currentNode.id,
+                            action: "add",
+                          });
+                        } else {
+                          insertOrRemoveIdsFromCurrentEditorErrors({
+                            fromId: "",
+                            initialNodeId: currentNode.id,
+                            action: "remove",
+                          });
+                        }
+                      }}
                       onSave={(newCondition) => {
                         setBranchCurrentlyEditted(undefined);
                         branch.condition = newCondition;
+
+                        insertOrRemoveIdsFromCurrentEditorErrors({
+                          fromId: "",
+                          initialNodeId: currentNode.id,
+                          action: "remove",
+                        });
                       }}
                     />
 
@@ -187,30 +215,11 @@ const BranchesList = () => {
           {branchCurrentlyEditted && (
             <div className="flex flex-col -ml-4 w-[var(--workflowPanelWidth)] !h-10 bg-white z-10 fixed bottom-[7vh]">
               {/* Shared Outputs DnD Buttons */}
-              <div className="flex flex-1 gap-1 justify-between items-center py-1 px-1 border-t">
-                {previousInputData.map((inputData) => (
-                  <SimpleTooltip
-                    key={inputData.label}
-                    tooltipText={inputData.tooltip}
-                  >
-                    <div
-                      role="button"
-                      tabIndex={2}
-                      draggable
-                      onDragStart={(e: React.DragEvent) => {
-                        e.dataTransfer.setData(
-                          "application/workflowEditor_inputdata",
-                          inputData.dataTransfer
-                        );
-                        e.dataTransfer.effectAllowed = "move";
-                      }}
-                      className="w-1/3 h-5 px-1 py-0 line-clamp-1 text-center content-center border-none rounded-sm bg-primary/20 text-primary/80 cursor-grab text-xs font-medium"
-                    >
-                      {inputData.label}
-                    </div>
-                  </SimpleTooltip>
-                ))}
-              </div>
+
+              <SharedOutputButtons
+                nodeId={currentNode.id}
+                blockId={currentNode.block?.id}
+              />
             </div>
           )}
         </div>

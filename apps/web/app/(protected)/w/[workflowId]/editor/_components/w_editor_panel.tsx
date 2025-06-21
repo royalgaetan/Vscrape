@@ -29,7 +29,16 @@ import {
   FormBlock,
   FormFieldItem,
 } from "@/lib/workflow_editor/classes/form_field_block";
-
+import { rebuildExecutionPlan } from "@/lib/workflow_editor/utils/w_utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import ConfirmationDialog from "@/components/dialogs/confirmation_dialog";
 const EditorPanel = () => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
@@ -51,6 +60,7 @@ const EditorPanel = () => {
         prev.currentNode?.id !== state.currentNode?.id ||
         isWorkflowPanelOpen
       ) {
+        // Display a confirmation dialog if on Editing Mode
         setIsEditing(false);
       }
     });
@@ -65,31 +75,27 @@ const EditorPanel = () => {
         <div className="h-px w-full relative">
           <div className="min-w-[18rem] max-w-[18rem] bg-white border-r flex flex-col items-start justify-start relative">
             {/* Close Button */}
-            <div className="pointer-events-none flex w-[var(--workflowPanelWidth)] justify-end px-4 items-center bg-transparent z-10 translate-y-4 -mb-1 sticky top-0">
-              <SimpleTooltip
-                side="bottom"
-                align="end"
-                tooltipText={"Close the panel"}
-              >
-                <Button
-                  className="pointer-events-auto bg-gray-100 hover:bg-gray-200 inset-0 p-3 duration-0 rounded-full size-4 flex justify-center items-center"
-                  variant={"ghost"}
-                  onClick={() => {
-                    if (isEditing) {
-                      setBlockOrigin(undefined);
-                    } else {
-                      toggleWorkflowPanel(false, undefined);
-                    }
-                    setIsEditing(false);
-                  }}
+            <div className="!h-5 pointer-events-none flex w-[var(--workflowPanelWidth)] justify-end px-4 items-center bg-transparent z-10 translate-y-4 -mb-1 sticky top-0">
+              {!isEditing && (
+                <SimpleTooltip
+                  side="bottom"
+                  align="end"
+                  tooltipText={"Close the panel"}
                 >
-                  <X className="size-3" />
-                </Button>
-              </SimpleTooltip>
+                  <Button
+                    className="pointer-events-auto bg-gray-100 hover:bg-gray-200 inset-0 p-3 duration-0 rounded-full size-4 flex justify-center items-center"
+                    variant={"ghost"}
+                    onClick={() => {
+                      toggleWorkflowPanel(false, undefined);
+                    }}
+                  >
+                    <X className="size-3" />
+                  </Button>
+                </SimpleTooltip>
+              )}
             </div>
 
             {/* Content */}
-
             {/* Empty Display */}
             {!currentNode && (
               <div className=" text-muted-foreground w-full text-xs font-semibold flex flex-1 justify-center items-center min-h-[80vh]">
@@ -115,12 +121,14 @@ const EditorPanel = () => {
                       (currentNode.block as OperationBlock).removeItem(
                         operationItemId
                       );
+                      rebuildExecutionPlan();
                     }}
                     onSave={(operationItem) => {
                       setIsEditing(false);
                       (currentNode.block as OperationBlock).upsertItem(
                         operationItem
                       );
+                      rebuildExecutionPlan();
                     }}
                     onBack={() => {
                       setIsEditing(false);
@@ -158,8 +166,8 @@ const EditorPanel = () => {
                 {/* Cron Block Panel: "Cron Editor" */}
                 {currentNode.blockType === "cron" && (
                   <SingleCronEditorPanel
-                    nodeOrigin={currentNode}
-                    cronBlockOrigin={blockOrigin as CronBlock | undefined}
+                    initialNode={currentNode}
+                    initialCronBlock={blockOrigin as CronBlock | undefined}
                     displayBackButton={isEditing}
                     onDelete={() => {
                       setIsEditing(false);
@@ -179,8 +187,8 @@ const EditorPanel = () => {
                 {/* Webhook Block Panel: "Webhook Editor" */}
                 {currentNode.blockType === "webhook" && (
                   <SingleWebhookEditorPanel
-                    nodeOrigin={currentNode}
-                    webhookBlockOrigin={blockOrigin as WebhookBlock}
+                    initialNode={currentNode}
+                    initialWebhookBlock={blockOrigin as WebhookBlock}
                     displayBackButton={isEditing}
                     onSave={(webhook) => {
                       setIsEditing(false);
