@@ -17,7 +17,7 @@ import {
 } from "@/lib/dom_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import { TokenInputType } from "@/lib/workflow_editor/types/w_types";
-import { resolveInputTypeFromReference } from "./filter_input_row";
+import { resolveInputTypeFromReference } from "@/lib/workflow_editor/utils/w_utils";
 
 const DnDTextInput = ({
   placeholder,
@@ -114,7 +114,11 @@ const DnDTextInput = ({
           b.textContent = token.replace(/\u200B/g, "").trim();
           b.setAttribute(
             "data-type",
-            resolveInputTypeFromReference(token) ?? ""
+            resolveInputTypeFromReference({
+              valueToResolve: token,
+              nodeId: nodeId ?? "",
+              itemId: itemId ?? "",
+            }) ?? ""
           );
           return b;
         } else {

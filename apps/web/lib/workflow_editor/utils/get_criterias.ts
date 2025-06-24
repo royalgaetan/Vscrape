@@ -16,6 +16,31 @@ import {
   isImageMimeType,
   isVideoMimeType,
 } from "../types/mime_types";
+import { isValidDateString } from "@/lib/date_time_utils";
+
+export const getSimplifiedTypeFromType = (type: any): GetFilterValueInput => {
+  // Date Case
+  if (type === "primitive/dateTime") return "date";
+  // Number Case
+  else if (type === "primitive/number") return "number";
+  // Undefined Case
+  else if (type === undefined || type === null) return "undefined";
+  // Default: String Case
+  else return "text";
+};
+
+export const getTypeFromTypedText = (
+  content: string
+): (vsAnyPrimitives | vsAnyRawTypes)["type"] | undefined => {
+  // Date Case
+  if (isValidDateString(content)) return "primitive/dateTime";
+  // Number Case
+  else if (!isNaN(Number(content))) return "primitive/number";
+  // String Case
+  else if (typeof content === "string") return "primitive/text";
+  // Undefined
+  else return undefined;
+};
 
 type T = (vsAnyPrimitives | vsAnyRawTypes)["type"] | any;
 export const getTypeBigCategory = (

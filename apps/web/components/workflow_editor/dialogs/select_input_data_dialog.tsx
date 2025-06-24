@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
 import SharedOutputsViewer from "./shared_outputs_viewer";
 import { getPreviousInputData } from "@/lib/workflow_editor/utils/w_utils";
+import { getWorkflowDefinition } from "@/actions/workflow_editor/get_workflow_definition";
 
 const SelectInputDataDialog = () => {
   const [currentKeyTab, setCurrentKeyTab] = useState("");
@@ -38,10 +39,12 @@ const SelectInputDataDialog = () => {
   const previousInputs = getPreviousInputData({
     nodeId: sharedOutputInitialNodeId ?? "",
     itemId: sharedOutputInitialItemId ?? "",
-    currentEditor,
+    executionPlan: currentEditor.executionPlan ?? {},
+    workflowDefinition: getWorkflowDefinition(currentEditor.editor) ?? {
+      connections: [],
+      nodes: [],
+    },
   });
-  console.log("previousInputs$*#?!", previousInputs);
-
   useEffect(() => {
     const sharedOutputInputTokenValue = sharedOutputInputToken?.inputTokenValue;
     if (

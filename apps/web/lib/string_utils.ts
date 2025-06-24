@@ -73,6 +73,16 @@ export const isPureVariableOnly = (html: string): boolean => {
   return matches.length === 1 && cleanedText === matches[0].trim();
 };
 
+export const variablesIncluded = (html: string): string[] => {
+  const container = document.createElement("div");
+  container.innerHTML = html;
+
+  const cleanedText = toCleanHTML(container.textContent);
+
+  const matches = cleanedText.match(/{{\s*[^{}]*?\s*}}/g) || [];
+  return matches.map((v) => v.trim());
+};
+
 export const extractTextFromHTML = (html: string) => {
   // Create a temporary dom element
   const tempDiv = document.createElement("div");

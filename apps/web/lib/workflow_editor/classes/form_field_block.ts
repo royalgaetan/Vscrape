@@ -92,7 +92,7 @@ export class FormBlock extends ObservableMixin() {
   // ---------------------------------------------------------------------------
 
   // OutputData
-  get outputData(): OutputDataType | undefined {
+  get outputData(): OutputDataType {
     const merged = this._fields.reduce((acc, f) => {
       const key = f.fieldLabel;
       const fieldValue = f.fieldValue;
@@ -106,12 +106,12 @@ export class FormBlock extends ObservableMixin() {
       return acc;
     }, {} as OutputDataType);
 
-    return Object.keys(merged).length > 0 ? merged : undefined;
+    return Object.keys(merged).length > 0 ? merged : {};
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
-    return this._fields.every((f) => f.hasValidInputs());
+  hasValidInputs(parentNodeId: string): boolean {
+    return this._fields.every((f) => f.hasValidInputs(parentNodeId));
   }
 
   // To Object
@@ -295,8 +295,11 @@ export class FormFieldItem extends ObservableMixin() {
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
-    return getInvalidInputs(this).length === 0;
+  hasValidInputs(nodeParentId: string): boolean {
+    return (
+      getInvalidInputs({ from: this, nodeId: nodeParentId, itemId: this._id })
+        .length === 0
+    );
   }
 
   // To Object

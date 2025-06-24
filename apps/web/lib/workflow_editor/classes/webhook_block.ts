@@ -55,7 +55,7 @@ export class WebhookBlock extends ObservableMixin() {
 
   // --------------------------------------------------
   // OutputData
-  get outputData(): OutputDataType | undefined {
+  get outputData(): OutputDataType {
     return {
       endpointUrl: {
         type: "primitive/url",
@@ -75,8 +75,8 @@ export class WebhookBlock extends ObservableMixin() {
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
-    return getInvalidInputs(this).length === 0;
+  hasValidInputs(parentNodeId: string): boolean {
+    return getInvalidInputs({ from: this, nodeId: parentNodeId }).length === 0;
   }
 
   // To Object

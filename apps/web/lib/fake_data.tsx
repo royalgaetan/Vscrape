@@ -273,7 +273,7 @@ import { generateAvatar } from "./image_utils";
 import { getRandomElement } from "./numbers_utils";
 import { ChatReply, knowledgeBase, userProfile } from "./types";
 import {
-  OperationThroughput,
+  OutputDataType,
   PhaseInput,
   PhaseItemType,
   PhaseLog,
@@ -289,110 +289,110 @@ export const generateWorkflowLogo = () => {
   );
 };
 
-export const fakeInputs: OperationThroughput = {
-  Variables: {
-    text: {
-      value: "TEXT_UPPERCASED",
-      type: "primitive/text",
-    },
-    translatedText: {
-      value: "Bonjour tout le monde",
-      type: "primitive/text",
-    },
-    img: {
-      type: "image/png",
-      value: null,
-      name: "Sample Screenshot",
-      sizeInBytes: 1_783_290,
-    },
-    json: {
-      name: "JSON data",
-      sizeInBytes: 200344,
-      value: new Blob(
-        [
-          JSON.stringify({
-            enabled: true,
-            retries: 3,
-            threshold: 0.85,
-          }),
-        ],
-        { type: "application/json" }
-      ),
-      type: "application/json",
-    },
-    date: {
-      value: new Date().toISOString(),
-      type: "primitive/dateTime",
-    },
-    num: {
-      value: 20,
-      type: "primitive/number",
-    },
-    boolean: {
-      value: true,
-      type: "primitive/boolean",
-    },
-    time: {
-      value: 2394,
-      type: "primitive/milliseconds",
-    },
-    url: {
-      value: "royalgaetan.com",
-      type: "primitive/url",
-    },
-    email: {
-      value: "support@royalgaetan.com",
-      type: "primitive/emailUrl",
-    },
-    tel: {
-      value: "+230 5400 0000",
-      type: "primitive/tel",
-    },
-    range: {
-      value: [49.99, 199.99],
-      type: "primitive/range",
-    },
-  },
-  LastNode: {
-    Metric: {
-      timestamp: {
-        value: new Date().toISOString(),
-        type: "primitive/dateTime",
-      },
-    },
-    Metadata: {
-      runId: {
-        value: "RUN_2025_04_13_001",
-        type: "primitive/text",
-      },
-      executionTime: {
-        value: 3.412,
-        type: "primitive/number",
-      },
+// export const fakeInputs: OutputDataType = {
+//   Variables: {
+//     text: {
+//       value: "TEXT_UPPERCASED",
+//       type: "primitive/text",
+//     },
+//     translatedText: {
+//       value: "Bonjour tout le monde",
+//       type: "primitive/text",
+//     },
+//     img: {
+//       type: "image/png",
+//       value: null,
+//       name: "Sample Screenshot",
+//       sizeInBytes: 1_783_290,
+//     },
+//     json: {
+//       name: "JSON data",
+//       sizeInBytes: 200344,
+//       value: new Blob(
+//         [
+//           JSON.stringify({
+//             enabled: true,
+//             retries: 3,
+//             threshold: 0.85,
+//           }),
+//         ],
+//         { type: "application/json" }
+//       ),
+//       type: "application/json",
+//     },
+//     date: {
+//       value: new Date().toISOString(),
+//       type: "primitive/dateTime",
+//     },
+//     num: {
+//       value: 20,
+//       type: "primitive/number",
+//     },
+//     boolean: {
+//       value: true,
+//       type: "primitive/boolean",
+//     },
+//     time: {
+//       value: 2394,
+//       type: "primitive/milliseconds",
+//     },
+//     url: {
+//       value: "royalgaetan.com",
+//       type: "primitive/url",
+//     },
+//     email: {
+//       value: "support@royalgaetan.com",
+//       type: "primitive/emailUrl",
+//     },
+//     tel: {
+//       value: "+230 5400 0000",
+//       type: "primitive/tel",
+//     },
+//     range: {
+//       value: [49.99, 199.99],
+//       type: "primitive/range",
+//     },
+//   },
+//   LastNode: {
+//     Metric: {
+//       timestamp: {
+//         value: new Date().toISOString(),
+//         type: "primitive/dateTime",
+//       },
+//     },
+//     Metadata: {
+//       runId: {
+//         value: "RUN_2025_04_13_001",
+//         type: "primitive/text",
+//       },
+//       executionTime: {
+//         value: 3.412,
+//         type: "primitive/number",
+//       },
 
-      completed: {
-        value: true,
-        type: "primitive/boolean",
-      },
-    },
-  },
-  LastOperation: {
-    Files: {
-      downloadedPDF: {
-        name: "Monthly Report",
-        type: "application/pdf",
-        sizeInBytes: 1_423_400,
-        value: null,
-      },
-      rawCSV: {
-        type: "text/csv",
-        name: "User Data Export",
-        sizeInBytes: 745_900,
-        value: null,
-      },
-    },
-  },
-};
+//       completed: {
+//         value: true,
+//         type: "primitive/boolean",
+//       },
+//     },
+//   },
+//   LastOperation: {
+//     Files: {
+//       downloadedPDF: {
+//         name: "Monthly Report",
+//         type: "application/pdf",
+//         sizeInBytes: 1_423_400,
+//         value: null,
+//       },
+//       rawCSV: {
+//         type: "text/csv",
+//         name: "User Data Export",
+//         sizeInBytes: 745_900,
+//         value: null,
+//       },
+//     },
+//   },
+// };
 
 export const getStatsData = (
   periodSelected: DateRange | undefined,
@@ -419,22 +419,26 @@ export const getStatsData = (
 
   // Reduce the date, and merge data of same dates
   const mergedDates = Object.values(
-    onlyDatesSelectedArr.reduce((acc, curr) => {
-      const key = formatISO(curr.date);
+    onlyDatesSelectedArr.reduce(
+      (acc, curr) => {
+        const key = formatISO(curr.date);
 
-      if (!acc[key]) {
-        acc[key] = { ...curr };
-      } else {
-        acc[key].workflow_execution_succeed += curr.workflow_execution_succeed;
-        acc[key].workflow_execution_failed += curr.workflow_execution_failed;
-        acc[key].phase_execution_succeed += curr.phase_execution_succeed;
-        acc[key].phase_execution_failed += curr.phase_execution_failed;
-        acc[key].phase_credit_succeed += curr.phase_credit_succeed;
-        acc[key].phase_credit_failed += curr.phase_credit_failed;
-      }
+        if (!acc[key]) {
+          acc[key] = { ...curr };
+        } else {
+          acc[key].workflow_execution_succeed +=
+            curr.workflow_execution_succeed;
+          acc[key].workflow_execution_failed += curr.workflow_execution_failed;
+          acc[key].phase_execution_succeed += curr.phase_execution_succeed;
+          acc[key].phase_execution_failed += curr.phase_execution_failed;
+          acc[key].phase_credit_succeed += curr.phase_credit_succeed;
+          acc[key].phase_credit_failed += curr.phase_credit_failed;
+        }
 
-      return acc;
-    }, {} as Record<string, (typeof onlyDatesSelectedArr)[number]>)
+        return acc;
+      },
+      {} as Record<string, (typeof onlyDatesSelectedArr)[number]>
+    )
   );
 
   return mergedDates.sort((a, b) => a.date.getTime() - b.date.getTime());

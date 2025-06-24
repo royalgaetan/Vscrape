@@ -30,15 +30,6 @@ import {
   FormFieldItem,
 } from "@/lib/workflow_editor/classes/form_field_block";
 import { rebuildExecutionPlan } from "@/lib/workflow_editor/utils/w_utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import ConfirmationDialog from "@/components/dialogs/confirmation_dialog";
 const EditorPanel = () => {
   // Store:
   const currentNode = useWorkflowEditorStore((s) => s.currentNode);
@@ -48,10 +39,13 @@ const EditorPanel = () => {
   const isWorkflowPanelOpen = useWorkflowEditorStore(
     (s) => s.isWorkflowPanelOpen
   );
-
   // End Store
   const [isEditing, setIsEditing] = useState(false);
   const [blockOrigin, setBlockOrigin] = useState<any>();
+  const handleBackButton = () => {
+    rebuildExecutionPlan();
+    setIsEditing(false);
+  };
 
   useEffect(() => {
     // When the Workflow Panel changes: set EditingMode to false
@@ -130,9 +124,7 @@ const EditorPanel = () => {
                       );
                       rebuildExecutionPlan();
                     }}
-                    onBack={() => {
-                      setIsEditing(false);
-                    }}
+                    onBack={() => handleBackButton()}
                   />
                 ) : (
                   <></>
@@ -157,9 +149,7 @@ const EditorPanel = () => {
                         fieldItemId
                       );
                     }}
-                    onBack={() => {
-                      setIsEditing(false);
-                    }}
+                    onBack={() => handleBackButton()}
                   />
                 )}
 
@@ -178,9 +168,7 @@ const EditorPanel = () => {
                       if (!cron) return;
                       currentNode.block = cron;
                     }}
-                    onBack={() => {
-                      setIsEditing(false);
-                    }}
+                    onBack={() => handleBackButton()}
                   />
                 )}
 
@@ -195,9 +183,7 @@ const EditorPanel = () => {
                       if (!webhook) return;
                       currentNode.block = webhook;
                     }}
-                    onBack={() => {
-                      setIsEditing(false);
-                    }}
+                    onBack={() => handleBackButton()}
                   />
                 )}
               </>

@@ -135,15 +135,15 @@ export class CronBlock extends ObservableMixin() {
 
   // --------------------------------------------------
   // OutputData
-  get outputData(): OutputDataType | undefined {
+  get outputData(): OutputDataType {
     return {
       "Cron Expression": { type: "primitive/cron", value: this.cronExp },
     };
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
-    return getInvalidInputs(this).length === 0;
+  hasValidInputs(parentNodeId: string): boolean {
+    return getInvalidInputs({ from: this, nodeId: parentNodeId }).length === 0;
   }
 
   // To Object

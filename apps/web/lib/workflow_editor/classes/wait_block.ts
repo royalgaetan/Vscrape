@@ -27,7 +27,7 @@ export class WaitBlock extends ObservableMixin() {
 
   // --------------------------------------------------
   // OutputData
-  get outputData(): OutputDataType | undefined {
+  get outputData(): OutputDataType {
     return {
       duration: {
         type: "primitive/milliseconds",
@@ -37,7 +37,7 @@ export class WaitBlock extends ObservableMixin() {
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
+  hasValidInputs(parentNodeId: string): boolean {
     return true;
   }
 

@@ -28,62 +28,12 @@ import { OperationItem } from "@/lib/workflow_editor/classes/operation_block";
 import { VsNode } from "@/lib/workflow_editor/classes/node";
 import { cloneDeep } from "lodash";
 import { toast } from "sonner";
-import { getTypeBigCategory } from "@/lib/workflow_editor/utils/get_criterias";
-import {
-  extractTextFromHTML,
-  isPureVariableOnly,
-  toCleanHTML,
-  toStringSafe,
-} from "@/lib/string_utils";
-import { resolveInputTypeFromReference } from "../../inputs/filter_input_row";
 import SharedOutputButtons from "../../buttons/shared_output_buttons";
 import {
   getInvalidInputs,
   insertOrRemoveIdsFromCurrentEditorErrors,
+  rebuildExecutionPlan,
 } from "@/lib/workflow_editor/utils/w_utils";
-import { useWorkflowEditorStore } from "@/stores/workflowStore";
-
-export const shouldExcludeItem = (
-  item: any,
-  idx?: number,
-  arr?: any[]
-): boolean => {
-  const itemAsString = toCleanHTML(toStringSafe(item));
-
-  // Exclude if empty and is 1st element
-  if (itemAsString.length === 0 && idx === 0) {
-    return true;
-  }
-
-  // Exclude if empty and not the last item
-  if (
-    (arr && idx && itemAsString.length === 0 && idx !== arr.length - 1) ||
-    (!arr && itemAsString.length === 0)
-  ) {
-    return true;
-  }
-
-  const typeCategory = getItemTypeCategory(item);
-
-  // Exclude if not one of the allowed types
-  return !["string", "number", "Strings", "Numbers"].includes(typeCategory);
-};
-
-export const getItemTypeCategory = (item: any): string => {
-  if (isPureVariableOnly(item)) {
-    const resolvedType = resolveInputTypeFromReference(
-      extractTextFromHTML(item)
-    );
-    return getTypeBigCategory(resolvedType) ?? "";
-  }
-  if (typeof item === "boolean") {
-    return "boolean";
-  }
-  if (isReallyNumber(item)) {
-    return "number";
-  }
-  return typeof item;
-};
 
 const SingleOperationItemPanel = ({
   initialNode,
@@ -149,7 +99,11 @@ const SingleOperationItemPanel = ({
 
   const errorChecker = (currentOperationItem: OperationItem) => {
     // Get Invalid Inputs
-    const errFields = getInvalidInputs(currentOperationItem);
+    const errFields = getInvalidInputs({
+      from: currentOperationItem,
+      nodeId: initialNode.id,
+      itemId: currentOperationItem.id,
+    });
 
     // If found
     if (errFields.length > 0) {
@@ -190,19 +144,13 @@ const SingleOperationItemPanel = ({
   }, []);
 
   useEffect(() => {
+    rebuildExecutionPlan();
     // Run Errors Checking if on Update Mode
     if (initialOperationItem) {
       try {
         errorChecker(initialOperationItem);
       } catch (e) {
         console.log("Err", e);
-        toast.error(
-          e instanceof Error ? e.message : "An error occured. Try again.",
-          {
-            position: "bottom-center",
-            richColors: true,
-          }
-        );
       }
     }
   }, []);

@@ -1,5 +1,6 @@
 import { BehaviorSubject } from "rxjs";
 import { ExtendedOperationFilterType } from "../types/w_types";
+import { rebuildExecutionPlan } from "../utils/w_utils";
 
 export type Constructor<T = {}> = new (...args: any[]) => T;
 
@@ -11,6 +12,7 @@ export const ObservableMixin = <TBase extends Constructor = Constructor>(
 
     // Notify All Class instance Subscribers
     notifyAll() {
+      rebuildExecutionPlan();
       this._stream$.next(this);
     }
 

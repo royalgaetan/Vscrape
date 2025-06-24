@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { NodeEditor, GetSchemes } from "rete";
 import CustomLoader from "@/components/global/loader";
 import { createRoot } from "react-dom/client";
@@ -344,7 +350,7 @@ const WorkflowEditor = ({
       // On New Connection
       if (context.type === "connectioncreated") {
         // Rebuild the ExecutionPlan (to propagate Shared outputData)
-        rebuildExecutionPlan();
+        remakeExecutionPlan();
 
         // Check for Cycles (D.A.G)
         const adj = buildAdjacency(editor);
@@ -363,7 +369,7 @@ const WorkflowEditor = ({
       // On Connection removed
       if (context.type === "connectionremoved") {
         // Rebuild the ExecutionPlan (to propagate Shared outputData)
-        rebuildExecutionPlan();
+        remakeExecutionPlan();
       }
 
       // Picked: Node "fully" Clicked
@@ -408,6 +414,10 @@ const WorkflowEditor = ({
       return context;
     });
   }, [editorInstanceRef.current]);
+
+  const remakeExecutionPlan = useCallback(() => {
+    rebuildExecutionPlan();
+  }, []);
 
   useEffect(() => {
     if (elementDropped) {

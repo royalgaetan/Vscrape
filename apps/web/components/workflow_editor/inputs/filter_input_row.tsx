@@ -15,6 +15,7 @@ import {
   GetFilterValueInput,
   GetFilterValueInputs,
   getFilterValueInputs,
+  getSimplifiedTypeFromType,
 } from "@/lib/workflow_editor/utils/get_criterias";
 import FilterValueInput from "./filter_value_input";
 import { formatDate, isDate } from "date-fns";
@@ -28,7 +29,7 @@ import {
 } from "@/lib/workflow_editor/types/data_types";
 import { Button } from "@/components/ui/button";
 import SimpleTooltip from "@/components/global/simple_tooltip";
-import { fakeInputs } from "@/lib/fake_data";
+import { resolveInputTypeFromReference } from "@/lib/workflow_editor/utils/w_utils";
 
 type SingleFilterRowProps = {
   initialFilter: ExtendedOperationFilterType;
@@ -97,7 +98,11 @@ const SingleFilterRow = ({
     } else {
       if (
         resolveInputTypeFromReference(text) !==
-        resolveInputTypeFromReference(filterObj.filterType)
+        resolveInputTypeFromReference({
+          valueToResolve: filterObj.filterType,
+          nodeId: nodeId ?? "",
+          itemId: itemId ?? "",
+        })
       ) {
         filterObj.filterCriteria = null;
         filterObj.filterValue = [undefined] as any;
@@ -241,15 +246,19 @@ const SingleFilterRow = ({
 
   const valueInputsSchema: GetFilterValueInputs = getFilterValueInputs({
     filterCriteria: filterObj.filterCriteria,
-    filterType: resolveInputTypeFromReference(
-      extractTextFromHTML(filterObj?.inputID)
-    ) as any,
+    filterType: resolveInputTypeFromReference({
+      valueToResolve: extractTextFromHTML(filterObj?.inputID),
+      nodeId: nodeId ?? "",
+      itemId: itemId ?? "",
+    }) as any,
   });
   const criteriaSelectionName: string =
     getCriteriaSelection({
-      filterType: resolveInputTypeFromReference(
-        extractTextFromHTML(filterObj?.inputID)
-      ),
+      filterType: resolveInputTypeFromReference({
+        valueToResolve: extractTextFromHTML(filterObj?.inputID),
+        nodeId: nodeId ?? "",
+        itemId: itemId ?? "",
+      }),
     }).length > 0
       ? "Criterias"
       : "";
@@ -386,9 +395,11 @@ const SingleFilterRow = ({
                 label={filterObj.filterCriteria ?? "Criteria..."}
                 data={{
                   [criteriaSelectionName]: getCriteriaSelection({
-                    filterType: resolveInputTypeFromReference(
-                      extractTextFromHTML(filterObj?.inputID)
-                    ),
+                    filterType: resolveInputTypeFromReference({
+                      valueToResolve: extractTextFromHTML(filterObj?.inputID),
+                      nodeId: nodeId ?? "",
+                      itemId: itemId ?? "",
+                    }),
                   }).map((criteria) => ({
                     label: capitalizeFirstLetter(criteria),
                     value: criteria,
@@ -548,82 +559,4 @@ export const TextWithSeparator = ({
   ) : (
     ""
   );
-};
-
-export const getSimplifiedTypeFromType = (type: any): GetFilterValueInput => {
-  // Date Case
-  if (type === "primitive/dateTime") return "date";
-  // Number Case
-  else if (type === "primitive/number") return "number";
-  // Undefined Case
-  else if (type === undefined || type === null) return "undefined";
-  // Default: String Case
-  else return "text";
-};
-
-export const getTypeFromTypedText = (
-  content: string
-): (vsAnyPrimitives | vsAnyRawTypes)["type"] | undefined => {
-  // Date Case
-  if (isValidDateString(content)) return "primitive/dateTime";
-  // Number Case
-  else if (!isNaN(Number(content))) return "primitive/number";
-  // String Case
-  else if (typeof content === "string") return "primitive/text";
-  // Undefined
-  else return undefined;
-};
-
-/**
- * Tries to resolve the data type of an input reference string (e.g., {{ Variables.json }})
- * by looking it up in the shared output data or by falling back to a typed-text extractor.
- *
- * @param inputID - The string or reference to resolve (e.g., {{ Variables.json }})
- * @returns The corresponding type string if found, or undefined.
- */
-export const resolveInputTypeFromReference = (
-  inputID: any
-): (vsAnyPrimitives | vsAnyRawTypes)["type"] | undefined => {
-  const cleanInput = toStringSafe(inputID);
-  const path = stripMustacheBraces(cleanInput).split(".");
-
-  // Attempt to resolve type from predefined shared outputs
-  let resolvedType = resolveNestedType(fakeInputs, path);
-
-  // Fallback if path resolution fails
-  if (!resolvedType) {
-    resolvedType = getTypeFromTypedText(cleanInput);
-  }
-
-  return resolvedType;
-};
-
-/**
- * Traverses a nested object using a key path to resolve the final `.type` if it exists.
- *
- * @param object - The root object to start from.
- * @param keys - The list of keys (e.g., ["Variables", "json"]) to traverse.
- * @param level - Internal use for recursion depth (default 0).
- * @returns The `.type` string at the final node, or undefined if not found.
- */
-export const resolveNestedType = (
-  object: Record<string, any>,
-  keys: string[],
-  level: number = 0
-): (vsAnyPrimitives | vsAnyRawTypes)["type"] | undefined => {
-  const key = keys[level];
-
-  if (!(key in object)) return;
-
-  const currentValue = object[key];
-
-  // If it's a nested object without a type, go deeper
-  if (isRecord(currentValue) && !currentValue["type"]) {
-    return resolveNestedType(currentValue, keys, level + 1);
-  }
-
-  // If it has a "type" field, return it
-  if (isRecord(currentValue) && currentValue["type"]) {
-    return currentValue.type;
-  }
 };

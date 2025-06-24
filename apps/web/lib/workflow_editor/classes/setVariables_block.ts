@@ -35,7 +35,7 @@ export class SetVariablesBlock extends ObservableMixin() {
 
   // ----------------------------------------------------------------------
   // OutputData
-  get outputData(): OutputDataType | undefined {
+  get outputData(): OutputDataType {
     const merged = this._variableAssignations.reduce((acc, as) => {
       const key = as.varName;
       const value = as.varValue;
@@ -45,13 +45,13 @@ export class SetVariablesBlock extends ObservableMixin() {
       return acc;
     }, {} as OutputDataType);
 
-    return Object.keys(merged).length > 0 ? merged : undefined;
+    return Object.keys(merged).length > 0 ? merged : {};
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
+  hasValidInputs(parentNodeId: string): boolean {
     return this._variableAssignations.every(
-      (as) => getInvalidInputs(as).length === 0
+      (as) => getInvalidInputs({ from: as, nodeId: parentNodeId }).length === 0
     );
   }
 

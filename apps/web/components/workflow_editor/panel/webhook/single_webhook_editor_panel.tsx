@@ -92,7 +92,10 @@ const SingleWebhookEditorPanel = ({
 
   const errorChecker = () => {
     // Get Invalid Inputs
-    const errFields = getInvalidInputs(currentBlock);
+    const errFields = getInvalidInputs({
+      from: currentBlock,
+      nodeId: currentBlock.id,
+    });
 
     if (errFields.length > 0) {
       // Add the current "Webhook Id" + "Parent Node Id" among CurrentEditor errors list

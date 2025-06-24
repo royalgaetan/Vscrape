@@ -3,6 +3,7 @@ import {
   ExecutionPlan,
   SharedOutputSelectedItem,
   TokenInputType,
+  WorkflowDefinition,
 } from "@/lib/workflow_editor/types/w_types";
 import { create } from "zustand";
 import { NodeEditor } from "rete";
@@ -87,6 +88,8 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
       editor: undefined,
       state: undefined,
       executionPlan: undefined,
+      errors: undefined,
+      workflowDefinition: undefined,
     },
     setCurrentEditor: ({
       editor,
@@ -98,7 +101,15 @@ export const useWorkflowEditorStore = create<WorkflowEditorState>(
       state?: currentEditorState;
       executionPlan?: ExecutionPlan;
       errors?: Set<string>;
-    }) => set({ currentEditor: { editor, state, executionPlan, errors } }),
+    }) =>
+      set({
+        currentEditor: {
+          editor,
+          state,
+          executionPlan,
+          errors,
+        },
+      }),
 
     // Workflow Panel-related
     isWorkflowPanelOpen: false,

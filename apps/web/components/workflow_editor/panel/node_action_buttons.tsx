@@ -107,7 +107,8 @@ const NodeActionButtons = () => {
       </SimpleTooltip>
 
       {/* Duplicate Node */}
-      {!entryPointNodesLabels().includes(currentNode?.label ?? "") && (
+      {!entryPointNodesLabels().includes(currentNode?.label ?? "") &&
+      currentNode?.blockType !== "setVariables" ? (
         <SimpleTooltip tooltipText="Duplicate Node" side="bottom">
           <Button
             variant={"ghost"}
@@ -128,6 +129,8 @@ const NodeActionButtons = () => {
             <Copy className="group-hover/deleleNodeBtn:stroke-destructive-foreground !size-3 stroke-[2.5px] translate-y-[1px] stroke-neutral-500" />
           </Button>
         </SimpleTooltip>
+      ) : (
+        <></>
       )}
 
       {/* Delete Node */}

@@ -13,7 +13,10 @@ const ExecuteButton = () => {
       onClick={() => {
         try {
           const executionPlan = getWorkflowExecutionPlan();
-          orchestrator({ executionPlan: executionPlan, mode: "local" });
+          orchestrator({
+            executionPlan: executionPlan.plan,
+            mode: "local",
+          });
 
           toast.success("Your workflow execution has started...", {
             richColors: true,

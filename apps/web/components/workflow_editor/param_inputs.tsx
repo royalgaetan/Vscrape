@@ -148,7 +148,7 @@ const ParamInput = ({
               onChange(text);
             }}
             placeholder={placeHolder}
-            className={`min-w-[100%] max-w-[100%] ${isWithinAGroup && "min-w-[6rem] max-w-[6rem]"}`}
+            className={`min-w-[15.7rem] max-w-[15.7rem] ${isWithinAGroup && "min-w-[6rem] max-w-[6rem]"}`}
           />
         );
       }

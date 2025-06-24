@@ -77,22 +77,22 @@ export class OperationBlock extends ObservableMixin() {
   // -----------------------------------------------------------------------------
 
   // OutputData
-  get outputData(): OutputDataType | undefined {
+  get outputData(): OutputDataType {
     const merged = this._items.reduce((acc, it) => {
       const key = it.operationItemName;
       const value = it.itemOutputData;
-      if (value !== undefined) {
+      if (value && key) {
         acc[key] = value;
       }
       return acc;
     }, {} as OutputDataType);
 
-    return Object.keys(merged).length > 0 ? merged : undefined;
+    return Object.keys(merged).length > 0 ? merged : {};
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
-    return this._items.every((it) => it.hasValidInputs());
+  hasValidInputs(parentNodeId: string): boolean {
+    return this._items.every((it) => it.hasValidInputs(parentNodeId));
   }
 
   // To Object
@@ -113,7 +113,7 @@ export class OperationItem extends ObservableMixin() {
   private _nodeName: (typeof workflowEditorNodes)[number]["label"];
 
   private _itemParams?: (OperationItemParam | OperationItemParam[])[];
-  private _itemOutputData?: OutputDataType;
+  private _itemOutputData: OutputDataType;
 
   private _skipDuplicate?: boolean;
   private _loopThrough?: "All items" | number | boolean;
@@ -126,7 +126,7 @@ export class OperationItem extends ObservableMixin() {
     this._operationItemName = operationItem.operationItemName;
     this._operationItemDescription = operationItem.operationItemDescription;
     this._itemParams = operationItem.itemParams;
-    this._itemOutputData = operationItem.itemOutputData;
+    this._itemOutputData = operationItem.itemOutputData ?? {};
     this._skipDuplicate = operationItem.skipDuplicate;
     this._loopThrough = operationItem.loopThrough;
   }
@@ -176,17 +176,20 @@ export class OperationItem extends ObservableMixin() {
 
   // ------------------------------------------------------------
   // OutputData: Add getter + setter
-  get itemOutputData(): OutputDataType | undefined {
-    return this._itemOutputData;
+  get itemOutputData(): OutputDataType {
+    return this._itemOutputData ?? {};
   }
-  set itemOutputData(outputsVal: OutputDataType | undefined) {
+  set itemOutputData(outputsVal: OutputDataType) {
     this._itemOutputData = outputsVal;
     this.notifyAll();
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
-    return getInvalidInputs(this).length === 0;
+  hasValidInputs(parentNodeId: string): boolean {
+    return (
+      getInvalidInputs({ from: this, nodeId: parentNodeId, itemId: this._id })
+        .length === 0
+    );
   }
 
   // To Object

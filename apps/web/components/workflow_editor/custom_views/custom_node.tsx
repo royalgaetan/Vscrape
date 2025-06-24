@@ -235,6 +235,7 @@ const CustomNode = ({
             </p>
             {/* Button: Duplicate */}
             {node.blockType !== "preview" &&
+            node.blockType !== "setVariables" &&
             !entryPointNodesLabels().includes(node.label) ? (
               <SimpleTooltip tooltipText="Duplicate" side="bottom">
                 <Button

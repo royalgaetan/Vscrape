@@ -74,7 +74,7 @@ const WHeader = () => {
       if (!currentEditor.editor)
         throw new Error("An error occured while saving the workflow...");
 
-      const workflowDefinition = getWorkflowDefinition();
+      const workflowDefinition = getWorkflowDefinition(currentEditor.editor);
       if (!workflowDefinition)
         throw new Error("Cannot save the current workflow...");
 

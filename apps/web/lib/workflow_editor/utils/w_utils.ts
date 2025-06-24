@@ -16,6 +16,7 @@ import {
   OutputDataType,
   PreviousInputDataType,
   VsNodeType,
+  WorkflowDefinition,
 } from "../types/w_types";
 import { WORKFLOW_COLORS } from "@/lib/colors_utils";
 import { VsNode } from "../classes/node";
@@ -26,22 +27,28 @@ import { CurrentEditor, useWorkflowEditorStore } from "@/stores/workflowStore";
 import { Schemes } from "@/app/(protected)/w/[workflowId]/editor/_components/w_editor";
 import { OperationBlock, OperationItem } from "../classes/operation_block";
 import { getWorkflowExecutionPlan } from "@/actions/workflow_editor/get_workflow_execution_plan";
-import { toast } from "sonner";
-import { resolveInputTypeFromReference } from "@/components/workflow_editor/inputs/filter_input_row";
-import { shouldExcludeItem } from "@/components/workflow_editor/panel/operations/single_operationItem_panel";
 import {
   extractTextFromHTML,
   toStringSafe,
   isPureVariableOnly,
+  stripMustacheBraces,
+  toCleanHTML,
+  variablesIncluded,
+  isTrulyEmpty,
 } from "@/lib/string_utils";
 import { isRecord } from "@/lib/utils";
-import { getTypeBigCategory } from "./get_criterias";
+import { getTypeBigCategory, getTypeFromTypedText } from "./get_criterias";
 import { FormFieldItem } from "../classes/form_field_block";
 import { isAFile } from "../types/mime_types";
 import { WebhookBlock } from "../classes/webhook_block";
 import { CronBlock } from "../classes/cron_block";
 import { isValidCronSection } from "@/components/workflow_editor/panel/cron/cron_editor_card";
 import { SetVariablesBlock } from "../classes/setVariables_block";
+import { vsAnyPrimitives, vsAnyRawTypes } from "../types/data_types";
+import { isReallyNumber } from "@/lib/numbers_utils";
+import { useCallback } from "react";
+import { VsConnection } from "../classes/connections";
+import { getWorkflowDefinition } from "@/actions/workflow_editor/get_workflow_definition";
 
 export const isDynamicInputDataOnly = (content: string) => {
   // Check if the provided content is only a data input. E.g. {{ Variables }}
@@ -166,14 +173,18 @@ export const rebuildExecutionPlan = () => {
   if (currentEditor.state !== "rendered") return;
   const setCurrentEditor = useWorkflowEditorStore.getState().setCurrentEditor;
   try {
+    // console.log("⛏️ 1.Rebuiling execution plan...", "\nWith:", currentEditor);
     const newExecutionPlan = getWorkflowExecutionPlan();
+    const plan = newExecutionPlan.plan;
+    const err = newExecutionPlan.errors;
     setCurrentEditor({
-      editor: currentEditor.editor,
-      state: "rendered",
-      executionPlan: newExecutionPlan,
+      ...currentEditor,
+      executionPlan: plan,
+      errors: err,
     });
+    // console.log("⛏️ 2.Rebuilt::Execution plan", "\nPlan:", plan, "\nErr:", err);
   } catch (err) {
-    console.log("Error while rebuilding the execution plan...");
+    console.log("Error while rebuilding the execution plan...", err);
   }
 };
 
@@ -184,42 +195,36 @@ export const rebuildExecutionPlan = () => {
 export const getPreviousInputData = ({
   nodeId,
   itemId,
-  currentEditor,
+  executionPlan,
+  workflowDefinition,
 }: {
   nodeId: string;
   itemId: string;
-  currentEditor: CurrentEditor;
+  executionPlan: ExecutionPlan;
+  workflowDefinition: WorkflowDefinition;
 }): PreviousInputDataType[] => {
   let _previousInputs = [] as PreviousInputDataType[];
-  if (currentEditor.state !== "rendered") return [];
-
   try {
-    const executionPlan = getWorkflowExecutionPlan();
+    // const executionPlan = getWorkflowExecutionPlan();
     // From ExecutionPlan, get "speculated" previousInputData
-    // To allow user to use them before calculation (Orchestrator
-    if (!executionPlan) return [];
-    const inputVars = getVariablesInputData(
-      nodeId,
-      currentEditor,
-      executionPlan
-    );
+    // To allow user to use them before calculation (Orchestrator)
+    const inputVars = getVariablesInputData(nodeId, executionPlan);
     const prevNodeOutputs = getPreviousNodeInputData(
       nodeId,
-      currentEditor,
-      executionPlan
+      executionPlan,
+      workflowDefinition
     );
     const prevItemOutputs = getPreviousItemInputData(
       nodeId,
       itemId ?? "",
-      currentEditor,
-      executionPlan
+      workflowDefinition
     );
-
-    const hasVariables = inputVars && Object.keys(inputVars).length > 0;
+    const hasVariables =
+      inputVars && Object.keys(inputVars["Variables"]).length > 0;
     const hasPreviousNode =
-      prevNodeOutputs && Object.keys(prevNodeOutputs).length > 0;
+      prevNodeOutputs && Object.keys(prevNodeOutputs["Last Node"]).length > 0;
     const hasPreviousItem =
-      prevItemOutputs && Object.keys(prevItemOutputs).length > 0;
+      prevItemOutputs && Object.keys(prevItemOutputs["Last Item"]).length > 0;
 
     _previousInputs = previousInputData
       .map((p) => {
@@ -234,66 +239,62 @@ export const getPreviousInputData = ({
 
     return _previousInputs;
   } catch (err) {
-    toast.error(
-      err instanceof Error ? err.message : "An error occured. Try again!",
-      {
-        richColors: true,
-      }
-    );
+    console.log("Error while making Previous Input Data", err);
     return [];
   }
 };
 
 export const getVariablesInputData = (
   nodeId: string,
-  currentEditor: CurrentEditor,
   executionPlan: ExecutionPlan
 ): OutputDataType | undefined => {
-  const editor = currentEditor.editor;
-  if (!editor || !executionPlan) return {};
-
-  // From previous phases (desc.) find the all SetVariableNode and Merge them as Global Vars
-  // Conflicts: Vars with same names are overwritten
+  // From previous phases (desc.) find the all "SetVariables" Nodes and Merge them as Global Vars
+  // Conflicts: Vars with same "keys" are overwritten with last values
   // If not found return empty array: aka no Global Vars defined
   const currNodePhaseNumber = Number(
     Object.entries(executionPlan).find(([phaseNumber, nodes]) =>
-      nodes.find((n) => n.id === nodeId)
+      nodes.some((n) => n.id === nodeId)
     )?.[0]
   );
 
   let globalVars: OutputDataType = {};
 
   const _previousSetVariablesNodes = Object.entries(executionPlan)
-    .filter(
-      ([k, v]) =>
+    .filter(([k, v]) => {
+      return (
         Number(k) < currNodePhaseNumber &&
         v.some((n) => n.label === "Set Variables")
-    )
+      );
+    })
     .flatMap((vals) => vals[1]);
 
   _previousSetVariablesNodes.forEach((setVariablesNode, idx) => {
     if (setVariablesNode.outputData) {
-      globalVars = {
-        idx: setVariablesNode.outputData,
-        ...globalVars,
-      };
+      Object.entries(setVariablesNode.outputData).forEach(([key, values]) => {
+        // if key already exist, override its values with new one
+        if (Object.keys(globalVars).includes(key)) {
+          globalVars[key] = values;
+        } else {
+          globalVars = {
+            [key]: values,
+            ...globalVars,
+          };
+        }
+      });
     }
   });
 
-  return { Variables: globalVars };
+  return { ["Variables"]: globalVars };
 };
 
 export const getPreviousNodeInputData = (
   nodeId: string,
-  currentEditor: CurrentEditor,
-  executionPlan: ExecutionPlan
+  executionPlan: ExecutionPlan,
+  workflowDefinition: WorkflowDefinition
 ): OutputDataType | undefined => {
-  const editor = currentEditor.editor;
-  if (!editor || !executionPlan) return {};
-
-  const relatedConnections = editor
-    .getConnections()
-    .filter((conn) => conn.target === nodeId);
+  const relatedConnections = workflowDefinition.connections.filter(
+    (conn) => conn.target === nodeId
+  );
 
   const previousNodeIds = new Set(relatedConnections.map((c) => c.source));
 
@@ -307,7 +308,9 @@ export const getPreviousNodeInputData = (
     .filter(
       ([phaseNumber, nodes]) =>
         Number(phaseNumber) < getCurrNodePhaseNumber &&
-        nodes.find((n) => previousNodeIds.has(n.id))
+        nodes.find(
+          (n) => previousNodeIds.has(n.id) && n.label !== "Set Variables"
+        )
     )
     .flatMap((n) => n[1]);
 
@@ -324,14 +327,10 @@ export const getPreviousNodeInputData = (
 export const getPreviousItemInputData = (
   nodeId: string,
   itemId: string,
-  currentEditor: CurrentEditor,
-  executionPlan: ExecutionPlan
+  workflowDefinition: WorkflowDefinition
 ): OutputDataType | undefined => {
-  const editor = currentEditor.editor;
-  if (!editor || !executionPlan) return;
-
   // Check if the node is composed of OperationItems only
-  const node = editor.getNode(nodeId);
+  const node = workflowDefinition.nodes.find((n) => n.id === nodeId);
   const nodeBlock = node?.block;
   if (!node || !node.block) return;
 
@@ -349,10 +348,146 @@ export const getPreviousItemInputData = (
   }
 
   const previousItem = nodeItemsArr[previousItemIndex];
+  if (!previousItem) return;
   const previousItemOutputData = previousItem.itemOutputData;
-  if (!previousItem || !previousItemOutputData) return;
+  if (!previousItemOutputData) return;
 
   return { "Last Item": previousItemOutputData };
+};
+
+/**
+ * Tries to resolve the data type of an input reference string (e.g., {{ Variables.json }})
+ * by looking it up in the shared output data or by falling back to a typed-text extractor.
+ *
+ * @param inputID - The string or reference to resolve (e.g., {{ Variables.json }})
+ * @returns The corresponding type string if found, or undefined.
+ */
+export const resolveInputTypeFromReference = ({
+  valueToResolve,
+  nodeId,
+  itemId,
+}: {
+  valueToResolve: any;
+  nodeId: string;
+  itemId: string;
+}): (vsAnyPrimitives | vsAnyRawTypes)["type"] | undefined => {
+  const cleanInput = toStringSafe(valueToResolve);
+  const path = stripMustacheBraces(cleanInput).split(".");
+  let _prevInputs = {};
+
+  const currentEditor = useWorkflowEditorStore.getState().currentEditor;
+  const plan = currentEditor.executionPlan;
+  const definition = getWorkflowDefinition(currentEditor.editor);
+  if (!definition || !plan) return;
+
+  const previousInputData = getPreviousInputData({
+    executionPlan: plan,
+    workflowDefinition: definition,
+    nodeId,
+    itemId,
+  });
+  previousInputData.forEach((inputData) => {
+    if (inputData.data) {
+      const key = Object.keys(inputData.data)[0];
+      const values = Object.values(inputData.data)[0];
+      _prevInputs = {
+        [key]: values,
+        ..._prevInputs,
+      };
+    }
+  });
+  // Attempt to resolve type from predefined shared outputs
+  return resolveNestedType(_prevInputs, path);
+};
+
+/**
+ * Traverses a nested object using a key path to resolve the final `.type` if it exists.
+ *
+ * @param object - The root object to start from.
+ * @param keys - The list of keys (e.g., ["Variables", "json"]) to traverse.
+ * @param level - Internal use for recursion depth (default 0).
+ * @returns The `.type` string at the final node, or undefined if not found.
+ */
+export const resolveNestedType = (
+  object: Record<string, any>,
+  keys: string[],
+  level: number = 0
+): (vsAnyPrimitives | vsAnyRawTypes)["type"] | undefined => {
+  const key = keys[level];
+
+  if (!(key in object)) return;
+
+  const currentValue = object[key];
+
+  // If it's a nested object without a type, go deeper
+  if (isRecord(currentValue) && !currentValue["type"]) {
+    return resolveNestedType(currentValue, keys, level + 1);
+  }
+
+  // If it has a "type" field, return it
+  if (isRecord(currentValue) && currentValue["type"]) {
+    return currentValue.type;
+  }
+};
+
+export const shouldExcludeItem = ({
+  item,
+  idx,
+  arr,
+  nodeId,
+  itemId,
+}: {
+  item: any;
+  idx?: number;
+  arr?: any[];
+  nodeId?: string;
+  itemId?: string;
+}): boolean => {
+  const itemAsString = toCleanHTML(toStringSafe(item));
+
+  // Exclude if empty and is 1st element
+  if (itemAsString.length === 0 && idx === 0) {
+    return true;
+  }
+
+  // Exclude if empty and not the last item
+  if (
+    (arr && idx && itemAsString.length === 0 && idx !== arr.length - 1) ||
+    (!arr && itemAsString.length === 0)
+  ) {
+    return true;
+  }
+
+  const typeCategory = getItemTypeCategory({ item: item, nodeId, itemId });
+
+  // Exclude if not one of the allowed types
+  return !["string", "number", "Strings", "Numbers"].includes(typeCategory);
+};
+
+export const getItemTypeCategory = ({
+  item,
+  nodeId,
+  itemId,
+}: {
+  item: any;
+  nodeId?: string;
+  itemId?: string;
+}): string => {
+  if (isPureVariableOnly(item)) {
+    const resolvedType = resolveInputTypeFromReference({
+      valueToResolve: extractTextFromHTML(item),
+      nodeId: nodeId ?? "",
+      itemId: itemId ?? "",
+    });
+    return getTypeBigCategory(resolvedType) ?? "";
+  }
+  if (typeof item === "boolean") {
+    return "boolean";
+  }
+  if (isReallyNumber(item)) {
+    return "number";
+  }
+  return typeof item;
 };
 
 // --------------------------------------------------------------------------------
@@ -381,6 +516,7 @@ export const insertOrRemoveIdsFromCurrentEditorErrors = ({
       setCurrentEditor({
         editor: currentEditor.editor,
         state: currentEditor.state,
+        executionPlan: currentEditor.executionPlan,
         errors: currentEditor.errors
           ? new Set([...currentEditor.errors, ...set])
           : set,
@@ -394,6 +530,7 @@ export const insertOrRemoveIdsFromCurrentEditorErrors = ({
       setCurrentEditor({
         editor: currentEditor.editor,
         state: currentEditor.state,
+        executionPlan: currentEditor.executionPlan,
         errors: updSet,
       });
 
@@ -404,8 +541,16 @@ export const insertOrRemoveIdsFromCurrentEditorErrors = ({
   }
 };
 
-export const getInvalidInputs = (from: any): string[] => {
-  const errFields: string[] = [];
+export const getInvalidInputs = ({
+  from,
+  nodeId,
+  itemId,
+}: {
+  from: any;
+  nodeId?: string;
+  itemId?: string;
+}): string[] => {
+  const errFields = new Set<string>();
   if (from === undefined) return [];
 
   // OperationItem (from OperationBlock) Validator
@@ -417,12 +562,38 @@ export const getInvalidInputs = (from: any): string[] => {
           toStringSafe(param.value)
         );
         const paramValueType = isPureVariableOnly(paramValueCleaned)
-          ? resolveInputTypeFromReference(paramValueCleaned)
+          ? resolveInputTypeFromReference({
+              valueToResolve: paramValueCleaned,
+              nodeId: nodeId ?? "",
+              itemId: itemId ?? "",
+            })
           : typeof param.value;
         const paramExpectedType = getTypeBigCategory(param.type);
+        const _variablesIncluded = variablesIncluded(paramValueCleaned);
 
-        if (param.isOptional) {
-        } else {
+        // Contains more than one variables
+        if (_variablesIncluded.length > 1) {
+          // INPUTDATA (Variables, Last Node, Last Item) CHECKER
+          if (
+            _variablesIncluded.some(
+              (v) =>
+                resolveInputTypeFromReference({
+                  valueToResolve: v,
+                  nodeId: nodeId ?? "",
+                  itemId: itemId ?? "",
+                }) === undefined
+            )
+          ) {
+            errFields.add(param.paramName);
+          }
+        }
+        // If the param is optional and truly empty: Skip
+        // Otherwise: evaluate()
+        else if (
+          param.isOptional !== true ||
+          (param.isOptional === true &&
+            !isTrulyEmpty(toStringSafe(param.value)))
+        ) {
           // STRINGS CHECKER
           if (paramExpectedType === "Strings") {
             if (
@@ -432,7 +603,7 @@ export const getInvalidInputs = (from: any): string[] => {
             ) {
               // Value is Valid here...
             } else {
-              errFields.push(param.paramName);
+              errFields.add(param.paramName);
             }
           }
 
@@ -446,7 +617,7 @@ export const getInvalidInputs = (from: any): string[] => {
             ) {
               // Value is Valid here...
             } else {
-              errFields.push(param.paramName);
+              errFields.add(param.paramName);
             }
           }
 
@@ -458,7 +629,7 @@ export const getInvalidInputs = (from: any): string[] => {
             ) {
               // Value is Valid here...
             } else {
-              errFields.push(param.paramName);
+              errFields.add(param.paramName);
             }
           }
 
@@ -467,7 +638,7 @@ export const getInvalidInputs = (from: any): string[] => {
             param.type === "primitive/radio" &&
             (typeof param.value !== "string" || param.value.length === 0)
           ) {
-            errFields.push(param.paramName);
+            errFields.add(param.paramName);
           }
 
           // Array CHECKER
@@ -475,10 +646,16 @@ export const getInvalidInputs = (from: any): string[] => {
             param.type === "primitive/array" &&
             (!Array.isArray(param.value) ||
               param.value.some((item, idx, arr) =>
-                shouldExcludeItem(item, idx, arr)
+                shouldExcludeItem({
+                  item,
+                  idx,
+                  arr,
+                  nodeId,
+                  itemId,
+                })
               ))
           ) {
-            errFields.push(param.paramName);
+            errFields.add(param.paramName);
           }
 
           // Record CHECKER
@@ -493,10 +670,10 @@ export const getInvalidInputs = (from: any): string[] => {
 
                 // Either Key or Value is missing
                 const isMissingKey = Object.keys(el).some((key) =>
-                  shouldExcludeItem(key)
+                  shouldExcludeItem({ item: key, itemId, nodeId })
                 );
                 const isMissingValue = Object.values(el).some((val) =>
-                  shouldExcludeItem(val)
+                  shouldExcludeItem({ item: val, itemId, nodeId })
                 );
                 if (!isRecord(el)) return true;
                 if (idx === 0) return isMissingKey || isMissingValue || isEmpty;
@@ -507,7 +684,7 @@ export const getInvalidInputs = (from: any): string[] => {
                 if (!isLast) return isMissingKey || isMissingValue || isEmpty;
               }))
           ) {
-            errFields.push(param.paramName);
+            errFields.add(param.paramName);
           }
 
           // Raw CHECKER: Non-existant in Operations Definition List
@@ -518,10 +695,10 @@ export const getInvalidInputs = (from: any): string[] => {
   // FormFieldItem (from FormBlock) Validator
   if (from instanceof FormFieldItem) {
     if (!from.fieldName || !from.fieldType) {
-      errFields.push("fieldName");
+      errFields.add("fieldName");
     }
     if (typeof from.fieldLabel === "string" && from.fieldLabel.length === 0) {
-      errFields.push("fieldLabel");
+      errFields.add("fieldLabel");
     }
     if (
       from.fieldValueToPickFrom !== undefined &&
@@ -529,14 +706,14 @@ export const getInvalidInputs = (from: any): string[] => {
       from.fieldValueToPickFrom.filter((a) => extractTextFromHTML(a).length > 0)
         .length < 2
     ) {
-      errFields.push("fieldValueToPickFrom");
+      errFields.add("fieldValueToPickFrom");
     }
 
     if (
       from.isHidden !== undefined &&
       toStringSafe(from.fieldValue).length === 0
     ) {
-      errFields.push("fieldValue");
+      errFields.add("fieldValue");
     }
 
     if (
@@ -544,7 +721,7 @@ export const getInvalidInputs = (from: any): string[] => {
       from.fieldValueToPickFrom === undefined &&
       from.isMultiline === undefined
     ) {
-      errFields.push("fieldIsMultiline");
+      errFields.add("fieldIsMultiline");
     }
 
     if (
@@ -552,17 +729,17 @@ export const getInvalidInputs = (from: any): string[] => {
       isAFile(from.fieldType) &&
       from.acceptedFileExtensions === undefined
     ) {
-      errFields.push("fieldAcceptedExtensions");
+      errFields.add("fieldAcceptedExtensions");
     }
   }
 
   // Webhook Block Validator
   if (from instanceof WebhookBlock) {
     if (from.endpointUrl.length < 1) {
-      errFields.push("endpointURL");
+      errFields.add("endpointURL");
     }
     if (!from.httpMethod) {
-      errFields.push("httpMethod");
+      errFields.add("httpMethod");
     }
   }
 
@@ -572,19 +749,19 @@ export const getInvalidInputs = (from: any): string[] => {
     if (
       isValidCronSection(from.configMinute ?? "", "Minute", "main") === false
     ) {
-      errFields.push("configMinuteMain");
+      errFields.add("configMinuteMain");
     }
     if (
       isValidCronSection(from.configMinute ?? "", "Minute", "step") === false
     ) {
-      errFields.push("configMinuteStep");
+      errFields.add("configMinuteStep");
     }
     // Hour
     if (isValidCronSection(from.configHour ?? "", "Hour", "main") === false) {
-      errFields.push("configHourMain");
+      errFields.add("configHourMain");
     }
     if (isValidCronSection(from.configHour ?? "", "Hour", "step") === false) {
-      errFields.push("configHourStep");
+      errFields.add("configHourStep");
     }
 
     // Day Of Month
@@ -595,7 +772,7 @@ export const getInvalidInputs = (from: any): string[] => {
         "main"
       ) === false
     ) {
-      errFields.push("configDayOfMonthMain");
+      errFields.add("configDayOfMonthMain");
     }
     if (
       isValidCronSection(
@@ -604,15 +781,15 @@ export const getInvalidInputs = (from: any): string[] => {
         "step"
       ) === false
     ) {
-      errFields.push("configDayOfMonthStep");
+      errFields.add("configDayOfMonthStep");
     }
 
     // Month
     if (isValidCronSection(from.configMonth ?? "", "Month", "main") === false) {
-      errFields.push("configMonthMain");
+      errFields.add("configMonthMain");
     }
     if (isValidCronSection(from.configMonth ?? "", "Month", "step") === false) {
-      errFields.push("configMonthStep");
+      errFields.add("configMonthStep");
     }
 
     // Day Of Week
@@ -620,13 +797,13 @@ export const getInvalidInputs = (from: any): string[] => {
       isValidCronSection(from.configDayOfWeek ?? "", "Day of Week", "main") ===
       false
     ) {
-      errFields.push("configDayOfWeekMain");
+      errFields.add("configDayOfWeekMain");
     }
     if (
       isValidCronSection(from.configDayOfWeek ?? "", "Day of Week", "step") ===
       false
     ) {
-      errFields.push("configDayOfWeekStep");
+      errFields.add("configDayOfWeekStep");
     }
   }
 
@@ -637,12 +814,12 @@ export const getInvalidInputs = (from: any): string[] => {
     Object.keys(from).includes("varValue")
   ) {
     if (from.varName.length === 0) {
-      errFields.push("varNameField");
+      errFields.add("varNameField");
     }
     if (extractTextFromHTML(toStringSafe(from.varValue)).length === 0) {
-      errFields.push("varValueField");
+      errFields.add("varValueField");
     }
   }
 
-  return errFields;
+  return [...errFields];
 };

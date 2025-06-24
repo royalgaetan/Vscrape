@@ -127,7 +127,10 @@ const SingleCronEditorPanel = ({
 
   const errorChecker = (currentBlock: CronBlock) => {
     // Get Invalid Inputs
-    const errFields = getInvalidInputs(currentBlock);
+    const errFields = getInvalidInputs({
+      from: currentBlock,
+      nodeId: currentBlock.id,
+    });
 
     if (errFields.length > 0) {
       // Add the current "Cron Id" + "Parent Node Id" among CurrentEditor errors list
@@ -157,13 +160,6 @@ const SingleCronEditorPanel = ({
         errorChecker(initialCronBlock);
       } catch (e) {
         console.log("Err", e);
-        toast.error(
-          e instanceof Error ? e.message : "An error occured. Try again.",
-          {
-            position: "bottom-center",
-            richColors: true,
-          }
-        );
       }
     }
   }, []);

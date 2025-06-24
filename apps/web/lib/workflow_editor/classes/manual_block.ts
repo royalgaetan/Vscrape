@@ -16,12 +16,12 @@ export class ManualBlock extends ObservableMixin() {
 
   // --------------------------------------
   // OutputData
-  get outputData(): OutputDataType[] | undefined {
-    return undefined;
+  get outputData(): OutputDataType {
+    return {};
   }
 
   // Input Validation
-  hasValidInputs(): boolean {
+  hasValidInputs(parentNodeId: string): boolean {
     return true;
   }
 

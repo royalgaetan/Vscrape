@@ -97,7 +97,11 @@ const SingleFormFieldItemPanel = ({
 
   const errorChecker = (currentFieldItem: FormFieldItem) => {
     // Get Invalid Inputs
-    const errFields = getInvalidInputs(currentFieldItem);
+    const errFields = getInvalidInputs({
+      from: currentFieldItem,
+      nodeId: initialNode.id,
+      itemId: currentFieldItem.id,
+    });
 
     // If found
     if (errFields.length > 0) {
@@ -138,13 +142,6 @@ const SingleFormFieldItemPanel = ({
         errorChecker(initialFieldItem);
       } catch (e) {
         console.log("Err", e);
-        toast.error(
-          e instanceof Error ? e.message : "An error occured. Try again.",
-          {
-            position: "bottom-center",
-            richColors: true,
-          }
-        );
       }
     }
   }, []);

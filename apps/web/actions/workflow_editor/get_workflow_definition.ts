@@ -1,12 +1,12 @@
+import { Schemes } from "@/app/(protected)/w/[workflowId]/editor/_components/w_editor";
 import { WorkflowDefinition } from "@/lib/workflow_editor/types/w_types";
-import { useWorkflowEditorStore } from "@/stores/workflowStore";
+import { NodeEditor } from "rete";
 
-export const getWorkflowDefinition = (): WorkflowDefinition | undefined => {
-  // Store
-  const editor = useWorkflowEditorStore.getState().currentEditor.editor;
-
-  // End Store
+export const getWorkflowDefinition = (
+  editor?: NodeEditor<Schemes>
+): WorkflowDefinition | undefined => {
   if (!editor) return;
+
   const nodes = editor.getNodes();
   const connections = editor.getConnections();
 

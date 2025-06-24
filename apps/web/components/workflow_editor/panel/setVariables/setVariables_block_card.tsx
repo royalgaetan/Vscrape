@@ -119,8 +119,12 @@ const SetVariablesBlockCard = ({
                   // Error Checker
                   // Get Invalid Inputs
                   const errFields = getInvalidInputs({
-                    varName: localVarName,
-                    varValue: localVarValue,
+                    from: {
+                      varName: localVarName,
+                      varValue: localVarValue,
+                    },
+                    nodeId,
+                    itemId,
                   });
 
                   if (errFields.length > 0) {

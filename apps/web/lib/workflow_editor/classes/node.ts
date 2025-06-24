@@ -120,7 +120,7 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
 
   // Input Validation
   hasValidInputs(): boolean {
-    return this.block?.hasValidInputs() ?? false;
+    return this.block?.hasValidInputs(this.id) ?? false;
   }
 
   duplicate(): VsNode {
@@ -139,8 +139,8 @@ export class VsNode extends ObservableMixin(ClassicPreset.Node) {
   }
 
   // OutputData
-  get outputData(): OutputDataType | undefined {
-    return this._block?.outputData;
+  get outputData(): OutputDataType {
+    return this._block?.outputData ?? {};
   }
 
   // To Object

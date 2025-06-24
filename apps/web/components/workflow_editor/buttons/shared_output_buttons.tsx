@@ -1,3 +1,4 @@
+import { getWorkflowDefinition } from "@/actions/workflow_editor/get_workflow_definition";
 import SimpleTooltip from "@/components/global/simple_tooltip";
 import { getPreviousInputData } from "@/lib/workflow_editor/utils/w_utils";
 import { useWorkflowEditorStore } from "@/stores/workflowStore";
@@ -18,7 +19,11 @@ const SharedOutputButtons = ({
   const previousInputs = getPreviousInputData({
     nodeId,
     itemId: itemId ?? "",
-    currentEditor,
+    executionPlan: currentEditor.executionPlan ?? {},
+    workflowDefinition: getWorkflowDefinition(currentEditor.editor) ?? {
+      connections: [],
+      nodes: [],
+    },
   });
 
   return (
