@@ -1,0 +1,39 @@
+{
+  "name": "@vscrape/editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/layout.tsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/lodash": "^4.17.17",
+    "@vscrape/config": "workspace:*",
+    "@vscrape/engine": "workspace:*",
+    "@vscrape/ui": "workspace:*",
+    "cron-validator": "^1.3.1",
+    "cronstrue": "^2.61.0",
+    "date-fns": "^4.1.0",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.475.0",
+    "next": "^15.3.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-json-view": "^1.21.3",
+    "rete": "^2.0.5",
+    "rete-area-plugin": "^2.1.3",
+    "rete-connection-plugin": "^2.0.5",
+    "rete-react-plugin": "^2.0.7",
+    "sonner": "^2.0.5"
+  },
+  "overrides": {
+    "react-is": "^19.0.0-rc-69d4b800-20241021"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7"
+  }
+}
